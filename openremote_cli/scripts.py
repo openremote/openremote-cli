@@ -12,6 +12,7 @@ def deploy(password):
         "docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:latest")
     shell.execute(
         "wget -nc https://github.com/openremote/openremote/raw/master/swarm/swarm-docker-compose.yml")
+    shell.execute("docker swarm init")
     shell.execute(
         f"SETUP_ADMIN_PASSWORD={password} docker-compose -f swarm-docker-compose.yml -p openremote up -d")
 

@@ -84,19 +84,19 @@ class OpenRemote(object):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
-            if args.action == "up":
+            if args.action == "create":
                 print("Deploying OR... This can take few minutes, please be patient.\n")
                 scripts.deploy(args.password)
-            elif args.action == "down":
+            elif args.action == "remove":
                 print("Removing OR stack...\n")
                 scripts.remove()
         else:
             parser = self.__parser("deploy", "Deploy OpenRemote stack")
-            parser.add_argument(
-                "--action", nargs="?", choices=["up", "down"], help="create/remove OpenRemote stack", required=True)
+            parser.add_argument("-a",
+                "--action", nargs=1, choices=["create", "remove"], help="create/remove OpenRemote stack", required=True)
             parser.add_argument("-p", "--password", type=str,
                                 default="secret", help="Password for admin user")
-            parser.add_argument("-u", type=str, default="secret")
+            #parser.add_argument("-u", type=str, default="secret")
 
     def __parser(self, name, description):
         parser = self.subparsers.add_parser(
