@@ -26,7 +26,6 @@ jobs:
           poetry install
           poetry build
           poetry config repositories.test https://test.pypi.org/legacy/
-          behave
       - name: Publish
         #run: poetry publish -r test -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
         run: poetry publish -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
