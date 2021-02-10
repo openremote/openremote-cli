@@ -1,13 +1,15 @@
+# -*- coding: utf-8 -*-
 from behave import *
-#import sys
-#from mock import patch
+
+# import sys
+# from mock import patch
 import subprocess
 
 
 @given(u'we have docker and docker-compose installed')
 def step_impl(context):
-    subprocess.run(["docker", "-v"])
-    subprocess.run(["docker-compose", "-v"])
+    subprocess.run(['docker', '-v'])
+    subprocess.run(['docker-compose', '-v'])
 
 
 @when(u'we call or-cli')
@@ -23,4 +25,5 @@ def step_impl(context):
 @then(u'deploy OpenRemote stack accordingly')
 def step_impl(context):
     raise NotImplementedError(
-        u'STEP: Then deploy OpenRemote stack accordingly')
+        u'STEP: Then deploy OpenRemote stack accordingly'
+    )

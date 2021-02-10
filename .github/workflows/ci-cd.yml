@@ -23,6 +23,7 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Before publish
         run: |
+          poetry install
           poetry build
           poetry config repositories.test https://test.pypi.org/legacy/
       - name: Publish

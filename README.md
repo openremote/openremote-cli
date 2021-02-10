@@ -54,3 +54,12 @@ TODO
 ### Add assets
 
 ### Add customization
+
+## Develop openremote-cli
+
+Following tools are used:
+- python
+- poetry
+- black
+- git
+- pre-commit
