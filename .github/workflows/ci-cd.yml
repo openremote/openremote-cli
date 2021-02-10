@@ -21,9 +21,11 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - name: Before publish
+      - name: Config
         run: |
-          poetry build
+          pip install poetry-dynamic-versioning
           poetry config repositories.test https://test.pypi.org/legacy/
+      - name: Build
+        run: poetry build
       - name: Publish
         run: poetry publish -r test -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
