@@ -5,9 +5,12 @@
 # import pkg_resources
 
 from openremote_cli import shell
+from openremote_cli import config
 
 
 def deploy(password):
+    if config.DRY_RUN:
+        print("dry-run active! Following commands would be executed:\n")
     shell.execute('docker volume create openremote_deployment-data')
     shell.execute(
         'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:latest'
@@ -22,6 +25,8 @@ def deploy(password):
 
 
 def remove():
+    if config.DRY_RUN:
+        print("--dry-run active! Following commands would be executed:\n")
     shell.execute(
         'wget -nc https://github.com/openremote/openremote/raw/master/swarm/swarm-docker-compose.yml'
     )

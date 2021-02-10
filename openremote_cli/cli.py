@@ -94,12 +94,15 @@ class OpenRemote(object):
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
                 scripts.remove()
+            else:
+                raise ValueError(f"'{args.action}' not implemented")
         else:
+            logging.debug('adding deploy parser')
             parser = self.__parser('deploy', 'Deploy OpenRemote stack')
             parser.add_argument(
                 '-a',
                 '--action',
-                nargs=1,
+                nargs="?",
                 choices=['create', 'remove'],
                 help='create/remove OpenRemote stack',
                 required=True,

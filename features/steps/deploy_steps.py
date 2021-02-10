@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from behave import *
 
-# import sys
-# from mock import patch
 import subprocess
+from openremote_cli.shell import execute
 
 
 @given(u'we have docker and docker-compose installed')
@@ -12,14 +11,32 @@ def step_impl(context):
     subprocess.run(['docker-compose', '-v'])
 
 
-@when(u'we call or-cli')
+@when(u'we call openremote-cli --dry-run deploy --action create')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: When we call or-cli')
+    response_code, output = execute(
+        f"poetry run openremote-cli --dry-run deploy --action create"
+    )
+    context.response = output
 
 
 @then(u'show what will be done')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then show what will be done')
+    assert (
+        "docker volume create openremote_deployment-data" in context.response
+    )
+    assert (
+        "docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:latest"
+        in context.response
+    )
+    assert (
+        "wget -nc https://github.com/openremote/openremote/raw/master/swarm/swarm-docker-compose.yml"
+        in context.response
+    )
+    assert "docker swarm init" in context.response
+    assert (
+        "docker-compose -f swarm-docker-compose.yml -p openremote up -d"
+        in context.response
+    )
 
 
 @then(u'deploy OpenRemote stack accordingly')

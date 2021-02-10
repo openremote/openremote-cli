@@ -8,6 +8,11 @@ from openremote_cli import config
 def execute(args):
     logging.debug(f'executing command `{args}`')
     print(args)
+    try:
+        if config.DRY_RUN:
+            pass
+    except:
+        config.initialize()
     if config.DRY_RUN:
         return 0, 'Invoked using dry run'
     else:

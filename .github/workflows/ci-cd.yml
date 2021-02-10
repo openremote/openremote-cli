@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on: [push]
 
@@ -26,5 +26,8 @@ jobs:
           poetry install
           poetry build
           poetry config repositories.test https://test.pypi.org/legacy/
+      - name: Test
+        run: behave
       - name: Publish
-        run: poetry publish -r test -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
+        #run: poetry publish -r test -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
+        run: poetry publish -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
