@@ -11,6 +11,8 @@
 
 This is Command Line Interface to OpenRemote IoT platform. It's purpose is to reduce friction of using OpenRemote by Do It Yourself users.
 
+It is published as a Python package on [PyPi.org](https://pypi.org/project/openremote-cli/)
+
 ## About OR
 
 OpenRemote is a great real OpenSource IoT platform.
