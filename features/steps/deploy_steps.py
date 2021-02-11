@@ -7,8 +7,10 @@ from openremote_cli.shell import execute
 
 @given(u'we have docker and docker-compose installed')
 def step_impl(context):
-    subprocess.run(['docker', '-v'])
-    subprocess.run(['docker-compose', '-v'])
+    response_code, output = execute('docker -v')
+    assert response_code == 0
+    response_code, output = execute('docker-compose -v')
+    assert response_code == 0
 
 
 @when(u'we call openremote-cli --dry-run deploy --action create')
