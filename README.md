@@ -15,16 +15,11 @@ OpenRemote is a great real OpenSource IoT platform.
 
 ## Usage
 
-To install the CLI
+To install/upgrade the CLI:
 ```bash
-pip install openremote-cli
+python3 -m pip install --upgrade openremote-cli
 or --version
 ```
-
-To update the CLI:
- ```bash
-pip install openremote-cli --upgrade
- ```
 
 ### Deploy local OpenRemote stack
 
