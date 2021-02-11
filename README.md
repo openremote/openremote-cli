@@ -66,11 +66,10 @@ TODO
 ## Develop openremote-cli
 
 Following tools are used:
-- python
-- poetry
-- black
-- git
-- pre-commit
+- python (pip, poetry, black, PyPI.org)
+- git (pre-commit, actions)
+- docker (docker-compose, swarm)
+- AWS (CloudFormation)
 - make
 
 ### Adding feature
