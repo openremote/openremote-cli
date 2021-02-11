@@ -1,4 +1,4 @@
-all: lint test bump
+all: lint test
 
 test:
 	behave
