@@ -26,6 +26,19 @@ jobs:
           poetry install
           poetry build
           poetry config repositories.test https://test.pypi.org/legacy/
-      - name: Publish
+      - name: Test
+        run: |
+          poetry --version
+          poetry version
+          poetry run behave
+      - uses: dorny/paths-filter@v2
+        id: Publish
+        with:
+          filters: |
+            toml:
+              - 'pyproject.toml'
+
+        # run only if pyproject.toml was changed
+        if: steps.changes.outputs.src == 'true'
         #run: poetry publish -r test -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
         run: poetry publish -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
