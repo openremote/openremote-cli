@@ -1,6 +1,7 @@
-![CI](https://github.com/openremote/openremote-cli/workflows/CI/badge.svg)
+![CI/CD](https://github.com/openremote/openremote-cli/workflows/CI/CD/badge.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![GitHub license](https://img.shields.io/github/license/openremote/openremote-cli.svg)](https://github.com/openremote/openremote-cli/blob/main/LICENSE.txt)
+[![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/Naereen/badges/)
 
 
 # OpenRemote CLI
