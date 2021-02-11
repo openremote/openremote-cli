@@ -99,14 +99,12 @@ When the feature is implemented it can be checked with behave:
 Feature: deploy # features/deploy.feature:1
 
   Scenario: deploy to localhost                                  # features/deploy.feature:3
-    Given we have docker and docker-compose installed            # features/steps/deploy_steps.py:8
-Docker version 19.03.13, build 4484c46d9d
-    Given we have docker and docker-compose installed            # features/steps/deploy_steps.py:8 0.499s
-    When we call openremote-cli --dry-run deploy --action create # features/steps/deploy_steps.py:14 0.593s
-    Then show what will be done                                  # features/steps/deploy_steps.py:22 0.000s
+    Given we have docker and docker-compose installed            # features/steps/deploy_steps.py:8 0.453s
+    When we call openremote-cli --dry-run deploy --action create # features/steps/deploy_steps.py:16 0.591s
+    Then show what will be done                                  # features/steps/deploy_steps.py:24 0.000s
 
 1 feature passed, 0 failed, 0 skipped
 1 scenario passed, 0 failed, 0 skipped
 3 steps passed, 0 failed, 0 skipped, 0 undefined
-Took 0m1.092s
+Took 0m1.044s
 ```
