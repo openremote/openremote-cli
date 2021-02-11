@@ -1,4 +1,4 @@
-all: lint test versionbump
+all: lint test bump
 
 test:
 	behave
@@ -6,5 +6,5 @@ test:
 lint:
 	pre-commit run --all-files
 
-versionbump:
+bump:
 	poetry version patch
