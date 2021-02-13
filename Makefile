@@ -1,10 +1,10 @@
 all: lint test
 
 test:
-	behave
+	poetry run behave
 
 lint:
-	pre-commit run --all-files
+	poetry run pre-commit run --all-files
 
 bump:
 	poetry version patch

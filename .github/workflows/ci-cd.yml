@@ -26,11 +26,11 @@ jobs:
           poetry install
           poetry build
           poetry config repositories.test https://test.pypi.org/legacy/
-      - name: Behave test
+      - name: QA
         run: |
           poetry --version
           poetry version
-          poetry run behave
+          make test lint
       # Because we can only publish new versions look for change of it
       - uses: dorny/paths-filter@v2
         id: changes
