@@ -98,14 +98,17 @@ class OpenRemote(object):
                 raise ValueError(f"'{args.action}' not implemented")
         else:
             logging.debug('adding deploy parser')
-            parser = self.__parser('deploy', 'Deploy OpenRemote stack')
+            parser = self.__parser(
+                'deploy',
+                'Deploy OpenRemote stack. By default create on localhost.',
+            )
             parser.add_argument(
                 '-a',
                 '--action',
                 nargs="?",
                 choices=['create', 'remove'],
                 help='create/remove OpenRemote stack',
-                required=True,
+                default='create',
             )
             parser.add_argument(
                 '-p',

@@ -41,8 +41,16 @@ def step_impl(context):
     )
 
 
-@then(u'deploy OpenRemote stack accordingly')
+# @then(u'deploy OpenRemote stack accordingly')
+# def step_impl(context):
+#     raise NotImplementedError(
+#         u'STEP: Then deploy OpenRemote stack accordingly'
+#     )
+
+
+@when(u'we call or --dry-run deploy')
 def step_impl(context):
-    raise NotImplementedError(
-        u'STEP: Then deploy OpenRemote stack accordingly'
+    response_code, output = execute(
+        f"poetry run openremote-cli --dry-run deploy"
     )
+    context.response = output
