@@ -31,6 +31,9 @@ or --version
 or deploy
 ```
 
+When it finishes you should be able to open https://localhost and login with admin:secret to the manager. Depending on your machine it can take few minutes to
+start or services (usually less than 10 minutes). If it does not work yet, check it with ```docker ps``` to see if all services are in healthy or starting stage.
+
 ### Remove local OpenRemote stack
 
 ```bash
