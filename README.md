@@ -28,7 +28,7 @@ or --version
 ### Deploy local OpenRemote stack
 
 ```bash
-or deploy --action create
+or deploy
 ```
 
 ### Remove local OpenRemote stack
