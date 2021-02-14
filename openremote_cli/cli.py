@@ -17,7 +17,7 @@ class OpenRemote(object):
 
         self.base_subparser = parser
         self.base_subparser.add_argument(
-            '-v',
+            '-V',
             '--version',
             action='version',
             version=f'%(prog)s {package_version()}',
@@ -27,6 +27,13 @@ class OpenRemote(object):
             '--dry-run',
             action='store_true',
             help='showing effects without actual run and exit',
+        )
+        parser.add_argument(
+            "-v",
+            "--verbosity",
+            action="count",
+            default=1,
+            help="increase output verbosity",
         )
 
         # Create subparsers
@@ -38,8 +45,17 @@ class OpenRemote(object):
                 getattr(self, attr)([])
 
         args, unknown = self.base_subparser.parse_known_args(arguments)
+
+        level = {
+            1: logging.ERROR,
+            2: logging.WARNING,
+            3: logging.INFO,
+            4: logging.DEBUG,
+        }.get(args.verbosity, logging.DEBUG)
+        logging.getLogger().setLevel(level)
+
         if args.dry_run is True:
-            logging.debug('Enabling dry run mode')
+            logging.warning('Enabling dry run mode')
             config.DRY_RUN = True
 
         logging.debug(args)
@@ -140,4 +156,4 @@ def main():
 
 # Support invoking the script directly from source
 if __name__ == '__main__':
-    main()
+    exit(main())
