@@ -66,8 +66,11 @@ class OpenRemote(object):
             self.help(['--help'])
         else:
             command = args.command
+            logging.debug(f"command: {command}")
             # handle undefined command
-            if not hasattr(self, command):
+            if not command:
+                self.help(arguments)
+            elif not hasattr(self, command):
                 if command[0] != '-':
                     print('Unknown command ' + command)
                 self.help(arguments)

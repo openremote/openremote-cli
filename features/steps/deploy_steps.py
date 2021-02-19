@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 from behave import *
 
-import subprocess
-from openremote_cli.shell import execute
 
-
-@given(u'we have docker and docker-compose installed')
+@given(u'we have docker and docker-compose and wget installed')
 def step_impl(context):
-    response_code, output = execute('docker -v')
+    response_code, output = context.execute('docker -v')
     assert response_code == 0
-    response_code, output = execute('docker-compose -v')
+    response_code, output = context.execute('docker-compose -v')
+    assert response_code == 0
+    response_code, output = context.execute('wget -V')
     assert response_code == 0
 
 
 @when(u'we call openremote-cli --dry-run deploy --action create')
 def step_impl(context):
-    response_code, output = execute(
+    response_code, output = context.execute(
         f"poetry run openremote-cli --dry-run deploy --action create"
     )
     context.response = output
@@ -50,7 +49,7 @@ def step_impl(context):
 
 @when(u'we call or --dry-run deploy')
 def step_impl(context):
-    response_code, output = execute(
+    response_code, output = context.execute(
         f"poetry run openremote-cli --dry-run deploy"
     )
     context.response = output
