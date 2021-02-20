@@ -22,11 +22,11 @@ def deploy(password):
     shell.execute('docker swarm init')
     if password != 'secret':
         shell.execute(
-            f'SETUP_ADMIN_PASSWORD={password} docker-compose -f swarm-docker-compose.yml -p openremote up -d'
+            f'SETUP_ADMIN_PASSWORD={password} docker stack deploy -c swarm-docker-compose.yml openremote'
         )
     else:
         shell.execute(
-            f'docker-compose -f swarm-docker-compose.yml -p openremote up -d'
+            f'docker stack deploy -c swarm-docker-compose.yml openremote'
         )
 
 
@@ -36,6 +36,5 @@ def remove():
     shell.execute(
         'wget -nc https://github.com/openremote/openremote/raw/master/swarm/swarm-docker-compose.yml'
     )
-    shell.execute(
-        f'docker-compose -f swarm-docker-compose.yml -p openremote down'
-    )
+    shell.execute(f'docker stack rm openremote')
+    shell.execute(f'rm -f swarm-docker-compose.yml')
