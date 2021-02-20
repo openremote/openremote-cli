@@ -15,26 +15,7 @@ class OpenRemote(object):
     def __init__(self, arguments):
         parser = argparse.ArgumentParser(prog='openremote-cli')
 
-        self.base_subparser = parser
-        self.base_subparser.add_argument(
-            '-V',
-            '--version',
-            action='version',
-            version=f'%(prog)s {package_version()}',
-        )
-        self.base_subparser.add_argument(
-            '-d',
-            '--dry-run',
-            action='store_true',
-            help='showing effects without actual run and exit',
-        )
-        parser.add_argument(
-            "-v",
-            "--verbosity",
-            action="count",
-            default=1,
-            help="increase output verbosity",
-        )
+        self.base_subparser = self._add_std_arguments(parser)
 
         # Create subparsers
         self.subparsers = parser.add_subparsers(
@@ -140,10 +121,29 @@ class OpenRemote(object):
 
     def __parser(self, name, description):
         parser = self.subparsers.add_parser(
-            name=name,
-            # parents=[self.base_subparser],
-            description=description,
-            help=description,
+            name=name, description=description, help=description
+        )
+        return self._add_std_arguments(parser)
+
+    def _add_std_arguments(self, parser):
+        parser.add_argument(
+            '-V',
+            '--version',
+            action='version',
+            version=f'%(prog)s {package_version()}',
+        )
+        parser.add_argument(
+            '-d',
+            '--dry-run',
+            action='store_true',
+            help='showing effects without actual run and exit',
+        )
+        parser.add_argument(
+            "-v",
+            "--verbosity",
+            action="count",
+            default=1,
+            help="increase output verbosity",
         )
         return parser
 
