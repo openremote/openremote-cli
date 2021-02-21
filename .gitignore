@@ -1,5 +1,5 @@
 swarm-docker-compose.yml
-
+python-flask-server-generated/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

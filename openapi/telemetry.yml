@@ -1,0 +1,81 @@
+# Editor https://editor.swagger.io
+openapi: 3.0.1
+info:
+  title: KlickBrick CLI Telemetry
+  description: 'This define the contract for the server which handles the CLI telemetry metrics'
+  version: 1.0.0
+servers:
+  - url: https://my.api.com
+tags:
+  - name: Telemetry
+paths:
+  /metrics:
+    post:
+      tags:
+        - metrics
+      summary: Add a new CLI metric
+      operationId: app.post_metrics
+      requestBody:
+        description: Metric object that describes a users activity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metrics'
+        required: true
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    Metrics:
+      type: object
+      properties:
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Metric'
+    Metric:
+      required:
+        - command
+        - osPlatform
+        - userId
+      type: object
+      properties:
+        userId:
+          type: string
+          example: Ole.Christiansen@klickbrick.com
+        osPlatform:
+          type: string
+          example: Mac OS X
+        osVersion:
+          type: string
+          example: 10.15.6
+        pythonVersion:
+          type: string
+          example: 3.8.0
+        command:
+          type: object
+          $ref: '#/components/schemas/Command'
+    Command:
+      required:
+        - exitReason
+        - exitCode
+        - duration
+        - input
+      type: object
+      properties:
+        input:
+          type: string
+          example: init --name klickbrick-api --path ~/Working/cli-project
+        exitReason:
+          type: string
+          example: Missing Required Argument
+        exitCode:
+          type: string
+          example: 0
+        duration:
+          type: string
+          example: 0m0.001s
+        timestamp:
+          type: string
+          example: 01/03/2021, 16:26:54

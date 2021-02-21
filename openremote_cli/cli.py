@@ -4,11 +4,17 @@ import sys
 import pkg_resources
 import logging
 import inspect
+import os
+import platform
+from datetime import datetime
+import requests
 
 from openremote_cli import config
 from openremote_cli import scripts
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+# TODO make telemetry user configurable
+ENABLE_TELEMETRY = True
 
 
 class OpenRemote(object):
@@ -27,13 +33,13 @@ class OpenRemote(object):
 
         args, unknown = self.base_subparser.parse_known_args(arguments)
 
-        level = {
+        config.LEVEL = {
             1: logging.ERROR,
             2: logging.WARNING,
             3: logging.INFO,
             4: logging.DEBUG,
         }.get(args.verbosity, logging.DEBUG)
-        logging.getLogger().setLevel(level)
+        logging.getLogger().setLevel(config.LEVEL)
 
         if args.dry_run is True:
             logging.warning('Enabling dry run mode')
@@ -41,6 +47,9 @@ class OpenRemote(object):
 
         logging.debug(args)
         logging.debug(unknown)
+
+        if ENABLE_TELEMETRY:
+            send_metric(arguments)
 
         # handle no arguments
         if len(arguments) == 0:
@@ -94,6 +103,9 @@ class OpenRemote(object):
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
                 scripts.remove()
+            elif args.action == 'clean':
+                print('Cleaning OR resources...\n')
+                scripts.clean()
             else:
                 raise ValueError(f"'{args.action}' not implemented")
         else:
@@ -106,8 +118,8 @@ class OpenRemote(object):
                 '-a',
                 '--action',
                 nargs="?",
-                choices=['create', 'remove'],
-                help='create/remove OpenRemote stack',
+                choices=['create', 'remove', 'clean'],
+                help='create/remove/clean OpenRemote stack',
                 default='create',
             )
             parser.add_argument(
@@ -127,12 +139,6 @@ class OpenRemote(object):
 
     def _add_std_arguments(self, parser):
         parser.add_argument(
-            '-V',
-            '--version',
-            action='version',
-            version=f'%(prog)s {package_version()}',
-        )
-        parser.add_argument(
             '-d',
             '--dry-run',
             action='store_true',
@@ -146,6 +152,32 @@ class OpenRemote(object):
             help="increase output verbosity",
         )
         return parser
+
+
+def send_metric(cli_input):
+    # TODO capture exit reason and duration
+    payload = {
+        "metrics": [
+            {
+                "userId": os.getlogin(),
+                "osPlatform": platform.system(),
+                "osVersion": platform.version(),
+                "pythonVersion": sys.version,
+                "command": {
+                    "input": " ".join(cli_input),
+                    "exitReason": "Not Implemented",
+                    "exitCode": "Not Implemented",
+                    "duration": "Not Implemented",
+                    "timestamp": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+                },
+            }
+        ]
+    }
+
+    try:
+        requests.post(config.TELEMETRY_URL, json=payload, timeout=2000)
+    except requests.exceptions.RequestException as exception:
+        logging.debug(str(exception))
 
 
 def package_version():
