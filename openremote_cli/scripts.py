@@ -31,26 +31,22 @@ def deploy(password):
         shell.execute(
             f'docker stack deploy -c swarm-docker-compose.yml openremote'
         )
+    shell.execute(f'rm -f swarm-docker-compose.yml')
 
 
 def remove():
     if config.DRY_RUN:
         print("--dry-run active! Following commands would be executed:\n")
-    shell.execute(
-        'wget -nc https://github.com/openremote/openremote/raw/master/swarm/swarm-docker-compose.yml'
-    )
     shell.execute(f'docker stack rm openremote')
-    shell.execute(f'rm -f swarm-docker-compose.yml')
 
 
 def clean():
     if config.DRY_RUN:
-        print("--dry-run active! Following commands would be executed:\n")
+        print("--dry-run active!! Following commands would be executed:\n")
     shell.execute(
-        'wget -nc https://github.com/openremote/openremote/raw/master/swarm/swarm-docker-compose.yml'
+        'docker volume rm --force openremote_deployment-data openremote_postgresql-data openremote_proxy-data'
     )
-    shell.execute(f'docker stack rm openremote')
-    logging.error(
-        'TODO: remove images. Now do it manually with docker rmi ...'
+    shell.execute(
+        'docker rmi openremote/manager-swarm openremote/deployment openremote/keycloak openremote/postgresql openremote/proxy '
     )
-    shell.execute(f'rm -f swarm-docker-compose.yml')
+    shell.execute('docker system prune --force')
