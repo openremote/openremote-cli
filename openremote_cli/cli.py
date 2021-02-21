@@ -149,15 +149,21 @@ class OpenRemote(object):
 
 def send_metric(cli_input):
     # TODO capture exit reason and duration
+    try:
+        user_id = os.getlogin()
+        input_cmd = sys.argv[0] + " " + " ".join(cli_input)
+    except:
+        # We don't have login in github workflow
+        return
     payload = {
         "metrics": [
             {
-                "userId": os.getlogin(),
+                "userId": user_id,
                 "osPlatform": platform.system(),
                 "osVersion": platform.version(),
                 "pythonVersion": sys.version,
                 "command": {
-                    "input": " ".join(cli_input),
+                    "input": input_cmd,
                     "exitReason": "Not Implemented",
                     "exitCode": "Not Implemented",
                     "duration": "Not Implemented",
