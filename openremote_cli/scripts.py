@@ -11,7 +11,7 @@ from openremote_cli import config
 
 def deploy(password):
     if config.DRY_RUN:
-        print("dry-run active! Following commands would be executed:\n")
+        print("dry-run active!")
     shell.execute('docker volume create openremote_deployment-data')
     shell.execute('docker volume rm openremote_postgresql-data')
     shell.execute(
@@ -36,13 +36,13 @@ def deploy(password):
 
 def remove():
     if config.DRY_RUN:
-        print("--dry-run active! Following commands would be executed:\n")
+        print("--dry-run active!")
     shell.execute(f'docker stack rm openremote')
 
 
 def clean():
     if config.DRY_RUN:
-        print("--dry-run active!! Following commands would be executed:\n")
+        print("--dry-run active!")
     shell.execute(
         'docker volume rm --force openremote_deployment-data openremote_postgresql-data openremote_proxy-data'
     )

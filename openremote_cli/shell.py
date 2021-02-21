@@ -6,8 +6,7 @@ from openremote_cli import config
 
 
 def execute(args):
-    logging.debug(f'executing command `{args}`')
-    print(args)
+    logging.debug(f'executing command:\n\n\t{args}\n')
     try:
         if config.DRY_RUN:
             pass

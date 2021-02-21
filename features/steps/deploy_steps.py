@@ -15,8 +15,9 @@ def step_impl(context):
 @when(u'we call openremote-cli --dry-run deploy --action create')
 def step_impl(context):
     response_code, output = context.execute(
-        f"poetry run openremote-cli --dry-run deploy --action create -d"
+        f"poetry run openremote-cli --dry-run deploy --action create -d -vvv"
     )
+    print(output)
     context.response = output
 
 
@@ -33,7 +34,6 @@ def step_impl(context):
         "wget -nc https://github.com/openremote/openremote/raw/master/swarm/swarm-docker-compose.yml"
         in context.response
     )
-    assert "docker swarm init" in context.response
     assert "docker stack deploy" in context.response
 
 
@@ -48,7 +48,7 @@ def step_impl(context):
 @when(u'call openremote-cli deploy --action remove --dry-run')
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run openremote-cli deploy --action remove --dry-run'
+        'poetry run openremote-cli deploy --action remove --dry-run -vvv'
     )
 
 
@@ -60,7 +60,7 @@ def step_impl(context):
 @when(u'call openremote-cli deploy --action clean --dry-run')
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run openremote-cli deploy --action clean --dry-run'
+        'poetry run openremote-cli deploy --action clean --dry-run -vvv'
     )
 
 
