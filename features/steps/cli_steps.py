@@ -1,13 +1,26 @@
 from behave import *
 
 
-@when(u'calling openremote-cli -v')
+@when(u'calling openremote-cli -V')
 def step_impl(context):
-    response_code, output = context.execute(f"poetry run openremote-cli -v")
-    context.response = output
+    context.code, context.response = context.execute(
+        f"poetry run openremote-cli -V"
+    )
 
 
-@then(u'should be the same as openremote-cli')
+@then(u'should show version')
+def step_impl(context):
+    assert "openremote-cli version: " in context.response
+
+
+@when(u'calling openremote-cli without arguments')
+def step_impl(context):
+    context.code, context.response = context.execute(
+        f"poetry run openremote-cli"
+    )
+
+
+@then(u'it should show help')
 def step_impl(context):
     assert "usage: openremote-cli" in context.response
     assert "error: unrecognized arguments" not in context.response
@@ -15,10 +28,9 @@ def step_impl(context):
 
 @when(u'calling openremote-cil deploy -d')
 def step_impl(context):
-    response_code, output = context.execute(
+    context.code, context.response = context.execute(
         f"poetry run openremote-cli deploy -d"
     )
-    context.response = output
 
 
 @then(u'should be the same as openremote-cli --dry-run deploy')

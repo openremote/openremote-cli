@@ -75,21 +75,8 @@ class OpenRemote(object):
         if len(arguments) > 0:
             self.base_subparser.parse_args(['-h'])
         else:
-            self.__parser('help', 'CLI help')
-
-    def hello(self, arguments=[]):
-        if len(arguments) > 0:
-            args = self.base_subparser.parse_args(arguments)
-            print('Hello ' + args.name)
-        else:
-            parser = self.__parser('hello', 'Sample command')
-            parser.add_argument(
-                '-n',
-                '--name',
-                type=str,
-                default='World',
-                help='Optional flag to be more friendly',
-            )
+            pass
+            # self.__parser('help', 'CLI help')
 
     def deploy(self, arguments=[]):
         if len(arguments) > 0:
@@ -138,6 +125,12 @@ class OpenRemote(object):
         return self._add_std_arguments(parser)
 
     def _add_std_arguments(self, parser):
+        parser.add_argument(
+            '-V',
+            '--version',
+            action='version',
+            version=f'%(prog)s version: {package_version()}',
+        )
         parser.add_argument(
             '-d',
             '--dry-run',
