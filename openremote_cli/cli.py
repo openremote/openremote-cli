@@ -34,22 +34,24 @@ class OpenRemote(object):
         args, unknown = self.base_subparser.parse_known_args(arguments)
 
         config.LEVEL = {
-            1: logging.ERROR,
-            2: logging.WARNING,
-            3: logging.INFO,
-            4: logging.DEBUG,
+            0: logging.ERROR,
+            1: logging.WARNING,
+            2: logging.INFO,
+            3: logging.DEBUG,
         }.get(args.verbosity, logging.DEBUG)
         logging.getLogger().setLevel(config.LEVEL)
 
+        if ENABLE_TELEMETRY:
+            send_metric(arguments)
+
         if args.dry_run is True:
-            logging.warning('Enabling dry run mode')
+            logging.info('Enabling dry run mode')
             config.DRY_RUN = True
+        if args.verbosity > 0:
+            config.VERBOSE = True
 
         logging.debug(args)
         logging.debug(unknown)
-
-        if ENABLE_TELEMETRY:
-            send_metric(arguments)
 
         # handle no arguments
         if len(arguments) == 0:
@@ -141,7 +143,7 @@ class OpenRemote(object):
             "-v",
             "--verbosity",
             action="count",
-            default=1,
+            default=0,
             help="increase output verbosity",
         )
         return parser
@@ -149,12 +151,12 @@ class OpenRemote(object):
 
 def send_metric(cli_input):
     # TODO capture exit reason and duration
+    input_cmd = sys.argv[0] + " " + " ".join(cli_input)
     try:
         user_id = os.getlogin()
-        input_cmd = sys.argv[0] + " " + " ".join(cli_input)
     except:
         # We don't have login in github workflow
-        return
+        user_id = 'No login'
     payload = {
         "metrics": [
             {

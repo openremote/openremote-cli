@@ -1,3 +1,5 @@
+node_modules/
+.serverless/
 swarm-docker-compose.yml
 python-flask-server-generated/
 # Byte-compiled / optimized / DLL files

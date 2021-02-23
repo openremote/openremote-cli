@@ -12,6 +12,8 @@ def execute(args):
             pass
     except:
         config.initialize()
+    if config.VERBOSE:
+        print(args)
     if config.DRY_RUN:
         return 0, 'Invoked using dry run'
     else:
