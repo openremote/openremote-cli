@@ -10,8 +10,8 @@ const { RemoteCredentials } = require('aws-sdk');
 
 module.exports.metrics = async event => {
   console.log(JSON.stringify(event))
-  try{
-    let body = JSON.parse(event.body);
+  try {
+    var body = JSON.parse(event.body);
     // TODO validate body
 
     let record = {}
@@ -31,9 +31,10 @@ module.exports.metrics = async event => {
       .promise()
       .then(d => console.log(process.env.DDB_TELEMETRY, " inserted ", JSON.stringify(record)))
       .catch(e => { throw (e) });
-  }
-  finally{
     return okResponse()
+  }
+  catch (err) {
+    return errCatching(body);
   }
 }
 
@@ -70,8 +71,11 @@ module.exports.geoip = async event => {
         await docClient.update({
           TableName: tableName,
           Key: keys,
-          UpdateExpression: 'set ip = :val',
-          ExpressionAttributeValues: { ':val': jsonIp }
+          UpdateExpression: 'set ip = :val, market = :country',
+          ExpressionAttributeValues: {
+            ':val': jsonIp,
+            ':country': jsonIp.country_code
+          }
         })
           .promise()
           .then(console.log("IP record updated to", jsonIp))

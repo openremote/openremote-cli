@@ -38,8 +38,14 @@ jobs:
           filters: |
             toml:
               - 'pyproject.toml'
+            openapi:
+              - 'openapi/**'
       - name: Publish to PyPI
         # run only if pyproject.toml was changed
         if: steps.changes.outputs.toml == 'true'
         #run: poetry publish -r test -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
         run: poetry publish -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
+      - name: Publish to AWS
+        # run only if something in openapi folder is changed
+        if: steps.changes.outputs.openapi == 'true'
+        run: echo TODO
