@@ -13,8 +13,6 @@ from openremote_cli import config
 from openremote_cli import scripts
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-# TODO make telemetry user configurable
-ENABLE_TELEMETRY = True
 
 
 class OpenRemote(object):
@@ -41,7 +39,7 @@ class OpenRemote(object):
         }.get(args.verbosity, logging.DEBUG)
         logging.getLogger().setLevel(config.LEVEL)
 
-        if ENABLE_TELEMETRY:
+        if not args.no_telemetry:
             send_metric(arguments)
 
         if args.dry_run is True:
@@ -51,7 +49,6 @@ class OpenRemote(object):
             config.VERBOSE = True
 
         logging.debug(args)
-        logging.debug(unknown)
 
         # handle no arguments
         if len(arguments) == 0:
@@ -145,6 +142,11 @@ class OpenRemote(object):
             action="count",
             default=0,
             help="increase output verbosity",
+        )
+        parser.add_argument(
+            "--no-telemetry",
+            action='store_true',
+            help="Don't send usage data to server",
         )
         return parser
 

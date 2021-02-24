@@ -15,7 +15,7 @@ def step_impl(context):
 @when(u'we call openremote-cli --dry-run deploy --action create')
 def step_impl(context):
     response_code, output = context.execute(
-        f"poetry run openremote-cli --dry-run deploy --action create -d -vvv"
+        f"poetry run openremote-cli --dry-run deploy --action create -d -vvv --no-telemetry"
     )
     print(output)
     context.response = output
@@ -40,7 +40,7 @@ def step_impl(context):
 @when(u'we call or --dry-run deploy')
 def step_impl(context):
     response_code, output = context.execute(
-        f"poetry run openremote-cli deploy -d -vvv"
+        f"poetry run openremote-cli deploy -d -vvv --no-telemetry"
     )
     context.response = output
 
@@ -48,7 +48,7 @@ def step_impl(context):
 @when(u'call openremote-cli deploy --action remove --dry-run')
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run openremote-cli deploy --action remove --dry-run -vvv'
+        'poetry run openremote-cli deploy --action remove --dry-run -vvv --no-telemetry'
     )
 
 
@@ -60,7 +60,7 @@ def step_impl(context):
 @when(u'call openremote-cli deploy --action clean --dry-run')
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run openremote-cli deploy --action clean --dry-run -vvv'
+        'poetry run openremote-cli deploy --action clean --dry-run -vvv --no-telemetry'
     )
 
 
