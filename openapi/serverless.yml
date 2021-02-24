@@ -1,0 +1,98 @@
+service: openremote-cli
+
+custom:
+  definition: telemetry.yml
+  telemetryTableName: openremote-cli-telemetry
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  profile: developers
+  tracing:
+    apiGateway: true
+    lambda: true
+  stage: dev
+  apiGateway:
+    usagePlan:
+      quota:
+        limit: 500
+        offset: 2
+        period: MONTH
+      throttle:
+        burstLimit: 20
+        rateLimit: 10
+    shouldStartNameWithService: true
+  environment:
+    DDB_TELEMETRY: ${self:custom.telemetryTableName}
+  iam:
+    role:
+      statements:
+    # RoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+        Resource:
+          - "Fn::GetAtt": ["telemetryTable", "Arn"]
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: "*"
+  logRetentionInDays: 14
+  lambdaHashingVersion: 20201221
+
+package:
+  individually: true
+  excludeDevDependencies: true
+  exclude:
+    - ‘*/**’
+    - ‘**’
+
+resources:
+  Resources:
+    telemetryTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.telemetryTableName}
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+
+functions:
+  metrics:
+    handler: handlers/handler.metrics
+    description: Receives metrics from openremote-cli
+    events:
+      - http:
+          path: metrics
+          method: post
+  geoIp:
+    handler: handlers/handler.geoip
+    description: Fetch data about IP from https://freegeoip.app/
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [telemetryTable, StreamArn]
+
+# plugins:
+#   - serverless-openapi-plugin
