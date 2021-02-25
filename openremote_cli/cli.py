@@ -9,6 +9,11 @@ import platform
 from datetime import datetime
 import requests
 
+# For checking version
+# TODO check if urllib can be replaced with requests or other way around
+import urllib.request
+import json
+
 from openremote_cli import config
 from openremote_cli import scripts
 
@@ -236,7 +241,21 @@ def package_version():
     return pkg_resources.get_distribution('openremote_cli').version
 
 
+def isLatestVersion():
+    # Check pypi for the latest version number
+    contents = urllib.request.urlopen(
+        'https://pypi.org/pypi/openremote-cli/json'
+    ).read()
+    data = json.loads(contents)
+    latest_version = data['info']['version']
+    if latest_version != package_version():
+        print(
+            f'your version ({package_version()}) < PyPI version ({latest_version}). Consider\npip install --upgrade openremote-cli\n'
+        )
+
+
 def main():
+    isLatestVersion()
     config.initialize()
     OpenRemote(sys.argv[1:])
 
