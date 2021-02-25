@@ -1,11 +1,11 @@
 # Editor https://editor.swagger.io
 openapi: 3.0.1
 info:
-  title: KlickBrick CLI Telemetry
+  title: OpenRemote CLI
   description: 'This define the contract for the server which handles the CLI telemetry metrics'
   version: 1.0.0
 servers:
-  - url: https://my.api.com
+  - url: https://cli.developers.openremote.io
 tags:
   - name: Telemetry
 paths:
@@ -37,22 +37,26 @@ components:
     Metric:
       required:
         - command
+        - cliVersion
         - osPlatform
         - userId
       type: object
       properties:
         userId:
           type: string
-          example: Ole.Christiansen@klickbrick.com
+          example: me@privacy.net
+        cliVersion:
+          type: string
+          example: 0.1.17
         osPlatform:
           type: string
           example: Mac OS X
         osVersion:
           type: string
-          example: 10.15.6
+          example: 10.15.7
         pythonVersion:
           type: string
-          example: 3.8.0
+          example: 3.8.1
         command:
           type: object
           $ref: '#/components/schemas/Command'
@@ -66,7 +70,7 @@ components:
       properties:
         input:
           type: string
-          example: init --name klickbrick-api --path ~/Working/cli-project
+          example: deploy --action create -vvv --dry-run
         exitReason:
           type: string
           example: Missing Required Argument

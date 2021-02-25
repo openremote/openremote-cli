@@ -10,7 +10,7 @@ def step_impl(context):
 
 @then(u'should show version')
 def step_impl(context):
-    assert "openremote-cli version: " in context.response
+    assert "openremote-cli/" in context.response
 
 
 @when(u'calling openremote-cli without arguments')

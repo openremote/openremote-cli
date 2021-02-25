@@ -64,9 +64,14 @@ class OpenRemote(object):
                     print('Unknown command ' + command)
                 self.help(arguments)
             else:
+                if config.DRY_RUN:
+                    print("--dry-run active!")
+                if not config.VERBOSE:
+                    print("To see commands use -v switch\n")
                 # use dispatch pattern to invoke method with same name so it's
                 # easy to add new subcommands
-                logging.debug('dispatching ' + command)
+                logging.debug('dispatching ' + command + f'({arguments})')
+                # logging.debug(args)
                 getattr(self, command)(arguments)
 
     # Basic command run without arguments adds parser
@@ -75,7 +80,51 @@ class OpenRemote(object):
             self.base_subparser.parse_args(['-h'])
         else:
             pass
-            # self.__parser('help', 'CLI help')
+            # parser = self.__parser('help', 'CLI help')
+
+    def map(self, arguments=[]):
+        if len(arguments) > 0:
+            args = self.base_subparser.parse_args(arguments)
+            logging.debug(args)
+            if args.action == 'list':
+                scripts.map_list()
+            elif args.action == 'configure':
+                scripts.map_configure(args.id, args.secret)
+            elif args.action == 'upload':
+                scripts.map_upload(args.f)
+            elif args.action == 'download':
+                scripts.map_download(args.f)
+            elif args.action == 'delete':
+                scripts.map_delete(args.f)
+            else:
+                raise ValueError(f"'{args.action}' not implemented")
+        else:
+            parser = self.__parser('map', 'map storage/retrive service')
+            parser.add_argument(
+                '-a',
+                '--action',
+                nargs="?",
+                choices=['configure', 'list', 'upload', 'download', 'delete'],
+                help='configure/list/upload/download/delete map from S3',
+                required=True,
+                const='list',
+            )
+            required_arguments = parser.add_argument_group(
+                "configure arguments"
+            )
+            required_arguments.add_argument(
+                "-i", "--id", type=str, required=False, help="Access key ID"
+            )
+            required_arguments.add_argument(
+                "-s",
+                "--secret",
+                type=str,
+                required=False,
+                help="Secret access key",
+            )
+            required_arguments = parser.add_argument(
+                '-f', type=str, help="file name"
+            )
 
     def deploy(self, arguments=[]):
         if len(arguments) > 0:
@@ -115,7 +164,6 @@ class OpenRemote(object):
                 default='secret',
                 help='Password for admin user',
             )
-            # parser.add_argument("-u", type=str, default="secret")
 
     def __parser(self, name, description):
         parser = self.subparsers.add_parser(
@@ -128,7 +176,7 @@ class OpenRemote(object):
             '-V',
             '--version',
             action='version',
-            version=f'%(prog)s version: {package_version()}',
+            version=f'%(prog)s/{package_version()} {sys.version} {platform.system()}/{platform.version()}',
         )
         parser.add_argument(
             '-d',
@@ -163,6 +211,7 @@ def send_metric(cli_input):
         "metrics": [
             {
                 "userId": user_id,
+                "cliVersion": f'{package_version()}',
                 "osPlatform": platform.system(),
                 "osVersion": platform.version(),
                 "pythonVersion": sys.version,
