@@ -2,7 +2,7 @@ import os
 
 
 def initialize():
-    global DRY_RUN, LEVEL, TELEMETRY_URL, VERBOSE, PROFILE, REGION, BUCKET
+    global DRY_RUN, LEVEL, TELEMETRY_URL, VERBOSE, PROFILE, BUCKET
     VERBOSE = False
     DRY_RUN = False
     LEVEL = 'logging.ERROR'
@@ -14,6 +14,5 @@ def initialize():
         pass
 
     # AWS parameters
-    PROFILE = 'mvp-map-manager'
-    REGION = 'eu-west-1'
+    PROFILE = 'openremote-cli'
     BUCKET = 'openremote-mvp-map-storage'

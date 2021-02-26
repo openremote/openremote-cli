@@ -87,14 +87,40 @@ class OpenRemote(object):
             pass
             # parser = self.__parser('help', 'CLI help')
 
+    def configure_aws(self, arguments=[]):
+        if len(arguments) > 0:
+            args = self.base_subparser.parse_args(arguments)
+            logging.debug(args)
+            scripts.configure_aws(args.id, args.secret, args.region)
+        else:
+            parser = self.__parser(
+                'configure_aws', 'configure AWS credentials'
+            )
+            parser.add_argument(
+                "-i", "--id", type=str, required=True, help="Access key ID"
+            )
+            parser.add_argument(
+                "-s",
+                "--secret",
+                type=str,
+                required=True,
+                help="Secret access key",
+            )
+            parser.add_argument(
+                "-r",
+                "--region",
+                type=str,
+                required=False,
+                help="AWS Region",
+                default="eu-west-1",
+            )
+
     def map(self, arguments=[]):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
             if args.action == 'list':
                 scripts.map_list()
-            elif args.action == 'configure':
-                scripts.map_configure(args.id, args.secret)
             elif args.action == 'upload':
                 scripts.map_upload(args.f)
             elif args.action == 'download':
@@ -110,7 +136,7 @@ class OpenRemote(object):
                 '--action',
                 nargs="?",
                 choices=['configure', 'list', 'upload', 'download', 'delete'],
-                help='configure/list/upload/download/delete map from S3',
+                help='list/upload/download/delete map from S3',
                 required=True,
                 const='list',
             )
@@ -139,13 +165,22 @@ class OpenRemote(object):
                 print(
                     'Deploying OR... This can take few minutes, be patient.\n'
                 )
-                scripts.deploy(args.password)
+                if args.provider == 'aws':
+                    scripts.deploy_aws(args.password)
+                else:
+                    scripts.deploy(args.password)
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
-                scripts.remove()
+                if args.provider == 'aws':
+                    raise ValueError(f'{args.action} not implemented')
+                else:
+                    scripts.remove()
             elif args.action == 'clean':
                 print('Cleaning OR resources...\n')
-                scripts.clean()
+                if args.provider == 'aws':
+                    raise ValueError(f'{args.action} not implemented')
+                else:
+                    scripts.clean()
             else:
                 raise ValueError(f"'{args.action}' not implemented")
         else:
@@ -168,6 +203,12 @@ class OpenRemote(object):
                 type=str,
                 default='secret',
                 help='Password for admin user',
+            )
+            parser.add_argument(
+                '--provider',
+                nargs="?",
+                choices=['aws', 'localhost'],
+                default='localhost',
             )
 
     def __parser(self, name, description):
@@ -207,6 +248,9 @@ class OpenRemote(object):
 def send_metric(cli_input):
     # TODO capture exit reason and duration
     input_cmd = sys.argv[0] + " " + " ".join(cli_input)
+    if 'configure_aws' in input_cmd:
+        # never telemetry secrets!
+        return
     try:
         user_id = os.getlogin()
     except:

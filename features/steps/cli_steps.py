@@ -24,3 +24,68 @@ def step_impl(context):
 def step_impl(context):
     assert "usage: openremote-cli" in context.response
     assert "error: unrecognized arguments" not in context.response
+
+
+@given(u'we have aws installed')
+def step_impl(context):
+    response_code, output = context.execute('aws --version')
+    assert response_code == 0
+
+
+@when(
+    u'we call openremote-cli configure-aws --id <id> --secret <secret> -d -v'
+)
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli configure_aws --id id --secret secret -d -v --no-telemetry'
+    )
+    print(context.output)
+
+
+@then(u'aws configure set profile.openremote-cli.aws_access_key_id <id>')
+def step_impl(context):
+    assert (
+        'aws configure set profile.openremote-cli.aws_access_key_id id'
+        in context.output
+    )
+
+
+@then(
+    u'aws configure set profile.openremote-cli.aws_secret_access_key <secret>'
+)
+def step_impl(context):
+    assert (
+        'aws configure set profile.openremote-cli.aws_secret_access_key secret'
+        in context.output
+    )
+
+
+@then(u'aws configure set profile.openremote-cli.region eu-west-1')
+def step_impl(context):
+    assert (
+        'aws configure set profile.openremote-cli.region eu-west-1'
+        in context.output
+    )
+
+
+@then(u'ssh-keygen -f openremote -t rsa -b 4096  -C "me@privacy.net"')
+def step_impl(context):
+    raise NotImplementedError(
+        u'STEP: Then ssh-keygen -f openremote -t rsa -b 4096  -C "me@privacy.net"'
+    )
+
+
+@then(
+    u'aws ec2 import-key-pair --key-name openremote --public-key-material fileb://openremote.pub'
+)
+def step_impl(context):
+    raise NotImplementedError(
+        u'STEP: Then aws ec2 import-key-pair --key-name openremote --public-key-material fileb://openremote.pub'
+    )
+
+
+@then(u'aws ec2 create-default-vpc --profile mvp')
+def step_impl(context):
+    raise NotImplementedError(
+        u'STEP: Then aws ec2 create-default-vpc --profile mvp'
+    )

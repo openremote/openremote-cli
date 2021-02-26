@@ -1,5 +1,11 @@
 Feature: deploy
 
+  Scenario: deploy to AWS
+    Given we have aws profile openremote-cli
+    When call or deploy --provider aws -d -v --no-telemetry
+    Then download CloudFormation template from github
+    And  execute AWS CloudFormation
+
   Scenario: deploy to localhost
     Given we have docker and docker-compose and wget installed
     When we call openremote-cli --dry-run deploy --action create

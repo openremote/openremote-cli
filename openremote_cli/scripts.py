@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-
-# import os
-# from pathlib import Path
-# import pkg_resources
+import uuid
 
 from openremote_cli import shell
 from openremote_cli import config
@@ -19,7 +16,7 @@ def deploy(password):
         'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:latest'
     )
     shell.execute(
-        'wget -nc https://github.com/openremote/openremote/raw/master/swarm/swarm-docker-compose.yml'
+        'wget -nc https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
     )
     if password != 'secret':
         shell.execute(
@@ -37,6 +34,23 @@ def deploy(password):
         print('then open http://localhost')
 
 
+def deploy_aws(password, url='demo.mvp.openremote.io'):
+    shell.execute(
+        'wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
+    )
+    shell.execute(
+        f'aws cloudformation create-stack --stack-name OpenRemote-{uuid.uuid4()} '
+        f'--template-body file://aws-cloudformation.template.yml --parameters '
+        f'ParameterKey=DomainName,ParameterValue=mvp.openremote.io '
+        f'ParameterKey=HostName,ParameterValue=demo '
+        f'ParameterKey=HostedZone,ParameterValue=true '
+        f'ParameterKey=OpenRemotePassword,ParameterValue={password} '
+        f'ParameterKey=InstanceType,ParameterValue=t3a.small '
+        f'ParameterKey=KeyName,ParameterValue=openremote --profile={config.PROFILE}'
+    )
+    shell.execute(f'rm -f aws-cloudformation.template.yml')
+
+
 def remove():
     shell.execute(f'docker stack rm openremote')
 
@@ -47,13 +61,14 @@ def clean():
     )
     logging.getLogger().setLevel(logging.CRITICAL)  # surpress some errors
     shell.execute(
-        'docker rmi openremote/manager-swarm openremote/deployment openremote/keycloak openremote/postgresql openremote/proxy '
+        'docker rmi openremote/manager-swarm openremote/deployment '
+        'openremote/keycloak openremote/postgresql openremote/proxy '
     )
     logging.getLogger().setLevel(config.LEVEL)
     shell.execute('docker system prune --force')
 
 
-def map_configure(id, secret):
+def configure_aws(id, secret, region):
     print(
         shell.execute(
             f'aws configure set profile.{config.PROFILE}.aws_access_key_id {id}'
@@ -66,7 +81,7 @@ def map_configure(id, secret):
     )
     print(
         shell.execute(
-            f'aws configure set profile.{config.PROFILE}.region {config.REGION}'
+            f'aws configure set profile.{config.PROFILE}.region {region}'
         )[1]
     )
 
