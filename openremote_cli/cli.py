@@ -166,7 +166,7 @@ class OpenRemote(object):
                     'Deploying OR... This can take few minutes, be patient.\n'
                 )
                 if args.provider == 'aws':
-                    scripts.deploy_aws(args.password)
+                    scripts.deploy_aws(args.password, args.dnsname)
                 else:
                     scripts.deploy(args.password)
             elif args.action == 'remove':
@@ -209,6 +209,12 @@ class OpenRemote(object):
                 nargs="?",
                 choices=['aws', 'localhost'],
                 default='localhost',
+            )
+            parser.add_argument(
+                '--dnsname',
+                type=str,
+                help='host and domain name',
+                default='demo.mvp.openremote.io',
             )
 
     def __parser(self, name, description):

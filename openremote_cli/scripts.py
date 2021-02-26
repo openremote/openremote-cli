@@ -34,15 +34,17 @@ def deploy(password):
         print('then open http://localhost')
 
 
-def deploy_aws(password, url='demo.mvp.openremote.io'):
+def deploy_aws(password, dnsname):
+    host = dnsname.split('.')[0]
+    domain = dnsname[len(host) + 1 :]
     shell.execute(
         'wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
     )
     shell.execute(
         f'aws cloudformation create-stack --stack-name OpenRemote-{uuid.uuid4()} '
         f'--template-body file://aws-cloudformation.template.yml --parameters '
-        f'ParameterKey=DomainName,ParameterValue=mvp.openremote.io '
-        f'ParameterKey=HostName,ParameterValue=demo '
+        f'ParameterKey=DomainName,ParameterValue={domain} '
+        f'ParameterKey=HostName,ParameterValue={host} '
         f'ParameterKey=HostedZone,ParameterValue=true '
         f'ParameterKey=OpenRemotePassword,ParameterValue={password} '
         f'ParameterKey=InstanceType,ParameterValue=t3a.small '
