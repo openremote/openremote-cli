@@ -95,3 +95,18 @@ def step_impl(context):
         'aws cloudformation create-stack --stack-name OpenRemote-'
         in context.output
     )
+
+
+@when(u'call or deploy -a remove aws -d -v --no-telemetry')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli deploy -a remove --provider aws -d -v --no-telemetry'
+    )
+    assert context.code == 0
+    print(context.output)
+
+
+@then(u'delete the proper cloudformation stack')
+def step_impl(context):
+    assert u'sh aws-delete-stack-' in context.output
+    assert u'rm aws-delete-stack-' in context.output

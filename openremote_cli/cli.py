@@ -163,7 +163,7 @@ class OpenRemote(object):
             logging.debug(args)
             if args.action == 'create':
                 print(
-                    'Deploying OR... This can take few minutes, be patient.\n'
+                    'Deploying OR... This usually takes less than 15 minutes.\n'
                 )
                 if args.provider == 'aws':
                     scripts.deploy_aws(args.password, args.dnsname)
@@ -172,13 +172,13 @@ class OpenRemote(object):
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
                 if args.provider == 'aws':
-                    raise ValueError(f'{args.action} not implemented')
+                    scripts.remove_aws(args.dnsname)
                 else:
                     scripts.remove()
             elif args.action == 'clean':
                 print('Cleaning OR resources...\n')
                 if args.provider == 'aws':
-                    raise ValueError(f'{args.action} not implemented')
+                    scripts.remove_aws(args.dnsname)
                 else:
                     scripts.clean()
             else:
@@ -300,7 +300,7 @@ def isLatestVersion():
     latest_version = data['info']['version']
     if latest_version != package_version():
         print(
-            f'your version ({package_version()}) < PyPI version ({latest_version}). Consider\npip install --upgrade openremote-cli\n'
+            f'your version ({package_version()}) < PyPI version ({latest_version}). Consider\npip3 install --upgrade openremote-cli\n'
         )
 
 

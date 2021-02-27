@@ -5,6 +5,8 @@ Feature: deploy
     When call or deploy --provider aws -d -v --no-telemetry
     Then download CloudFormation template from github
     And  execute AWS CloudFormation
+    When call or deploy -a remove aws -d -v --no-telemetry
+    Then delete the proper cloudformation stack
 
   Scenario: deploy to localhost
     Given we have docker and docker-compose and wget installed
