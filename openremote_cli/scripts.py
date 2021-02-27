@@ -38,21 +38,26 @@ def deploy_aws(password, dnsname):
     host = dnsname.split('.')[0]
     domain = dnsname[len(host) + 1 :]
     stack_name = f'OpenRemote-{uuid.uuid4()}'
-    shell.execute(
+    shell_exec = shell.execute(
         'wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
     )
-    print(
-        shell.execute(
-            f'aws cloudformation create-stack --stack-name {stack_name} '
-            f'--template-body file://aws-cloudformation.template.yml --parameters '
-            f'ParameterKey=DomainName,ParameterValue={domain} '
-            f'ParameterKey=HostName,ParameterValue={host} '
-            f'ParameterKey=HostedZone,ParameterValue=true '
-            f'ParameterKey=OpenRemotePassword,ParameterValue={password} '
-            f'ParameterKey=InstanceType,ParameterValue=t3a.small '
-            f'ParameterKey=KeyName,ParameterValue=openremote --profile={config.PROFILE}'
-        )[1]
+    if shell_exec[0] != 0:
+        return -1
+
+    shell_exec = shell.execute(
+        f'aws cloudformation create-stack --stack-name {stack_name} '
+        f'--template-body file://aws-cloudformation.template.yml --parameters '
+        f'ParameterKey=DomainName,ParameterValue={domain} '
+        f'ParameterKey=HostName,ParameterValue={host} '
+        f'ParameterKey=HostedZone,ParameterValue=true '
+        f'ParameterKey=OpenRemotePassword,ParameterValue={password} '
+        f'ParameterKey=InstanceType,ParameterValue=t3a.small '
+        f'ParameterKey=KeyName,ParameterValue=openremote --profile={config.PROFILE}'
     )
+    print(shell_exec[1])
+    if shell_exec[0] != 0:
+        return -1
+
     shell.execute(f'rm -f aws-cloudformation.template.yml')
     shell.execute(
         f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{dnsname}.sh'
@@ -60,7 +65,7 @@ def deploy_aws(password, dnsname):
     shell.execute(f'chmod +x aws-delete-stack-{dnsname}.sh')
     print(
         f'\nStack deployed. Mind that running it cost money! To free resources execute:\n'
-        f'aws-delete-stack-{dnsname}.sh'
+        f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}'
     )
 
 

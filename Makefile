@@ -6,5 +6,9 @@ test:
 lint:
 	poetry run pre-commit run --all-files
 
+image:
+	docker build -t openremote/openremote-cli .
+	docker push openremote/openremote-cli
+
 bump:
 	poetry version patch
