@@ -28,6 +28,8 @@ jobs:
         run: echo ${{ steps.buildx.outputs.platforms }}
       - name: login to docker hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+      - name: wait for new PyPI release if any
+        run: sleep 600
       - name: build and push images
         run: |
           docker build --push --platform $PLATFORM -t openremote/openremote-cli:latest .
