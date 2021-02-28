@@ -217,6 +217,25 @@ class OpenRemote(object):
                 default='demo.mvp.openremote.io',
             )
 
+    def perquisites(self, arguments=[]):
+        if len(arguments) > 0:
+            args = self.base_subparser.parse_args(arguments)
+            logging.debug(args)
+            if args.install is True:
+                print('Checking and installing missing tools.\n')
+            else:
+                print('Checking for required tools')
+        else:
+            logging.debug('adding perquisites parser')
+            parser = self.__parser(
+                'perquisites', 'Check if all required tools are installed'
+            )
+            parser.add_argument(
+                '--install',
+                action='store_true',
+                help='install all missing tools',
+            )
+
     def __parser(self, name, description):
         parser = self.subparsers.add_parser(
             name=name, description=description, help=description

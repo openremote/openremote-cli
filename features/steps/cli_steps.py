@@ -6,6 +6,7 @@ def step_impl(context):
     context.code, context.response = context.execute(
         f"poetry run openremote-cli -V"
     )
+    assert context.code == 0
 
 
 @then(u'should show version')
@@ -89,3 +90,30 @@ def step_impl(context):
     raise NotImplementedError(
         u'STEP: Then aws ec2 create-default-vpc --profile mvp'
     )
+
+
+# Required tools
+@when(u'or perquisites -v --dry-run')
+def step_impl(context):
+    context.code, context.response = context.execute(
+        f"poetry run or perquisites -v --dry-run --no-telemetry"
+    )
+    assert context.code == 0
+
+
+@then(u'check if all required tools are installed')
+def step_impl(context):
+    assert "Checking" in context.response
+
+
+@when(u'or perquisites --install -v --dry-run')
+def step_impl(context):
+    context.code, context.response = context.execute(
+        f"poetry run or perquisites --install -v --dry-run --no-telemetry"
+    )
+    assert context.code == 0
+
+
+@then(u'install all missing tools')
+def step_impl(context):
+    assert "installing missing tools" in context.response

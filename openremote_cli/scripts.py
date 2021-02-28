@@ -42,6 +42,11 @@ def deploy_aws(password, dnsname):
         'wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
     )
     if shell_exec[0] != 0:
+        shell_exec = shell.execute('wget -V')
+        if shell_exec[0] != 0:
+            print(
+                'You are missing wget. To install https://www.osradar.com/how-to-install-wget-in-windows-10/'
+            )
         return -1
 
     shell_exec = shell.execute(

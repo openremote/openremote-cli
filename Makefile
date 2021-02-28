@@ -7,7 +7,7 @@ lint:
 	poetry run pre-commit run --all-files
 
 image:
-	docker build -t openremote/openremote-cli .
+	docker build -t openremote/openremote-cli --no-cache .
 	docker push openremote/openremote-cli
 
 bump:

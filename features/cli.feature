@@ -15,3 +15,9 @@ Feature: cli
     # And ssh-keygen -f openremote -t rsa -b 4096  -C "me@privacy.net"
     # And aws ec2 import-key-pair --key-name openremote --public-key-material fileb://openremote.pub
     # And aws ec2 create-default-vpc --profile mvp
+
+    Scenario: check and install missing tools
+      When or perquisites -v --dry-run
+      Then check if all required tools are installed
+      When or perquisites --install -v --dry-run
+      Then install all missing tools

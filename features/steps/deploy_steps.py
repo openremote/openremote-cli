@@ -110,3 +110,49 @@ def step_impl(context):
 def step_impl(context):
     assert u'sh aws-delete-stack-' in context.output
     assert u'rm aws-delete-stack-' in context.output
+
+
+# Healthcheck
+
+
+@given(u'we have running openremote stack on a dnsname')
+def step_impl(context):
+    raise NotImplementedError(
+        u'STEP: Given we have running openremote stack on a dnsname'
+    )
+
+
+@when(u'or deploy -a health --dnsname demo.openremote.io')
+def step_impl(context):
+    raise NotImplementedError(
+        u'STEP: When or deploy -a health --dnsname demo.openremote.io'
+    )
+
+
+@then(u'we get 0/1 health status')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: Then we get 0/1 health status')
+
+
+@when(u'or deploy -a health --dnsname demo.openremote.io -v')
+def step_impl(context):
+    raise NotImplementedError(
+        u'STEP: When or deploy -a health --dnsname demo.openremote.io -v'
+    )
+
+
+@then(u'we get more info')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: Then we get more info')
+
+
+@when(u'or deploy -a health --dnsname demo.openremote.io -vv')
+def step_impl(context):
+    raise NotImplementedError(
+        u'STEP: When or deploy -a health --dnsname demo.openremote.io -vv'
+    )
+
+
+@then(u'we get full health response')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: Then we get full health response')

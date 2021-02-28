@@ -1,5 +1,14 @@
 Feature: deploy
 
+  # Scenario: check health of running stack
+  #   Given we have running openremote stack on a dnsname
+  #   When or deploy -a health --dnsname demo.openremote.io
+  #   Then we get 0/1 health status
+  #   When or deploy -a health --dnsname demo.openremote.io -v
+  #   Then we get more info
+  #   When or deploy -a health --dnsname demo.openremote.io -vv
+  #   Then we get full health response
+
   Scenario: deploy to AWS
     Given we have aws profile openremote-cli
     When call or deploy --provider aws -d -v --no-telemetry
