@@ -39,7 +39,7 @@ jobs:
             toml:
               - 'pyproject.toml'
             openapi:
-              - 'openapi/**'
+              - 'telemetry/**'
       - name: Publish to PyPI
         # run only if pyproject.toml was changed
         if: steps.changes.outputs.toml == 'true'

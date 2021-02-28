@@ -45,7 +45,7 @@ def deploy_aws(password, dnsname):
         shell_exec = shell.execute('wget -V')
         if shell_exec[0] != 0:
             print(
-                'You are missing wget. To install https://www.osradar.com/how-to-install-wget-in-windows-10/'
+                'You are missing wget. If you are on Windows it is easier to docker run -it openremote/openremote-cli'
             )
         return -1
 
