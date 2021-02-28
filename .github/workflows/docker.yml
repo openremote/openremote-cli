@@ -1,3 +1,5 @@
+name: build and push multi-platform docker images
+
 on:
   push:
 

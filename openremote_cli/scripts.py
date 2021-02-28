@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import uuid
+import wget
 
 from openremote_cli import shell
 from openremote_cli import config
@@ -15,9 +16,10 @@ def deploy(password):
     shell.execute(
         'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:latest'
     )
-    shell.execute(
-        'wget -nc https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
-    )
+    if not config.DRY_RUN:
+        wget.download(
+            'https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
+        )
     if password != 'secret':
         shell.execute(
             f'SETUP_ADMIN_PASSWORD={password} docker stack deploy -c swarm-docker-compose.yml openremote'
@@ -38,16 +40,10 @@ def deploy_aws(password, dnsname):
     host = dnsname.split('.')[0]
     domain = dnsname[len(host) + 1 :]
     stack_name = f'OpenRemote-{uuid.uuid4()}'
-    shell_exec = shell.execute(
-        'wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
-    )
-    if shell_exec[0] != 0:
-        shell_exec = shell.execute('wget -V')
-        if shell_exec[0] != 0:
-            print(
-                'You are missing wget. If you are on Windows it is easier to docker run -it openremote/openremote-cli'
-            )
-        return -1
+    if not config.DRY_RUN:
+        wget.download(
+            'https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
+        )
 
     shell_exec = shell.execute(
         f'aws cloudformation create-stack --stack-name {stack_name} '
@@ -59,7 +55,7 @@ def deploy_aws(password, dnsname):
         f'ParameterKey=InstanceType,ParameterValue=t3a.small '
         f'ParameterKey=KeyName,ParameterValue=openremote --profile={config.PROFILE}'
     )
-    print(shell_exec[1])
+    print(f'\n{shell_exec[1]}')
     if shell_exec[0] != 0:
         return -1
 

@@ -2,13 +2,11 @@
 from behave import *
 
 
-@given(u'we have docker and docker-compose and wget installed')
+@given(u'we have docker and docker-compose installed')
 def step_impl(context):
     response_code, output = context.execute('docker -v')
     assert response_code == 0
     response_code, output = context.execute('docker-compose -v')
-    assert response_code == 0
-    response_code, output = context.execute('wget -V')
     assert response_code == 0
 
 
@@ -28,10 +26,6 @@ def step_impl(context):
     )
     assert (
         "docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:latest"
-        in context.response
-    )
-    assert (
-        "wget -nc https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml"
         in context.response
     )
     assert "docker stack deploy" in context.response
@@ -83,10 +77,8 @@ def step_impl(context):
 
 @then(u'download CloudFormation template from github')
 def step_impl(context):
-    assert (
-        'wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
-        in context.output
-    )
+    # TODO check downloaded file
+    pass
 
 
 @then(u'execute AWS CloudFormation')

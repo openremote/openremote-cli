@@ -18,14 +18,14 @@ Feature: deploy
     Then delete the proper cloudformation stack
 
   Scenario: deploy to localhost
-    Given we have docker and docker-compose and wget installed
+    Given we have docker and docker-compose installed
     When we call openremote-cli --dry-run deploy --action create
     Then show what will be done
     When we call or --dry-run deploy
     Then show what will be done
 
   Scenario: remove and clean deployment
-    Given we have docker and docker-compose and wget installed
+    Given we have docker and docker-compose installed
     When call openremote-cli deploy --action remove --dry-run
     Then see that the stack is removed
     When call openremote-cli deploy --action clean --dry-run
