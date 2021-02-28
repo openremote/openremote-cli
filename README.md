@@ -40,10 +40,10 @@ start or services (usually less than 10 minutes). If it does not work yet, check
 or deploy --action remove
 ```
 
-### Deploy OpenRemote stack on AWS with DNS entry (TODO)
+### Deploy OpenRemote stack on AWS with DNS entry
 
 ```bash
-or deploy --platform aws --hostname myiot.mydomain.com
+or deploy --platform aws --dnsname myiot.mydomain.com
 ```
 
 ### Install shell completion extension
