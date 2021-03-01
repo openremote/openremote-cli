@@ -1,4 +1,4 @@
-name: build and push multi-platform docker images
+name: docker
 
 on:
   push:
