@@ -8,6 +8,7 @@ import os
 import platform
 from datetime import datetime
 import requests
+import time
 
 # For checking version
 # TODO check if urllib can be replaced with requests or other way around
@@ -44,8 +45,8 @@ class OpenRemote(object):
         }.get(args.verbosity, logging.DEBUG)
         logging.getLogger().setLevel(config.LEVEL)
 
-        if not args.no_telemetry:
-            send_metric(arguments)
+        if args.no_telemetry:
+            config.TELEMETRY = False
 
         if args.dry_run is True:
             logging.info('Enabling dry run mode')
@@ -272,9 +273,8 @@ class OpenRemote(object):
         return parser
 
 
-def send_metric(cli_input):
-    # TODO capture exit reason and duration
-    input_cmd = sys.argv[0] + " " + " ".join(cli_input)
+def send_metric(cli_input, exit_reason, exit_code, duration):
+    input_cmd = " ".join(cli_input)
     if 'configure_aws' in input_cmd:
         # never telemetry secrets!
         return
@@ -293,9 +293,9 @@ def send_metric(cli_input):
                 "pythonVersion": sys.version,
                 "command": {
                     "input": input_cmd,
-                    "exitReason": "Not Implemented",
-                    "exitCode": "Not Implemented",
-                    "duration": "Not Implemented",
+                    "exitReason": exit_reason,
+                    "exitCode": exit_code,
+                    "duration": duration,
                     "timestamp": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
                 },
             }
@@ -328,7 +328,19 @@ def isLatestVersion():
 def main():
     isLatestVersion()
     config.initialize()
-    OpenRemote(sys.argv[1:])
+    exit_reason = "program finished"
+    exit_code = 0
+    start = time.time()
+    try:
+        OpenRemote(sys.argv[1:])
+    except Exception as error:
+        exit_reason = error
+        exit_code = type(error)
+    finally:
+        end = time.time()
+        if config.TELEMETRY:
+            logging.debug(f'Sending telemetry to {config.TELEMETRY_URL}')
+            send_metric(sys.argv, exit_reason, exit_code, end - start)
 
 
 # Support invoking the script directly from source
