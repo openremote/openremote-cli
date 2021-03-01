@@ -340,7 +340,7 @@ def main():
         end = time.time()
         if config.TELEMETRY:
             logging.debug(f'Sending telemetry to {config.TELEMETRY_URL}')
-            send_metric(sys.argv, exit_reason, exit_code, end - start)
+            send_metric(sys.argv[1:], exit_reason, exit_code, end - start)
 
 
 # Support invoking the script directly from source
