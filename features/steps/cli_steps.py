@@ -38,7 +38,7 @@ def step_impl(context):
 )
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run openremote-cli configure_aws --id id --secret secret -d -v --no-telemetry'
+        'poetry run openremote-cli configure_aws --id id --secret secret -n -v --no-telemetry'
     )
     print(context.output)
 

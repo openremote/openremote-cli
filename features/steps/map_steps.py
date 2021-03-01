@@ -14,7 +14,7 @@ def step_impl(context):
 @when(u'we call openremote-cli map -a upload -f file')
 def step_impl(context):
     context.response_code, context.output = context.execute(
-        u'poetry run openremote-cli map -a upload -f file --no-telemetry -v -d'
+        u'poetry run openremote-cli map -a upload -f file --no-telemetry -v -n'
     )
     assert context.response_code == 0
     print(context.output)
@@ -23,7 +23,7 @@ def step_impl(context):
 @when(u'we call openremote-cli map -a list')
 def step_impl(context):
     context.response_code, context.output = context.execute(
-        'poetry run or map -a list --no-telemetry -v -d'
+        'poetry run or map -a list --no-telemetry -v -n'
     )
     assert context.response_code == 0
     print(context.output)
@@ -42,7 +42,7 @@ def step_impl(context):
 @when(u'we call openremote-cli map -a download -f file')
 def step_impl(context):
     context.response_code, context.output = context.execute(
-        'poetry run or map -a download -f file --no-telemetry -v -d'
+        'poetry run or map -a download -f file --no-telemetry -v -n'
     )
     assert context.response_code == 0
     print(context.output)
@@ -51,7 +51,7 @@ def step_impl(context):
 @when(u'we call openremote-cli map -a delete -f file')
 def step_impl(context):
     context.response_code, context.output = context.execute(
-        u'poetry run or map -a delete -f file --no-telemetry -v -d'
+        u'poetry run or map -a delete -f file --no-telemetry -v -n'
     )
     assert context.response_code == 0
     print(context.output)

@@ -253,7 +253,7 @@ class OpenRemote(object):
             version=f'%(prog)s/{package_version()} {sys.version} {platform.system()}/{platform.version()}',
         )
         parser.add_argument(
-            '-d',
+            '-n',
             '--dry-run',
             action='store_true',
             help='showing effects without actual run and exit',

@@ -13,7 +13,7 @@ def step_impl(context):
 @when(u'we call openremote-cli --dry-run deploy --action create')
 def step_impl(context):
     response_code, output = context.execute(
-        f"poetry run openremote-cli --dry-run deploy --action create -d -vvv --no-telemetry"
+        f"poetry run openremote-cli --dry-run deploy --action create -n -vvv --no-telemetry"
     )
     print(output)
     context.response = output
@@ -34,7 +34,7 @@ def step_impl(context):
 @when(u'we call or --dry-run deploy')
 def step_impl(context):
     response_code, output = context.execute(
-        f"poetry run openremote-cli deploy -d -vvv --no-telemetry"
+        f"poetry run openremote-cli deploy -n -vvv --no-telemetry"
     )
     context.response = output
 
@@ -70,7 +70,7 @@ def step_impl(context):
 @when(u'call or deploy --provider aws -d -v --no-telemetry')
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run or deploy --provider aws -d -v --no-telemetry'
+        'poetry run or deploy --provider aws -n -v --no-telemetry'
     )
     assert context.code == 0
 
@@ -92,7 +92,7 @@ def step_impl(context):
 @when(u'call or deploy -a remove aws -d -v --no-telemetry')
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run openremote-cli deploy -a remove --provider aws -d -v --no-telemetry'
+        'poetry run openremote-cli deploy -a remove --provider aws -n -v --no-telemetry'
     )
     assert context.code == 0
     print(context.output)
