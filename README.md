@@ -45,6 +45,10 @@ or deploy --action remove
 ```bash
 or deploy --platform aws --dnsname myiot.mydomain.com
 ```
+### Check health of the openremote stack
+```bash
+or deploy -a health --dnsname myiot.mydomain.com -v
+```
 
 ### Install shell completion extension
 
