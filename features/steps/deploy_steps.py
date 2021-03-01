@@ -105,46 +105,51 @@ def step_impl(context):
 
 
 # Healthcheck
+import requests
 
 
 @given(u'we have running openremote stack on a dnsname')
 def step_impl(context):
-    raise NotImplementedError(
-        u'STEP: Given we have running openremote stack on a dnsname'
-    )
+    requests.get('https://demo.openremote.io')
 
 
 @when(u'or deploy -a health --dnsname demo.openremote.io')
 def step_impl(context):
-    raise NotImplementedError(
-        u'STEP: When or deploy -a health --dnsname demo.openremote.io'
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli deploy -a health --dnsname demo.openremote.io --no-telemetry'
     )
+    assert context.code == 0
+    print(context.output)
 
 
 @then(u'we get 0/1 health status')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then we get 0/1 health status')
+    assert '1.0' in context.output
 
 
 @when(u'or deploy -a health --dnsname demo.openremote.io -v')
 def step_impl(context):
-    raise NotImplementedError(
-        u'STEP: When or deploy -a health --dnsname demo.openremote.io -v'
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli deploy -a health --dnsname demo.openremote.io -v --no-telemetry'
     )
+    assert context.code == 0
+    print(context.output)
 
 
 @then(u'we get more info')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then we get more info')
+    assert 'systemLoadPercentage' in context.output
 
 
 @when(u'or deploy -a health --dnsname demo.openremote.io -vv')
 def step_impl(context):
-    raise NotImplementedError(
-        u'STEP: When or deploy -a health --dnsname demo.openremote.io -vv'
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli deploy -a health --dnsname demo.openremote.io -vv --no-telemetry'
     )
+    assert context.code == 0
+    print(context.output)
 
 
 @then(u'we get full health response')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then we get full health response')
+    assert 'processLoadPercentage' in context.output

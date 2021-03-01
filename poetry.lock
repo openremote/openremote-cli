@@ -219,6 +219,14 @@ toml = "*"
 virtualenv = ">=20.0.8"
 
 [[package]]
+name = "pythonping"
+version = "1.0.15"
+description = "A simple way to ping in Python"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pyyaml"
 version = "5.4.1"
 description = "YAML parser and emitter for Python"
@@ -340,7 +348,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "92bdcd5e12bd557b487e5e23933f13c83529e60b357389db5d638f0872c03498"
+content-hash = "875d2d736e1417b387df22bf791803da61fcd9fe64ce433f9cfca5b0546f9e22"
 
 [metadata.files]
 appdirs = [
@@ -420,6 +428,9 @@ pathspec = [
 pre-commit = [
     {file = "pre_commit-2.10.1-py2.py3-none-any.whl", hash = "sha256:16212d1fde2bed88159287da88ff03796863854b04dc9f838a55979325a3d20e"},
     {file = "pre_commit-2.10.1.tar.gz", hash = "sha256:399baf78f13f4de82a29b649afd74bef2c4e28eb4f021661fc7f29246e8c7a3a"},
+]
+pythonping = [
+    {file = "pythonping-1.0.15.tar.gz", hash = "sha256:efd0bf47691966cafae523ff5bd1abcf82cd9c0a71a68fa5e2971c4eddb57ac8"},
 ]
 pyyaml = [
     {file = "PyYAML-5.4.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:3b2b1824fe7112845700f815ff6a489360226a5609b96ec2190a45e62a9fc922"},

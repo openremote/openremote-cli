@@ -2,6 +2,8 @@
 import logging
 import uuid
 import wget
+import json
+import urllib.request
 
 from openremote_cli import shell
 from openremote_cli import config
@@ -20,6 +22,10 @@ def deploy(password):
         wget.download(
             'https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
         )
+    if config.VERBOSE is True:
+        print(
+            'wget -nc https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
+        )
     if password != 'secret':
         shell.execute(
             f'SETUP_ADMIN_PASSWORD={password} docker stack deploy -c swarm-docker-compose.yml openremote'
@@ -36,6 +42,26 @@ def deploy(password):
         print('then open http://localhost')
 
 
+def deploy_health(dnsname, verbosity=0):
+    try:
+        health = json.loads(
+            urllib.request.urlopen(
+                f'https://{dnsname}/api/master/health'
+            ).read()
+        )
+        if verbosity == 0:
+            print(health['system']['version'])
+        elif verbosity == 1:
+            print(health['system'])
+        else:
+            print(health)
+    except:
+        if verbosity == 0:
+            print('0')
+        else:
+            print(f'Error calling\ncurl https://{dnsname}/api/master/health')
+
+
 def deploy_aws(password, dnsname):
     host = dnsname.split('.')[0]
     domain = dnsname[len(host) + 1 :]
@@ -43,6 +69,10 @@ def deploy_aws(password, dnsname):
     if not config.DRY_RUN:
         wget.download(
             'https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
+        )
+    if config.VERBOSE is True:
+        print(
+            'wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
         )
 
     shell_exec = shell.execute(
@@ -66,7 +96,9 @@ def deploy_aws(password, dnsname):
     shell.execute(f'chmod +x aws-delete-stack-{dnsname}.sh')
     print(
         f'\nStack deployed. Mind that running it cost money! To free resources execute:\n'
-        f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}'
+        f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}\n\n'
+        f'check running stack with health command:\n'
+        f'or deploy -a health --dnsname {dnsname} -v'
     )
 
 

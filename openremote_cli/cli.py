@@ -181,6 +181,8 @@ class OpenRemote(object):
                     scripts.remove_aws(args.dnsname)
                 else:
                     scripts.clean()
+            elif args.action == 'health':
+                scripts.deploy_health(args.dnsname, args.verbosity)
             else:
                 raise ValueError(f"'{args.action}' not implemented")
         else:
@@ -193,7 +195,7 @@ class OpenRemote(object):
                 '-a',
                 '--action',
                 nargs="?",
-                choices=['create', 'remove', 'clean'],
+                choices=['create', 'remove', 'clean', 'health'],
                 help='create/remove/clean OpenRemote stack',
                 default='create',
             )
