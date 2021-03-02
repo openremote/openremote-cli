@@ -74,6 +74,10 @@ class OpenRemote(object):
                     print("--dry-run active!")
                 if not config.VERBOSE:
                     print("To see commands use -v switch\n")
+                else:
+                    print(
+                        'If you need help go to https://forum.openremote.io/\n'
+                    )
                 # use dispatch pattern to invoke method with same name so it's
                 # easy to add new subcommands
                 logging.debug('dispatching ' + command + f'({arguments})')
