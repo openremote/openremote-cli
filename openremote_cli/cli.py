@@ -328,17 +328,17 @@ def isLatestVersion():
 def main():
     isLatestVersion()
     config.initialize()
-    exit_reason = "program finished"
+    exit_reason = "program finished normally"
     exit_code = 0
     start = time.time()
     try:
         OpenRemote(sys.argv[1:])
     except Exception as error:
-        exit_reason = error
-        exit_code = type(error)
+        exit_reason = str(error)
+        exit_code = -1
     finally:
         end = time.time()
-        if config.TELEMETRY:
+        if config.TELEMETRY and '--no-telemetry' not in sys.argv:
             logging.debug(f'Sending telemetry to {config.TELEMETRY_URL}')
             send_metric(sys.argv[1:], exit_reason, exit_code, end - start)
 

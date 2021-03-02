@@ -18,10 +18,13 @@ module.exports.metrics = async event => {
     record.ip = event.requestContext.identity.sourceIp
     record.user_id = body.metrics[0].userId
     record.timestamp = new Date().toISOString()
+      .replace(/T/, ' ')       // replace T with a space
+      .replace(/\..+/, '')     // delete the dot and everything after
     record.command = body.metrics[0].command.input
     record.os_platform = body.metrics[0].osPlatform
     record.os_version = body.metrics[0].osVersion
     record.metric = body.metrics[0]
+    record.date = record.timestamp.substr(0, 10) // get only date for partitioning
 
     const params = {
       TableName: process.env.DDB_TELEMETRY,

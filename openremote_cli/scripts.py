@@ -87,7 +87,13 @@ def deploy_aws(password, dnsname):
     )
     print(f'\n{shell_exec[1]}')
     if shell_exec[0] != 0:
-        return -1
+        raise Exception(shell_exec)
+
+    print('Waiting for CloudFormation...')
+    shell.execute(
+        f'aws cloudformation wait stack-create-complete '
+        f'--stack-name {stack_name} --profile {config.PROFILE}'
+    )
 
     shell.execute(f'rm -f aws-cloudformation.template.yml')
     shell.execute(
@@ -115,12 +121,12 @@ def clean():
     shell.execute(
         'docker volume rm --force openremote_deployment-data openremote_postgresql-data openremote_proxy-data'
     )
-    logging.getLogger().setLevel(logging.CRITICAL)  # surpress some errors
+    # logging.getLogger().setLevel(logging.CRITICAL)  # surpress some errors
     shell.execute(
         'docker rmi openremote/manager-swarm openremote/deployment '
         'openremote/keycloak openremote/postgresql openremote/proxy '
     )
-    logging.getLogger().setLevel(config.LEVEL)
+    # logging.getLogger().setLevel(config.LEVEL)
     shell.execute('docker system prune --force')
 
 

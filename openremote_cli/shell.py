@@ -28,4 +28,5 @@ def execute(args):
         logging.debug(f'stdout: {output.stdout}')
         if output.returncode != 0:
             logging.error(f'stderr: {output.stdout}')
+            raise Exception(output.returncode, output.stdout.decode('utf-8'))
         return output.returncode, output.stdout.decode('utf-8')

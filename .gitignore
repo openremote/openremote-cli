@@ -1,3 +1,4 @@
+telemetry/sls-*/
 node_modules/
 .serverless/
 swarm-docker-compose.yml
