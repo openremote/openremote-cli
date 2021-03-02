@@ -4,7 +4,7 @@ from behave import *
 @when(u'calling openremote-cli -V')
 def step_impl(context):
     context.code, context.response = context.execute(
-        f"poetry run openremote-cli -V"
+        f"poetry run openremote-cli -V --no-telemetry"
     )
     assert context.code == 0
 
