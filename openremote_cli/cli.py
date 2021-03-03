@@ -344,6 +344,8 @@ def main():
         if config.TELEMETRY and '--no-telemetry' not in sys.argv:
             logging.debug(f'Sending telemetry to {config.TELEMETRY_URL}')
             send_metric(sys.argv[1:], exit_reason, exit_code, end - start)
+        else:
+            logging.debug(f'skipping telemetry: {exit_reason}')
         # Check if there is a new version on PyPI
         isLatestVersion()
 

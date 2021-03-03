@@ -5,7 +5,7 @@ import subprocess
 from openremote_cli import config
 
 
-def execute(args):
+def execute(args, no_exception=False):
     logging.debug(f'executing command:\n\n\t{args}\n')
 
     if config.VERBOSE:
@@ -20,13 +20,22 @@ def execute(args):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 shell=True,
-                executable='/bin/bash',
+                # executable='/bin/bash',
             )
-        except FileNotFoundError as exception:
+        except Exception as exception:
             logging.error(f'Failed to execute {args}')
-            return exception.errno, exception.strerror
-        logging.debug(f'stdout: {output.stdout}')
+            if no_exception:
+                return exception.errno, exception.strerror
+            else:
+                raise Exception(exception.errno, exception.strerror)
         if output.returncode != 0:
-            logging.error(f'stderr: {output.stdout}')
-            raise Exception(output.returncode, output.stdout.decode('utf-8'))
+            if no_exception:
+                logging.debug(f'stderr: {output.stdout}')
+            else:
+                logging.error(f'stderr: {output.stdout}')
+                raise Exception(
+                    output.returncode, output.stdout.decode('utf-8')
+                )
+        else:
+            logging.debug(f'stdout: {output.stdout}')
         return output.returncode, output.stdout.decode('utf-8')

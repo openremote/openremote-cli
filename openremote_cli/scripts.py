@@ -10,10 +10,10 @@ from openremote_cli import config
 
 
 def deploy(password):
-    logging.getLogger().setLevel(logging.CRITICAL)  # surpress some errors
-    shell.execute('docker swarm init')
-    shell.execute('docker volume rm openremote_postgresql-data')
-    logging.getLogger().setLevel(config.LEVEL)
+    shell.execute('docker swarm init', no_exception=True)
+    shell.execute(
+        'docker volume rm openremote_postgresql-data', no_exception=True
+    )
     shell.execute('docker volume create openremote_deployment-data')
     shell.execute(
         'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:latest'
@@ -121,12 +121,11 @@ def clean():
     shell.execute(
         'docker volume rm --force openremote_deployment-data openremote_postgresql-data openremote_proxy-data'
     )
-    # logging.getLogger().setLevel(logging.CRITICAL)  # surpress some errors
     shell.execute(
         'docker rmi openremote/manager-swarm openremote/deployment '
-        'openremote/keycloak openremote/postgresql openremote/proxy '
+        'openremote/keycloak openremote/postgresql openremote/proxy ',
+        no_exception=True,
     )
-    # logging.getLogger().setLevel(config.LEVEL)
     shell.execute('docker system prune --force')
 
 
