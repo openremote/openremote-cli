@@ -325,12 +325,11 @@ def isLatestVersion():
     latest_version = data['info']['version']
     if latest_version != package_version():
         print(
-            f'your version ({package_version()}) < PyPI version ({latest_version}). Consider\npip3 install --upgrade openremote-cli\n'
+            f'\nyour version ({package_version()}) < PyPI version ({latest_version}). Consider\npip3 install --upgrade openremote-cli'
         )
 
 
 def main():
-    isLatestVersion()
     config.initialize()
     exit_reason = "program finished normally"
     exit_code = 0
@@ -345,6 +344,8 @@ def main():
         if config.TELEMETRY and '--no-telemetry' not in sys.argv:
             logging.debug(f'Sending telemetry to {config.TELEMETRY_URL}')
             send_metric(sys.argv[1:], exit_reason, exit_code, end - start)
+        # Check if there is a new version on PyPI
+        isLatestVersion()
 
 
 # Support invoking the script directly from source
