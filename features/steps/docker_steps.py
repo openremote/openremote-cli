@@ -10,7 +10,7 @@ def step_impl(context):
 @when(u'docker run --rm -ti openremote/openremote-cli -V')
 def step_impl(context):
     response_code, context.output = context.execute(
-        f"docker run --rm openremote/openremote-cli -V"
+        f"docker run --rm openremote/openremote-cli -V --no-telemetry"
     )
     assert response_code == 0
     print(context.output)
