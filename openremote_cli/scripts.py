@@ -4,6 +4,7 @@ import uuid
 import wget
 import json
 import urllib.request
+import os
 
 from openremote_cli import shell
 from openremote_cli import config
@@ -34,7 +35,7 @@ def deploy(password):
         shell.execute(
             f'docker stack deploy -c swarm-docker-compose.yml openremote'
         )
-    shell.execute(f'rm -f swarm-docker-compose.yml')
+    os.remove(f'swarm-docker-compose.yml')
     if config.VERBOSE is True:
         print(
             '\nCheck running services with `docker service ls` until all are 1/1 replicas...'
@@ -95,7 +96,7 @@ def deploy_aws(password, dnsname):
         f'--stack-name {stack_name} --profile {config.PROFILE}'
     )
 
-    shell.execute(f'rm -f aws-cloudformation.template.yml')
+    os.remove(f'aws-cloudformation.template.yml')
     shell.execute(
         f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{dnsname}.sh'
     )
@@ -110,7 +111,9 @@ def deploy_aws(password, dnsname):
 
 def remove_aws(dnsname):
     shell.execute(f'sh aws-delete-stack-{dnsname}.sh')
-    shell.execute(f'rm aws-delete-stack-{dnsname}.sh')
+    if config.VERBOSE:
+        print(f'rm aws-delete-stack-{dnsname}.sh')
+    os.remove(f'aws-delete-stack-{dnsname}.sh')
 
 
 def remove():
