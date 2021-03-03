@@ -21,6 +21,7 @@ module.exports.metrics = async event => {
       .replace(/T/, ' ')       // replace T with a space
       .replace(/\..+/, '')     // delete the dot and everything after
     record.command = body.metrics[0].command.input
+    record.exit_code = body.metrics[0].command.exitCode
     record.os_platform = body.metrics[0].osPlatform
     record.os_version = body.metrics[0].osVersion
     record.metric = body.metrics[0]

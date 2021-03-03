@@ -9,7 +9,7 @@ def execute(args, no_exception=False):
     logging.debug(f'executing command:\n\n\t{args}\n')
 
     if config.VERBOSE:
-        print(args)
+        print(f'> {args}')
 
     if config.DRY_RUN:
         return 0, 'Invoked using dry run'
