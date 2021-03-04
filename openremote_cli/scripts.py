@@ -25,7 +25,7 @@ def deploy(password):
         )
     if config.VERBOSE is True:
         print(
-            'wget -nc https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
+            '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
         )
     if password != 'secret':
         shell.execute(
@@ -35,7 +35,8 @@ def deploy(password):
         shell.execute(
             f'docker stack deploy -c swarm-docker-compose.yml openremote'
         )
-    os.remove(f'swarm-docker-compose.yml')
+    if not config.DRY_RUN:
+        os.remove(f'swarm-docker-compose.yml')
     if config.VERBOSE is True:
         print(
             '\nCheck running services with `docker service ls` until all are 1/1 replicas...'
@@ -73,7 +74,7 @@ def deploy_aws(password, dnsname):
         )
     if config.VERBOSE is True:
         print(
-            'wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
+            '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
         )
 
     shell_exec = shell.execute(
@@ -96,7 +97,8 @@ def deploy_aws(password, dnsname):
         f'--stack-name {stack_name} --profile {config.PROFILE}'
     )
 
-    os.remove(f'aws-cloudformation.template.yml')
+    if not config.DRY_RUN:
+        os.remove(f'aws-cloudformation.template.yml')
     shell.execute(
         f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{dnsname}.sh'
     )
@@ -113,7 +115,8 @@ def remove_aws(dnsname):
     shell.execute(f'sh aws-delete-stack-{dnsname}.sh')
     if config.VERBOSE:
         print(f'rm aws-delete-stack-{dnsname}.sh')
-    os.remove(f'aws-delete-stack-{dnsname}.sh')
+    if not config.DRY_RUN:
+        os.remove(f'aws-delete-stack-{dnsname}.sh')
 
 
 def remove():
