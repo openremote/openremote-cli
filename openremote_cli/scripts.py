@@ -65,8 +65,14 @@ def deploy_health(dnsname, verbosity=0):
 
 
 def deploy_aws(password, dnsname):
-    host = dnsname.split('.')[0]
-    domain = dnsname[len(host) + 1 :]
+    if '.' in dnsname:
+        host = dnsname.split('.')[0]
+        domain = dnsname[len(host) + 1 :]
+    else:
+        logging.debug('adding default domain')
+        host = dnsname
+        domain = 'mvp.openremote.io'
+    logging.debug(f'{dnsname} => {host} + {domain}')
     stack_name = f'OpenRemote-{uuid.uuid4()}'
     check_aws_perquisites()
     if not config.DRY_RUN:
