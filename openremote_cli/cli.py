@@ -232,6 +232,7 @@ class OpenRemote(object):
                 print('Checking and installing missing tools.\n')
             else:
                 print('Checking for required tools')
+                scripts.check_tools()
         else:
             logging.debug('adding perquisites parser')
             parser = self.__parser(

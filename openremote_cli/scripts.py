@@ -21,22 +21,22 @@ def deploy(password):
     )
     if not config.DRY_RUN:
         wget.download(
-            'https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
+            'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
         )
     if config.VERBOSE is True:
         print(
-            '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/swarm-docker-compose.yml'
+            '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
         )
     if password != 'secret':
         shell.execute(
-            f'SETUP_ADMIN_PASSWORD={password} docker stack deploy -c swarm-docker-compose.yml openremote'
+            f'SETUP_ADMIN_PASSWORD={password} docker stack deploy -c mvp-docker-compose.yml openremote'
         )
     else:
         shell.execute(
-            f'docker stack deploy -c swarm-docker-compose.yml openremote'
+            f'docker stack deploy -c mvp-docker-compose.yml openremote'
         )
     if not config.DRY_RUN:
-        os.remove(f'swarm-docker-compose.yml')
+        os.remove(f'mvp-docker-compose.yml')
     if config.VERBOSE is True:
         print(
             '\nCheck running services with `docker service ls` until all are 1/1 replicas...'
@@ -68,6 +68,7 @@ def deploy_aws(password, dnsname):
     host = dnsname.split('.')[0]
     domain = dnsname[len(host) + 1 :]
     stack_name = f'OpenRemote-{uuid.uuid4()}'
+    check_aws_perquisites()
     if not config.DRY_RUN:
         wget.download(
             'https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
@@ -112,6 +113,7 @@ def deploy_aws(password, dnsname):
 
 
 def remove_aws(dnsname):
+    check_aws_perquisites()
     shell.execute(f'sh aws-delete-stack-{dnsname}.sh')
     if config.VERBOSE:
         print(f'rm aws-delete-stack-{dnsname}.sh')
@@ -183,3 +185,26 @@ def map_delete(path):
             f'aws s3 rm s3://{config.BUCKET}/{path} --profile  {config.PROFILE}'
         )[1]
     )
+
+
+def check_tools():
+    print('Checking AWS perquisites')
+    return check_aws_perquisites()
+
+
+def check_aws_perquisites():
+    # Check AWS profile
+    code, output = shell.execute('aws configure list-profiles')
+    if not config.DRY_RUN and 'openremote-cli' not in output:
+        msg = "aws-cli profile 'openremote-cli' missing"
+        logging.error(msg)
+        raise Exception(1, msg)
+    # Check EC2 key
+    code, output = shell.execute(
+        'aws ec2 describe-key-pairs --key-names openremote'
+    )
+    if not config.DRY_RUN and 'openremote' not in output:
+        msg = "ERROR: Missing EC2 keypair 'openremote' in eu-west-1 region (Ireland)"
+        logging.error(msg)
+        raise Exception("Missing EC2 keypair 'openremote' in eu-west-1")
+    return True

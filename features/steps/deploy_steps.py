@@ -72,6 +72,7 @@ def step_impl(context):
     context.code, context.output = context.execute(
         'poetry run or deploy --provider aws -n -v --no-telemetry'
     )
+    print(context.output)
     assert context.code == 0
 
 
