@@ -5,6 +5,8 @@ import pkg_resources
 import logging
 import inspect
 import os
+import pwd
+import getpass
 import platform
 from datetime import datetime
 import requests
@@ -284,7 +286,7 @@ def send_metric(cli_input, exit_reason, exit_code, duration):
         # never telemetry secrets!
         return
     try:
-        user_id = os.getlogin()
+        user_id = f'{getpass.getuser()} {pwd.getpwuid(os.getuid())[0]}'
     except:
         # We don't have login in github workflow
         user_id = 'No login'
