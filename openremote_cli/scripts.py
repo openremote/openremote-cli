@@ -8,9 +8,10 @@ import os
 
 from openremote_cli import shell
 from openremote_cli import config
+from openremote_cli import gen_aws_smtp_credentials
 
 
-def deploy(password):
+def deploy(password, smtp_user, smtp_password):
     shell.execute('docker swarm init', no_exception=True)
     shell.execute(
         'docker volume rm openremote_postgresql-data', no_exception=True
@@ -27,14 +28,18 @@ def deploy(password):
         print(
             '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
         )
+    env = ''
     if password != 'secret':
-        shell.execute(
-            f'SETUP_ADMIN_PASSWORD={password} docker stack deploy -c mvp-docker-compose.yml openremote'
+        env = f'SETUP_ADMIN_PASSWORD={password} '
+    if smtp_user and smtp_password:
+        env = (
+            f'{env}SETUP_EMAIL_USER={smtp_user} '
+            f'SETUP_EMAIL_PASSWORD={smtp_password} '
+            f'SETUP_EMAIL_PORT=587 '
         )
-    else:
-        shell.execute(
-            f'docker stack deploy -c mvp-docker-compose.yml openremote'
-        )
+    shell.execute(
+        f'{env}docker stack deploy -c mvp-docker-compose.yml openremote'
+    )
     if not config.DRY_RUN:
         os.remove(f'mvp-docker-compose.yml')
     if config.VERBOSE is True:
@@ -144,6 +149,7 @@ def clean():
 
 
 def configure_aws(id, secret, region):
+    config.REGION = region
     print(
         shell.execute(
             f'aws configure set profile.{config.PROFILE}.aws_access_key_id {id}'
@@ -188,7 +194,7 @@ def map_download(path):
 def map_delete(path):
     print(
         shell.execute(
-            f'aws s3 rm s3://{config.BUCKET}/{path} --profile  {config.PROFILE}'
+            f'aws s3 rm s3://{config.BUCKET}/{path} --profile {config.PROFILE}'
         )[1]
     )
 
@@ -201,16 +207,47 @@ def check_tools():
 def check_aws_perquisites():
     # Check AWS profile
     code, output = shell.execute('aws configure list-profiles')
-    if not config.DRY_RUN and 'openremote-cli' not in output:
-        msg = "aws-cli profile 'openremote-cli' missing"
+    if not config.DRY_RUN and config.PROFILE not in output:
+        msg = f"aws-cli profile '{config.PROFILE}' missing"
         logging.error(msg)
         raise Exception(1, msg)
     # Check EC2 key
     code, output = shell.execute(
-        'aws ec2 describe-key-pairs --key-names openremote'
+        f'aws ec2 describe-key-pairs --key-names openremote --profile {config.PROFILE}'
     )
     if not config.DRY_RUN and 'openremote' not in output:
-        msg = "ERROR: Missing EC2 keypair 'openremote' in eu-west-1 region (Ireland)"
+        msg = f"ERROR: Missing EC2 keypair 'openremote' in {config.REGION} region (Ireland)"
         logging.error(msg)
-        raise Exception("Missing EC2 keypair 'openremote' in eu-west-1")
+        raise Exception(1, msg)
     return True
+
+
+# E-mail credentials
+def smtp_credentials(dnsname):
+    if dnsname == 'localhost':
+        user_name = f'ses-user-{dnsname}-{uuid.uuid4()}'
+    else:
+        user_name = f'ses-user-{dnsname}'
+    code, output = shell.execute(
+        f'aws iam create-user --user-name {user_name} --profile {config.PROFILE} --output json'
+    )
+    logging.debug(output)
+    code, output = shell.execute(
+        'aws iam put-user-policy --policy-document \'{"Version": "2012-10-17",'
+        '"Statement":[{"Effect": "Allow","Action": "ses:SendRawEmail","Resource": "*"}]}\''
+        f' --policy-name OpenRemoteSendEmail --user-name {user_name} --profile {config.PROFILE}'
+    )
+    code, output = shell.execute(
+        f'aws iam create-access-key --user-name {user_name} --profile {config.PROFILE} --output json'
+    )
+    if config.DRY_RUN:
+        return 'AccessKeyId', 'SecretAccessKey'
+    else:
+        logging.debug(output)
+        access = json.loads(output)
+        return (
+            access['AccessKey']['AccessKeyId'],
+            gen_aws_smtp_credentials.calculate_key(
+                access['AccessKey']['SecretAccessKey'], config.REGION
+            ),
+        )

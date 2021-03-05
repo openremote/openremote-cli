@@ -153,14 +153,23 @@ class OpenRemote(object):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
+            smtp_user, smtp_password = None, None
+            if args.with_email:
+                logging.debug('Creating SMTP credentials')
+                smtp_user, smtp_password = scripts.smtp_credentials(
+                    args.dnsname
+                )
+                logging.debug(f'user: {smtp_user}, password: {smtp_password}')
             if args.action == 'create':
                 print(
                     'Deploying OR... This usually takes less than 15 minutes.\n'
                 )
                 if args.provider == 'aws':
-                    scripts.deploy_aws(args.password, args.dnsname)
+                    scripts.deploy_aws(
+                        args.password, args.dnsname, smtp_user, smtp_password
+                    )
                 else:
-                    scripts.deploy(args.password)
+                    scripts.deploy(args.password, smtp_user, smtp_password)
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
                 if args.provider == 'aws':
@@ -209,8 +218,13 @@ class OpenRemote(object):
             arguments.add_argument(
                 '--dnsname',
                 type=str,
-                help='host and domain name, defaults to "demo.mvp.openremote.io"',
-                default='demo.mvp.openremote.io',
+                help='host and domain name, defaults to "localhost"',
+                default='localhost',
+            )
+            arguments.add_argument(
+                '--with-email',
+                action='store_true',
+                help='generate valid SMTP server access keys',
             )
 
     def perquisites(self, arguments=[]):

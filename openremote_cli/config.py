@@ -2,7 +2,7 @@ import os
 
 
 def initialize():
-    global DRY_RUN, LEVEL, TELEMETRY_URL, VERBOSE, PROFILE, BUCKET, TELEMETRY
+    global DRY_RUN, LEVEL, TELEMETRY_URL, VERBOSE, PROFILE, BUCKET, TELEMETRY, REGION
     VERBOSE = False
     DRY_RUN = False
     TELEMETRY = True
@@ -17,3 +17,4 @@ def initialize():
     # AWS parameters
     PROFILE = 'openremote-cli'
     BUCKET = 'openremote-mvp-map-storage'
+    REGION = 'eu-west-1'

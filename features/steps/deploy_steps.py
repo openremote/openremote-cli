@@ -154,3 +154,20 @@ def step_impl(context):
 @then(u'we get full health response')
 def step_impl(context):
     assert 'processLoadPercentage' in context.output
+
+
+# E-mail setup
+@when(u'we call or deploy --with-email')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli deploy --with-email -v -n --no-telemetry'
+    )
+    assert context.code == 0
+    print(context.output)
+
+
+@then(u'generate SMTP credentials')
+def step_impl(context):
+    assert 'aws iam create-user --user-name ses-user-' in context.output
+    assert 'aws iam put-user-policy --policy-document' in context.output
+    assert 'aws iam create-access-key --user-name ses-user-' in context.output

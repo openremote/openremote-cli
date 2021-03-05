@@ -24,6 +24,10 @@ Feature: deploy
     When we call or --dry-run deploy
     Then show what will be done
 
+  Scenario: deploy with e-mail
+    When we call or deploy --with-email
+    Then generate SMTP credentials
+
   Scenario: remove and clean deployment
     Given we have docker and docker-compose installed
     When call openremote-cli deploy --action remove --dry-run
