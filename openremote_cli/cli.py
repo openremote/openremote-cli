@@ -5,7 +5,6 @@ import pkg_resources
 import logging
 import inspect
 import os
-import pwd
 import getpass
 import platform
 from datetime import datetime
@@ -103,17 +102,18 @@ class OpenRemote(object):
             parser = self.__parser(
                 'configure_aws', 'configure AWS credentials'
             )
-            parser.add_argument(
+            arguments = parser.add_argument_group("configure_aws arguments")
+            arguments.add_argument(
                 "-i", "--id", type=str, required=True, help="Access key ID"
             )
-            parser.add_argument(
+            arguments.add_argument(
                 "-s",
                 "--secret",
                 type=str,
                 required=True,
                 help="Secret access key",
             )
-            parser.add_argument(
+            arguments.add_argument(
                 "-r",
                 "--region",
                 type=str,
@@ -137,32 +137,17 @@ class OpenRemote(object):
             else:
                 raise ValueError(f"'{args.action}' not implemented")
         else:
-            parser = self.__parser('map', 'map storage/retrive service')
-            parser.add_argument(
+            parser = self.__parser('map', 'map storage/retrieve service')
+            arguments = parser.add_argument_group("map arguments")
+            arguments.add_argument(
                 '-a',
                 '--action',
                 nargs="?",
-                choices=['configure', 'list', 'upload', 'download', 'delete'],
-                help='list/upload/download/delete map from S3',
-                required=True,
-                const='list',
+                choices=['list', 'upload', 'download', 'delete'],
+                help='list/upload/download/delete map from S3, defaults to "list"',
+                default='list',
             )
-            required_arguments = parser.add_argument_group(
-                "configure arguments"
-            )
-            required_arguments.add_argument(
-                "-i", "--id", type=str, required=False, help="Access key ID"
-            )
-            required_arguments.add_argument(
-                "-s",
-                "--secret",
-                type=str,
-                required=False,
-                help="Secret access key",
-            )
-            required_arguments = parser.add_argument(
-                '-f', type=str, help="file name"
-            )
+            arguments.add_argument('-f', type=str, help="file name")
 
     def deploy(self, arguments=[]):
         if len(arguments) > 0:
@@ -198,31 +183,33 @@ class OpenRemote(object):
                 'deploy',
                 'Deploy OpenRemote stack. By default create on localhost.',
             )
-            parser.add_argument(
+            arguments = parser.add_argument_group("deploy arguments")
+            arguments.add_argument(
                 '-a',
                 '--action',
                 nargs="?",
                 choices=['create', 'remove', 'clean', 'health'],
-                help='create/remove/clean OpenRemote stack',
+                help='create/remove/clean OpenRemote stack, defaults to "create"',
                 default='create',
             )
-            parser.add_argument(
+            arguments.add_argument(
                 '-p',
                 '--password',
                 type=str,
                 default='secret',
-                help='Password for admin user',
+                help='password for admin user, defaults to "secret"',
             )
-            parser.add_argument(
+            arguments.add_argument(
                 '--provider',
                 nargs="?",
                 choices=['aws', 'localhost'],
                 default='localhost',
+                help='defaults to "localhost"',
             )
-            parser.add_argument(
+            arguments.add_argument(
                 '--dnsname',
                 type=str,
-                help='host and domain name',
+                help='host and domain name, defaults to "demo.mvp.openremote.io"',
                 default='demo.mvp.openremote.io',
             )
 
@@ -232,6 +219,7 @@ class OpenRemote(object):
             logging.debug(args)
             if args.install is True:
                 print('Checking and installing missing tools.\n')
+                logging.error("Not implemented")
             else:
                 print('Checking for required tools')
                 scripts.check_tools()
@@ -240,10 +228,9 @@ class OpenRemote(object):
             parser = self.__parser(
                 'perquisites', 'Check if all required tools are installed'
             )
-            parser.add_argument(
-                '--install',
-                action='store_true',
-                help='install all missing tools',
+            arguments = parser.add_argument_group("perquisites arguments")
+            arguments.add_argument(
+                '--install', action='store_true', help='install missing tools'
             )
 
     def __parser(self, name, description):
@@ -286,10 +273,10 @@ def send_metric(cli_input, exit_reason, exit_code, duration):
         # never telemetry secrets!
         return
     try:
-        user_id = f'{getpass.getuser()} {pwd.getpwuid(os.getuid())[0]}'
+        user_id = f'{getpass.getuser()}'
     except:
         # We don't have login in github workflow
-        user_id = 'No login'
+        user_id = 'No login!'
     payload = {
         "metrics": [
             {
