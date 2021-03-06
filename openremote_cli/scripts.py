@@ -63,13 +63,16 @@ def deploy_health(dnsname, verbosity=0):
         else:
             print(health)
     except:
-        if verbosity == 0:
+        if '.' not in dnsname and dnsname != 'localhost':
+            host, domain = _split_dns(dnsname)
+            deploy_health(f'{host}.{domain}', verbosity)
+        elif verbosity == 0:
             print('0')
         else:
             print(f'Error calling\ncurl https://{dnsname}/api/master/health')
 
 
-def deploy_aws(password, dnsname):
+def _split_dns(dnsname):
     if '.' in dnsname:
         host = dnsname.split('.')[0]
         domain = dnsname[len(host) + 1 :]
@@ -77,6 +80,11 @@ def deploy_aws(password, dnsname):
         logging.debug('adding default domain')
         host = dnsname
         domain = 'mvp.openremote.io'
+    return host, domain
+
+
+def deploy_aws(password, dnsname):
+    host, domain = _split_dns(dnsname)
     logging.debug(f'{dnsname} => {host} + {domain}')
     stack_name = f'OpenRemote-{uuid.uuid4()}'
     check_aws_perquisites()
