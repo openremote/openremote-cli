@@ -165,10 +165,17 @@ class OpenRemote(object):
                     'Deploying OR... This usually takes less than 15 minutes.\n'
                 )
                 if args.provider == 'aws':
-                    scripts.deploy_aws(
-                        args.password, args.dnsname, smtp_user, smtp_password
-                    )
+                    scripts.deploy_aws(args.password, args.dnsname)
                 else:
+                    smtp_user, smtp_password = None, None
+                    if args.with_email:
+                        logging.debug('Creating SMTP credentials')
+                        smtp_user, smtp_password = scripts.smtp_credentials(
+                            args.dnsname
+                        )
+                    logging.debug(
+                        f'user: {smtp_user}, password: {smtp_password}'
+                    )
                     scripts.deploy(args.password, smtp_user, smtp_password)
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
