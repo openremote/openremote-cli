@@ -153,13 +153,6 @@ class OpenRemote(object):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
-            smtp_user, smtp_password = None, None
-            if args.with_email:
-                logging.debug('Creating SMTP credentials')
-                smtp_user, smtp_password = scripts.smtp_credentials(
-                    args.dnsname
-                )
-                logging.debug(f'user: {smtp_user}, password: {smtp_password}')
             if args.action == 'create':
                 print(
                     'Deploying OR... This usually takes less than 15 minutes.\n'

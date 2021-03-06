@@ -35,7 +35,7 @@ def deploy(password, smtp_user, smtp_password):
         env = (
             f'{env}SETUP_EMAIL_USER={smtp_user} '
             f'SETUP_EMAIL_PASSWORD={smtp_password} '
-            f'SETUP_EMAIL_PORT=587 '
+            f'SETUP_EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
         )
     shell.execute(
         f'{env}docker stack deploy -c mvp-docker-compose.yml openremote'
