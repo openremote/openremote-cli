@@ -2,10 +2,11 @@ import os
 
 
 def initialize():
-    global DRY_RUN, LEVEL, TELEMETRY_URL, VERBOSE, PROFILE, BUCKET, TELEMETRY, REGION
+    global DRY_RUN, LEVEL, TELEMETRY_URL, VERBOSE, PROFILE, BUCKET, TELEMETRY, REGION, QUIET
     VERBOSE = False
     DRY_RUN = False
     TELEMETRY = True
+    QUIET = False
     LEVEL = 'logging.ERROR'
     TELEMETRY_URL = 'https://cli.developers.openremote.io/metrics'
     try:

@@ -12,6 +12,8 @@ Feature: cli
     Then aws configure set profile.openremote-cli.aws_access_key_id <id>
     Then aws configure set profile.openremote-cli.aws_secret_access_key <secret>
     Then aws configure set profile.openremote-cli.region eu-west-1
+    When we call or configure_aws --secret secret -q
+    Then we get SMTP password and nothing else
     # And ssh-keygen -f openremote -t rsa -b 4096  -C "me@privacy.net"
     # And aws ec2 import-key-pair --key-name openremote --public-key-material fileb://openremote.pub
     # And aws ec2 create-default-vpc --profile mvp

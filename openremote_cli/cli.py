@@ -18,6 +18,7 @@ import json
 
 from openremote_cli import config
 from openremote_cli import scripts
+from openremote_cli import gen_aws_smtp_credentials
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
@@ -37,6 +38,9 @@ class OpenRemote(object):
                 getattr(self, attr)([])
 
         args, unknown = self.base_subparser.parse_known_args(arguments)
+        if args.quiet:
+            config.QUIET = True
+            args.verbosity = 0
 
         config.LEVEL = {
             0: logging.ERROR,
@@ -71,18 +75,20 @@ class OpenRemote(object):
                     print('Unknown command ' + command)
                 self.help(arguments)
             else:
-                if config.DRY_RUN:
-                    print("--dry-run active!")
-                if not config.VERBOSE:
-                    print("To see commands use -v switch (-vvv for debug)\n")
-                else:
-                    print(
-                        'If you need help go to https://forum.openremote.io/\n'
-                    )
-                # use dispatch pattern to invoke method with same name so it's
-                # easy to add new subcommands
-                logging.debug('dispatching ' + command + f'({arguments})')
-                # logging.debug(args)
+                if not config.QUIET:
+                    if config.DRY_RUN:
+                        print("--dry-run active!")
+                    if not config.VERBOSE:
+                        print(
+                            "To see commands use -v switch (-vvv for debug)\n"
+                        )
+                    else:
+                        print(
+                            'If you need help go to https://forum.openremote.io/\n'
+                        )
+                    # use dispatch pattern to invoke method with same name so it's
+                    # easy to add new subcommands
+                    logging.debug('dispatching ' + command + f'({arguments})')
                 getattr(self, command)(arguments)
 
     # Basic command run without arguments adds parser
@@ -97,14 +103,22 @@ class OpenRemote(object):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
-            scripts.configure_aws(args.id, args.secret, args.region)
+            if args.id:
+                scripts.configure_aws(args.id, args.secret, args.region)
+            else:
+                print(
+                    gen_aws_smtp_credentials.calculate_key(
+                        args.secret, config.REGION
+                    ),
+                    end='',
+                )
         else:
             parser = self.__parser(
                 'configure_aws', 'configure AWS credentials'
             )
             arguments = parser.add_argument_group("configure_aws arguments")
             arguments.add_argument(
-                "-i", "--id", type=str, required=True, help="Access key ID"
+                "-i", "--id", type=str, required=False, help="Access key ID"
             )
             arguments.add_argument(
                 "-s",
@@ -278,6 +292,9 @@ class OpenRemote(object):
             action='store_true',
             help="Don't send usage data to server",
         )
+        parser.add_argument(
+            '-q', '--quiet', action='store_true', help='suppress info'
+        )
         return parser
 
 
@@ -321,7 +338,9 @@ def package_version():
 
 
 def isLatestVersion():
-    # Check pypi for the latest version number
+    if config.QUIET:
+        return
+    # Check PyPI for the latest version number
     contents = urllib.request.urlopen(
         'https://pypi.org/pypi/openremote-cli/json'
     ).read()

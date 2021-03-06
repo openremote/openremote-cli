@@ -117,3 +117,18 @@ def step_impl(context):
 @then(u'install all missing tools')
 def step_impl(context):
     assert "installing missing tools" in context.response
+
+
+# Generate SMTP password
+@when(u'we call or configure_aws --secret secret -q')
+def step_impl(context):
+    context.code, context.response = context.execute(
+        f"poetry run or configure_aws --secret secret -q --no-telemetry"
+    )
+    print(context.response)
+    assert context.code == 0
+
+
+@then(u'we get SMTP password and nothing else')
+def step_impl(context):
+    assert 'BAF8hrfLn8+XGiCdeSx+uyiMJl3zQ3jJAjDo24AyWbVI' == context.response
