@@ -96,7 +96,6 @@ def deploy_aws(password, dnsname):
         print(
             '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
         )
-
     shell_exec = shell.execute(
         f'aws cloudformation create-stack --stack-name {stack_name} '
         f'--template-body file://aws-cloudformation.template.yml --parameters '
@@ -105,7 +104,9 @@ def deploy_aws(password, dnsname):
         f'ParameterKey=HostedZone,ParameterValue=true '
         f'ParameterKey=OpenRemotePassword,ParameterValue={password} '
         f'ParameterKey=InstanceType,ParameterValue=t3a.small '
-        f'ParameterKey=KeyName,ParameterValue=openremote --profile={config.PROFILE}'
+        f'ParameterKey=KeyName,ParameterValue=openremote '
+        f'--capabilities CAPABILITY_NAMED_IAM '
+        f'--profile={config.PROFILE}'
     )
     print(f'\n{shell_exec[1]}')
     if shell_exec[0] != 0:
@@ -122,12 +123,12 @@ def deploy_aws(password, dnsname):
     shell.execute(
         f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{dnsname}.sh'
     )
-    shell.execute(f'chmod +x aws-delete-stack-{dnsname}.sh')
+    shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
     print(
         f'\nStack deployed. Mind that running it cost money! To free resources execute:\n'
         f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}\n\n'
         f'check running stack with health command:\n'
-        f'or deploy -a health --dnsname {dnsname} -v'
+        f'or deploy -a health --dnsname {host}.{domain} -v'
     )
 
 
