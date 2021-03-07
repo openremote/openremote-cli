@@ -18,7 +18,7 @@ def deploy(password, smtp_user, smtp_password):
     )
     shell.execute('docker volume create openremote_deployment-data')
     shell.execute(
-        'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:latest'
+        'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:mvp'
     )
     if not config.DRY_RUN:
         wget.download(

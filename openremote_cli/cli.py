@@ -118,7 +118,11 @@ class OpenRemote(object):
             )
             arguments = parser.add_argument_group("configure_aws arguments")
             arguments.add_argument(
-                "-i", "--id", type=str, required=False, help="Access key ID"
+                "-i",
+                "--id",
+                type=str,
+                required=False,
+                help="Access key ID (if not given then return SMTP password)",
             )
             arguments.add_argument(
                 "-s",
@@ -180,9 +184,9 @@ class OpenRemote(object):
                         smtp_user, smtp_password = scripts.smtp_credentials(
                             args.dnsname
                         )
-                    logging.debug(
-                        f'user: {smtp_user}, password: {smtp_password}'
-                    )
+                        logging.debug(
+                            f'user: {smtp_user}, password: {smtp_password}'
+                        )
                     scripts.deploy(args.password, smtp_user, smtp_password)
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
@@ -281,14 +285,15 @@ class OpenRemote(object):
             help='showing effects without actual run and exit',
         )
         parser.add_argument(
-            "-v",
-            "--verbosity",
-            action="count",
+            '-v',
+            '--verbosity',
+            action='count',
             default=0,
-            help="increase output verbosity",
+            help='increase output verbosity',
         )
         parser.add_argument(
-            "--no-telemetry",
+            '-t',
+            '--no-telemetry',
             action='store_true',
             help="Don't send usage data to server",
         )
@@ -364,7 +369,11 @@ def main():
         exit_code = -1
     finally:
         end = time.time()
-        if config.TELEMETRY and '--no-telemetry' not in sys.argv:
+        if (
+            config.TELEMETRY
+            and '--no-telemetry' not in sys.argv
+            and '-t' not in sys.argv
+        ):
             logging.debug(f'Sending telemetry to {config.TELEMETRY_URL}')
             send_metric(sys.argv[1:], exit_reason, exit_code, end - start)
         else:
