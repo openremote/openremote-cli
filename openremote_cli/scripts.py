@@ -5,10 +5,12 @@ import wget
 import json
 import urllib.request
 import os
+import string
 
+from random import choice, randint
 from openremote_cli import shell
 from openremote_cli import config
-from openremote_cli import gen_aws_smtp_credentials
+from openremote_cli import gen_aws_smtp_credentials, email
 
 
 def deploy(password, smtp_user, smtp_password):
@@ -88,6 +90,12 @@ def deploy_aws(password, dnsname):
     logging.debug(f'{dnsname} => {host} + {domain}')
     stack_name = f'OpenRemote-{uuid.uuid4()}'
     check_aws_perquisites()
+    generate_password = password == 'secret'
+    if generate_password:
+        characters = string.ascii_letters + string.digits
+        password = "".join(choice(characters) for x in range(randint(8, 16)))
+        if not config.QUIET:
+            print(f'\nGenerated password: {password}\n')
     if not config.DRY_RUN:
         wget.download(
             'https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
@@ -117,17 +125,46 @@ def deploy_aws(password, dnsname):
         f'aws cloudformation wait stack-create-complete '
         f'--stack-name {stack_name} --profile {config.PROFILE}'
     )
-
     if not config.DRY_RUN:
         os.remove(f'aws-cloudformation.template.yml')
+        if generate_password:
+            # In case of password generation get email credentials and send it to support
+            code, output = shell.execute(
+                f'aws cloudformation describe-stacks --stack-name {stack_name} --profile {config.PROFILE} '
+                '--query "Stacks[0].Outputs[?OutputKey==\'UserId\'||OutputKey==\'UserSecret\'].OutputValue" --output json'
+            )
+            credentials = json.loads(output)
+            smtp_user = credentials[0]
+            smtp_password = gen_aws_smtp_credentials.calculate_key(
+                credentials[1], config.REGION
+            )
+            email.sendmail(
+                "michal.rutka@gmail.com",
+                "Openremote password",
+                f"""
+                A new AWS stack {stack_name} has been just created. Because there was a
+                default password used a more secure one was generated. The new admin password is
+                {password}
+                """,
+                smtp_user,
+                smtp_password,
+            )
+            print(
+                '\nAn email with generated password was sent to support@openremote.io\n'
+            )
+    elif generate_password:
+        print(
+            '\nAn email with generated password would be sent to support@openremote.io\n'
+        )
     shell.execute(
-        f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{dnsname}.sh'
+        f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.sh'
     )
     shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
     print(
-        f'\nStack deployed. Mind that running it cost money! To free resources execute:\n'
+        '\nStack deployed - wait about 15 min for OpenRemote installation to complete.\n'
+        'Mind that running it cost money! To free resources execute:\n'
         f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}\n\n'
-        f'check running stack with health command:\n'
+        'check running stack with health command:\n'
         f'or deploy -a health --dnsname {host}.{domain} -v'
     )
 

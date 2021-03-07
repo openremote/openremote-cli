@@ -171,3 +171,22 @@ def step_impl(context):
     assert 'aws iam create-user --user-name ses-user-' in context.output
     assert 'aws iam put-user-policy --policy-document' in context.output
     assert 'aws iam create-access-key --user-name ses-user-' in context.output
+
+
+# Auto generate password
+@when(u'or deploy --provider aws with default password')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli deploy --provider aws -v -n -t'
+    )
+    assert context.code == 0
+    print(context.output)
+
+
+@then(u'generate password and email it to support')
+def step_impl(context):
+    assert 'Generated password:' in context.output
+    assert (
+        'An email with generated password would be sent to support@openremote.io'
+        in context.output
+    )

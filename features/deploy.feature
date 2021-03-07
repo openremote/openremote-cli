@@ -16,6 +16,8 @@ Feature: deploy
     And  execute AWS CloudFormation
     When call or deploy -a remove aws -d -v --no-telemetry
     Then delete the proper cloudformation stack
+    When or deploy --provider aws with default password
+    Then generate password and email it to support
 
   Scenario: deploy to localhost
     Given we have docker and docker-compose installed
