@@ -6,8 +6,8 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  PLATFORM: linux/amd64,linux/arm64,linux/arm/v7
+# env:
+#   PLATFORM: linux/amd64,linux/arm64
 
 jobs:
   build_image:
@@ -32,4 +32,5 @@ jobs:
         run: sleep 600
       - name: build and push images
         run: |
-          docker build --push --platform $PLATFORM -t openremote/openremote-cli:latest .
+          make multi-image
+          # docker build --push --platform $PLATFORM -t openremote/openremote-cli:latest .

@@ -46,9 +46,14 @@ def deploy(password, smtp_user, smtp_password):
         os.remove(f'mvp-docker-compose.yml')
     if config.VERBOSE is True:
         print(
-            '\nCheck running services with `docker service ls` until all are 1/1 replicas...'
+            '\nCheck running services with `docker service ls` until all are 1/1 replicas...\n'
+            'then open http://localhost\n\n'
+            'Remove the stack when you are done:\n'
+            '> docker stack rm openremote\n'
+            'Remove docker resources:\n'
+            "> docker images --filter 'reference=openremote/*' -q | xargs docker rmi\n"
+            "> docker volume ls --filter 'dangling=true' -q | xargs docker volume rm"
         )
-        print('then open http://localhost')
 
 
 def deploy_health(dnsname, verbosity=0):
@@ -156,10 +161,10 @@ def deploy_aws(password, dnsname):
         print(
             '\nAn email with generated password would be sent to support@openremote.io\n'
         )
-    shell.execute(
-        f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.sh'
-    )
-    shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
+    # shell.execute(
+    #     f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.sh'
+    # )
+    # shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
     print(
         '\nStack deployed - wait about 15 min for OpenRemote installation to complete.\n'
         'Mind that running it cost money! To free resources execute:\n'

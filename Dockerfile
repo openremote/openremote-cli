@@ -5,9 +5,11 @@ RUN apt update && apt install curl unzip -y --no-install-recommends && \
     unzip awscliv2.zip && \
     ./aws/install
 
-RUN pip install openremote-cli
-
 # Install Docker client for deploy
 RUN curl -sSL https://get.docker.com/ | sh
+
+RUN pip install openremote-cli
+
+USER 1000
 
 ENTRYPOINT [ "/usr/local/bin/openremote-cli" ]
