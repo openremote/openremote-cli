@@ -10,6 +10,4 @@ RUN curl -sSL https://get.docker.com/ | sh
 
 RUN pip install openremote-cli
 
-USER 1000
-
 ENTRYPOINT [ "/usr/local/bin/openremote-cli" ]
