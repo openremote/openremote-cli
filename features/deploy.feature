@@ -26,6 +26,11 @@ Feature: deploy
     When we call or --dry-run deploy
     Then show what will be done
 
+  Scenario: deploy to localhost with custom dns name
+    Given we have docker and docker-compose installed
+    When we call openremote-cli -n deploy --dnsname xxx.yyy.com
+    Then show what will be done with dns
+
   Scenario: deploy with e-mail
     When we call or deploy --with-email
     Then generate SMTP credentials

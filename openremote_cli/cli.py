@@ -187,7 +187,9 @@ class OpenRemote(object):
                         logging.debug(
                             f'user: {smtp_user}, password: {smtp_password}'
                         )
-                    scripts.deploy(args.password, smtp_user, smtp_password)
+                    scripts.deploy(
+                        args.password, smtp_user, smtp_password, args.dnsname
+                    )
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
                 if args.provider == 'aws':

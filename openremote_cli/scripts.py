@@ -13,7 +13,7 @@ from openremote_cli import config
 from openremote_cli import gen_aws_smtp_credentials, email
 
 
-def deploy(password, smtp_user, smtp_password):
+def deploy(password, smtp_user, smtp_password, dnsname):
     shell.execute('docker swarm init', no_exception=True)
     shell.execute(
         'docker volume rm openremote_postgresql-data', no_exception=True
@@ -39,18 +39,42 @@ def deploy(password, smtp_user, smtp_password):
             f'SETUP_EMAIL_PASSWORD={smtp_password} '
             f'SETUP_EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
         )
-    shell.execute(
-        f'{env}docker stack deploy -c mvp-docker-compose.yml openremote'
-    )
-    if not config.DRY_RUN:
-        os.remove(f'mvp-docker-compose.yml')
+    if dnsname != 'localhost':
+        env = f'{env}DOMAINNAME={dnsname} IDENTITY_NETWORK_HOST={dnsname} '
+        # As you may be facing internet change default password for security
+        generate_password, password = _password(password)
+        if generate_password:
+            env = f'{env}SETUP_ADMIN_PASSWORD={password} '
+        # Deploy with docker-compose as proxy container does not obey
+        # health check within swarm mode
+        # TODO revisit proxy image to fix this, otherwise letsencrypt has problems
+        shell.execute(
+            f'{env}docker-compose -f mvp-docker-compose.yml -p openremote up -d'
+        )
+        if config.VERBOSE is True:
+            print(
+                '\nCheck running services with `docker ps` until containers are healthy...\n'
+                f'then open https://{dnsname} and login with admin {password}\n\n'
+                'Remove the stack when you are done:\n'
+                '> docker-compose -f mvp-docker-compose.yml -p openremote down\n'
+                '> rm mvp-docker-compose.yml\n'
+            )
+    else:
+        shell.execute(
+            f'{env}docker stack deploy -c mvp-docker-compose.yml openremote'
+        )
+        if config.VERBOSE is True:
+            print(
+                '\nCheck running services with `docker service ls` until all are 1/1 replicas...\n'
+                f'then open https://localhost and login with admin {password}\n\n'
+                'Remove the stack when you are done:\n'
+                '> docker stack rm openremote\n'
+            )
+        if not config.DRY_RUN:
+            os.remove(f'mvp-docker-compose.yml')
     if config.VERBOSE is True:
         print(
-            '\nCheck running services with `docker service ls` until all are 1/1 replicas...\n'
-            'then open http://localhost\n\n'
-            'Remove the stack when you are done:\n'
-            '> docker stack rm openremote\n'
-            'Remove docker resources:\n'
+            '\nRemove docker resources:\n'
             "> docker images --filter 'reference=openremote/*' -q | xargs docker rmi\n"
             "> docker volume ls --filter 'dangling=true' -q | xargs docker volume rm"
         )
@@ -90,17 +114,22 @@ def _split_dns(dnsname):
     return host, domain
 
 
-def deploy_aws(password, dnsname):
-    host, domain = _split_dns(dnsname)
-    logging.debug(f'{dnsname} => {host} + {domain}')
-    stack_name = f'OpenRemote-{uuid.uuid4()}'
-    check_aws_perquisites()
+def _password(password):
     generate_password = password == 'secret'
     if generate_password:
         characters = string.ascii_letters + string.digits
         password = "".join(choice(characters) for x in range(randint(8, 16)))
         if not config.QUIET:
             print(f'\nGenerated password: {password}\n')
+    return generate_password, password
+
+
+def deploy_aws(password, dnsname):
+    host, domain = _split_dns(dnsname)
+    logging.debug(f'{dnsname} => {host} + {domain}')
+    stack_name = f'OpenRemote-{uuid.uuid4()}'
+    check_aws_perquisites()
+    generate_password, password = _password(password)
     if not config.DRY_RUN:
         wget.download(
             'https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'

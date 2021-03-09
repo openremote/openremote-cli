@@ -190,3 +190,23 @@ def step_impl(context):
         'An email with generated password would be sent to support@openremote.io'
         in context.output
     )
+
+
+# Deploy localhost with custom dns name
+@when(u'we call openremote-cli -n deploy --dnsname xxx.yyy.com')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli deploy --dnsname xxx.yyy.com -v -t -n'
+    )
+    assert context.code == 0
+    print(context.output)
+
+
+@then(u'show what will be done with dns')
+def step_impl(context):
+    assert 'DOMAINNAME=xxx.yyy.com' in context.output
+    assert 'IDENTITY_NETWORK_HOST=xxx.yyy.com' in context.output
+    assert (
+        'docker-compose -f mvp-docker-compose.yml -p openremote up -d'
+        in context.output
+    )
