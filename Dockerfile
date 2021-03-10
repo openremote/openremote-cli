@@ -8,6 +8,10 @@ RUN apt update && apt install curl unzip -y --no-install-recommends && \
 # Install Docker client for deploy
 RUN curl -sSL https://get.docker.com/ | sh
 
+# Instal docker-compose
+RUN curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose
+
 RUN pip install openremote-cli
 
 ENTRYPOINT [ "/usr/local/bin/openremote-cli" ]

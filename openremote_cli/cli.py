@@ -369,6 +369,13 @@ def main():
     except Exception as error:
         exit_reason = str(error)
         exit_code = -1
+        try:
+            # If we made this exception then this should work
+            exit_code = exit_reason[0]
+            exit_reason = exit_reason[1]
+        except:
+            # If not then it is already good enough
+            pass
     finally:
         end = time.time()
         if (
