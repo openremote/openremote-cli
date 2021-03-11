@@ -6,7 +6,9 @@ import json
 import urllib.request
 import os
 import string
+import requests
 
+from keycloak import KeycloakOpenID
 from random import choice, randint
 from openremote_cli import shell
 from openremote_cli import config
@@ -331,3 +333,42 @@ def smtp_credentials(dnsname):
                 access['AccessKey']['SecretAccessKey'], config.REGION
             ),
         )
+
+
+# Manager
+def _token(username, password, url):
+    keycloak_openid = KeycloakOpenID(
+        server_url=f'https://{url}/auth/',
+        client_id="admin-cli",
+        realm_name="master",
+        client_secret_key="secret",
+    )
+    return keycloak_openid.token(username, password)['access_token']
+
+
+def manager_list_realms(username, password, dnsname):
+    response = requests.get(
+        f'https://{dnsname}/auth/admin/realms',
+        headers={
+            'Authorization': f'Bearer ' + _token(username, password, dnsname)
+        },
+    )
+    for r in response.json():
+        if config.QUIET:
+            print(f"{r['realm']}  \t{r['displayName']}")
+        else:
+            print(json.dumps(r, indent=2))
+
+
+def manager_list_users(realm, password, dnsname):
+    response = requests.get(
+        f'https://{dnsname}/auth/admin/realms/{realm}/users',
+        headers={
+            'Authorization': f'Bearer ' + _token('admin', password, dnsname)
+        },
+    )
+    for r in response.json():
+        if config.QUIET:
+            print(f"{r['username']}  \t{r['email']}")
+        else:
+            print(json.dumps(r, indent=2))

@@ -247,6 +247,64 @@ class OpenRemote(object):
                 help='generate valid SMTP server access keys',
             )
 
+    def manager(self, arguments=[]):
+        if len(arguments) > 0:
+            args = self.base_subparser.parse_args(arguments)
+            logging.debug(args)
+            if args.list_realms is True:
+                print('\nListing realms\n--------------')
+                scripts.manager_list_realms(
+                    args.user, args.password, args.dnsname
+                )
+            if args.list_users is True:
+                print(
+                    f'\nListing users for {args.realm} realm\n--------------'
+                )
+                scripts.manager_list_users(
+                    args.realm, args.password, args.dnsname
+                )
+            # else:
+            #     print('No command given')
+        else:
+            parser = self.__parser('manager', 'admin online manager')
+            arguments = parser.add_argument_group("manager arguments")
+            arguments.add_argument(
+                '-u',
+                '--user',
+                type=str,
+                required=False,
+                help='username',
+                default='admin',
+            )
+            arguments.add_argument(
+                '-p', '--password', required=True, help='password'
+            )
+            arguments.add_argument(
+                '--dnsname',
+                type=str,
+                required=False,
+                default='demo.openremote.io',
+            )
+            arguments.add_argument(
+                '--list-realms',
+                required=False,
+                action='store_true',
+                help='list defined realms',
+            )
+            arguments.add_argument(
+                '--list-users',
+                required=False,
+                action='store_true',
+                help='list defined realms',
+            )
+            arguments.add_argument(
+                '--realm',
+                required=False,
+                type=str,
+                help='realm to work on',
+                default='master',
+            )
+
     def perquisites(self, arguments=[]):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
@@ -367,12 +425,13 @@ def main():
     try:
         OpenRemote(sys.argv[1:])
     except Exception as error:
+        logging.error(error)
         exit_reason = str(error)
         exit_code = -1
         try:
             # If we made this exception then this should work
-            exit_code = exit_reason[0]
-            exit_reason = exit_reason[1]
+            exit_code = error[0]
+            exit_reason = error[1]
         except:
             # If not then it is already good enough
             pass
