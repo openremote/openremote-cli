@@ -307,7 +307,10 @@ class OpenRemote(object):
             )
 
     def shell(self, arguments=[]):
-        pty.spawn("/bin/sh")
+        if len(arguments) > 0:
+            pty.spawn("/bin/sh")
+        else:
+            self.__parser('shell', 'spawn shell')
 
     def perquisites(self, arguments=[]):
         if len(arguments) > 0:
