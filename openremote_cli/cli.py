@@ -10,6 +10,7 @@ import platform
 from datetime import datetime
 import requests
 import time
+import pty
 
 # For checking version
 # TODO check if urllib can be replaced with requests or other way around
@@ -295,7 +296,7 @@ class OpenRemote(object):
                 '--list-users',
                 required=False,
                 action='store_true',
-                help='list defined realms',
+                help='list defined users in a realm',
             )
             arguments.add_argument(
                 '--realm',
@@ -304,6 +305,9 @@ class OpenRemote(object):
                 help='realm to work on',
                 default='master',
             )
+
+    def shell(self, arguments=[]):
+        pty.spawn("/bin/sh")
 
     def perquisites(self, arguments=[]):
         if len(arguments) > 0:
