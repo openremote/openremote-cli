@@ -26,7 +26,12 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 class OpenRemote(object):
     def __init__(self, arguments):
-        parser = argparse.ArgumentParser(prog='openremote-cli')
+        parser = argparse.ArgumentParser(
+            prog='openremote-cli',
+            description=f'OpenRemote Command Line Interface (CLI) version {package_version()}',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            #                   conflict_handler='resolve',
+        )
 
         self.base_subparser = self._add_std_arguments(parser)
 
@@ -163,7 +168,7 @@ class OpenRemote(object):
                 '--action',
                 nargs="?",
                 choices=['list', 'upload', 'download', 'delete'],
-                help='list/upload/download/delete map from S3, defaults to "list"',
+                help='list/upload/download/delete map from S3',
                 default='list',
             )
             arguments.add_argument('-f', type=str, help="file name")
@@ -219,7 +224,7 @@ class OpenRemote(object):
                 '--action',
                 nargs="?",
                 choices=['create', 'remove', 'clean', 'health'],
-                help='create/remove/clean OpenRemote stack, defaults to "create"',
+                help='create/remove/clean OpenRemote stack',
                 default='create',
             )
             arguments.add_argument(
@@ -227,19 +232,19 @@ class OpenRemote(object):
                 '--password',
                 type=str,
                 default='secret',
-                help='password for admin user, defaults to "secret"',
+                help='password for admin user',
             )
             arguments.add_argument(
                 '--provider',
                 nargs="?",
                 choices=['aws', 'localhost'],
                 default='localhost',
-                help='defaults to "localhost"',
+                help='where the stack should be deployed',
             )
             arguments.add_argument(
                 '--dnsname',
                 type=str,
-                help='host and domain name, defaults to "localhost"',
+                help='host and domain name',
                 default='localhost',
             )
             arguments.add_argument(
@@ -310,7 +315,9 @@ class OpenRemote(object):
         if len(arguments) > 0:
             pty.spawn("/bin/sh")
         else:
-            self.__parser('shell', 'spawn shell')
+            self.__parser(
+                'shell', 'spawn shell (useful inside of docker container)'
+            )
 
     def perquisites(self, arguments=[]):
         if len(arguments) > 0:
@@ -320,7 +327,8 @@ class OpenRemote(object):
                 print('Checking and installing missing tools.\n')
                 logging.error("Not implemented")
             else:
-                print('Checking for required tools')
+                if not config.QUIET:
+                    print('Checking for required tools...\n')
                 scripts.check_tools()
         else:
             logging.debug('adding perquisites parser')
@@ -334,7 +342,13 @@ class OpenRemote(object):
 
     def __parser(self, name, description):
         parser = self.subparsers.add_parser(
-            name=name, description=description, help=description
+            name=name,
+            description=description,
+            help=description,
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            # TODO see what is wrong with parents
+            # conflict_handler='resolve',
+            # parents=[self.base_subparser],
         )
         return self._add_std_arguments(parser)
 

@@ -282,7 +282,16 @@ def map_delete(path):
 
 
 def check_tools():
-    print('Checking AWS perquisites')
+    code, output = shell.execute('docker --version')
+    if not config.QUIET:
+        print(output)
+    code, output = shell.execute('docker-compose --version')
+    if not config.QUIET:
+        print(output)
+    # print('Checking AWS perquisites')
+    code, output = shell.execute('aws --version')
+    if not config.QUIET:
+        print(output)
     return check_aws_perquisites()
 
 

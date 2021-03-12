@@ -18,5 +18,4 @@ def step_impl(context):
 
 @then(u'there should be openremote-cli version response')
 def step_impl(context):
-    # TODO why the output is formated in narrow column?
-    assert "openremote-" in context.output
+    assert "openremote-cli/" in context.output
