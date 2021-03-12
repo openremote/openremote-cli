@@ -8,7 +8,6 @@ lint:
 
 image:
 	docker build -t openremote/openremote-cli --no-cache .
-	docker push openremote/openremote-cli
 
 multi-image:
 	docker buildx build --push --platform linux/arm64,linux/amd64 -t openremote/openremote-cli --no-cache .
