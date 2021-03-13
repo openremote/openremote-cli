@@ -2,6 +2,11 @@ name: docker
 
 on:
   push:
+    paths:
+      - Dockerfile
+      - .github/workflows/docker.yml
+      - Makefile
+      - pyproject.toml
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
