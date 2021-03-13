@@ -13,8 +13,7 @@ RUN curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-c
     chmod +x /usr/local/bin/docker-compose
 
 RUN pip install openremote-cli
-ADD docker-entrypoint.sh /
+COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
 
-#ENTRYPOINT [ "/usr/local/bin/openremote-cli" ]
 ENTRYPOINT [ "/docker-entrypoint.sh" ]

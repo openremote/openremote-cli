@@ -269,10 +269,12 @@ class OpenRemote(object):
                 scripts.manager_list_users(
                     args.realm, args.password, args.dnsname
                 )
-            # else:
-            #     print('No command given')
+            if args.create_user is True:
+                raise Exception('not implemented')
+            if args.delete_user is True:
+                raise Exception('not implemented')
         else:
-            parser = self.__parser('manager', 'admin online manager')
+            parser = self.__parser('manager', 'manage online manager')
             arguments = parser.add_argument_group("manager arguments")
             arguments.add_argument(
                 '-u',
@@ -283,12 +285,13 @@ class OpenRemote(object):
                 default='admin',
             )
             arguments.add_argument(
-                '-p', '--password', required=True, help='password'
+                '-p', '--password', required=True, help='user password'
             )
             arguments.add_argument(
                 '--dnsname',
                 type=str,
                 required=False,
+                help='OpenRemote dns',
                 default='demo.openremote.io',
             )
             arguments.add_argument(
@@ -302,6 +305,18 @@ class OpenRemote(object):
                 required=False,
                 action='store_true',
                 help='list defined users in a realm',
+            )
+            arguments.add_argument(
+                '--create-user',
+                required=False,
+                action='store_true',
+                help='create users in a realm',
+            )
+            arguments.add_argument(
+                '--delete-user',
+                required=False,
+                action='store_true',
+                help='delete users from a realm',
             )
             arguments.add_argument(
                 '--realm',
