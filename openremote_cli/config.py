@@ -63,18 +63,25 @@ def initialize():
     QUIET = False
     LEVEL = 'logging.ERROR'
 
-    store_token('localhost', 'secret_token')
 
-
-def store_token(url, token):
+def store_token(url, token, refresh):
     config = configparser.ConfigParser()
     config.read(_config_file_name())
     try:
         # first try to update
         managerUrl = config[url]
-        managerUrl['token'] = token
+        managerUrl['access_token'] = token
+        managerUrl['refresh_token'] = refresh
     except:
         # if not the create
-        config[url] = {'token': token}
+        config[url] = {'access_token': token, 'refresh_token': refresh}
     with open(_config_file_name(), 'w') as conf:
         config.write(conf)
+
+
+def get_token(url):
+    config = configparser.ConfigParser()
+    config.read(_config_file_name())
+    # TODO refresh toke or ask to login again
+    # managerUrl = config[url]
+    return config[url]['access_token']

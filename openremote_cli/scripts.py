@@ -353,6 +353,20 @@ def _token(username, password, url):
     return keycloak_openid.token(username, password)['access_token']
 
 
+def manager_login(url, username, password):
+    keycloak_openid = KeycloakOpenID(
+        server_url=f'https://{url}/auth/',
+        client_id="admin-cli",
+        realm_name="master",
+        client_secret_key="secret",
+    )
+    response = keycloak_openid.token(username, password)
+    print(json.dumps(response, indent=2))
+    config.store_token(
+        url, response['access_token'], response['refresh_token']
+    )
+
+
 def manager_list_realms(username, password, dnsname):
     response = requests.get(
         f'https://{dnsname}/auth/admin/realms',

@@ -257,6 +257,13 @@ class OpenRemote(object):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
+            if not args.password:
+                try:
+                    args.password = os.getenv('SETUP_ADMIN_PASSWORD')
+                except:
+                    raise Exception("No password given")
+            if args.login:
+                scripts.manager_login(args.dnsname, args.user, args.password)
             if args.list_realms is True:
                 print('\nListing realms\n--------------')
                 scripts.manager_list_realms(
@@ -285,7 +292,7 @@ class OpenRemote(object):
                 default='admin',
             )
             arguments.add_argument(
-                '-p', '--password', required=True, help='user password'
+                '-p', '--password', required=False, help='user password'
             )
             arguments.add_argument(
                 '--dnsname',
@@ -324,6 +331,9 @@ class OpenRemote(object):
                 type=str,
                 help='realm to work on',
                 default='master',
+            )
+            arguments.add_argument(
+                '--login', action='store_true', help='login into manager'
             )
 
     def shell(self, arguments=[]):
