@@ -360,8 +360,8 @@ def manager_login(url, username, password):
         realm_name="master",
         client_secret_key="secret",
     )
-    response = keycloak_openid.token(username, password)
     print(username, password)
+    response = keycloak_openid.token(username, password)
     print(json.dumps(response, indent=2))
     config.store_token(
         url, response['access_token'], response['refresh_token']
