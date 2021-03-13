@@ -361,6 +361,7 @@ def manager_login(url, username, password):
         client_secret_key="secret",
     )
     response = keycloak_openid.token(username, password)
+    print(username, password)
     print(json.dumps(response, indent=2))
     config.store_token(
         url, response['access_token'], response['refresh_token']
