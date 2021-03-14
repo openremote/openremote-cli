@@ -7,6 +7,8 @@ import urllib.request
 import os
 import string
 import requests
+import ssl
+import time
 
 from keycloak import KeycloakOpenID
 from random import choice, randint
@@ -17,13 +19,13 @@ from openremote_cli import gen_aws_smtp_credentials, email
 
 def deploy(password, smtp_user, smtp_password, dnsname):
     shell.execute('docker swarm init', no_exception=True)
-    shell.execute(
-        'docker volume rm openremote_postgresql-data', no_exception=True
-    )
-    shell.execute('docker volume create openremote_deployment-data')
-    shell.execute(
-        'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:mvp'
-    )
+    # shell.execute(
+    #     'docker volume rm openremote_postgresql-data', no_exception=True
+    # )
+    # shell.execute('docker volume create openremote_deployment-data')
+    # shell.execute(
+    #     'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:mvp'
+    # )
     if not config.DRY_RUN:
         wget.download(
             'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
@@ -53,10 +55,14 @@ def deploy(password, smtp_user, smtp_password, dnsname):
         shell.execute(
             f'{env}docker-compose -f mvp-docker-compose.yml -p openremote up -d'
         )
+        if not config.DRY_RUN:
+            while _deploy_health(dnsname, 0) == 0:
+                print('.', end='', flush=True)
+                time.sleep(5)
+            print('\n')
         if config.VERBOSE is True:
             print(
-                '\nCheck running services with `docker ps` until containers are healthy...\n'
-                f'then open https://{dnsname} and login with admin {password}\n\n'
+                f'Open https://{dnsname} and login with admin:{password}\n\n'
                 'Remove the stack when you are done:\n'
                 '> docker-compose -f mvp-docker-compose.yml -p openremote down\n'
                 '> rm mvp-docker-compose.yml\n'
@@ -65,44 +71,54 @@ def deploy(password, smtp_user, smtp_password, dnsname):
         shell.execute(
             f'{env}docker stack deploy -c mvp-docker-compose.yml openremote'
         )
+        if not config.DRY_RUN:
+            while _deploy_health(dnsname, 0) == 0:
+                print('.', end='', flush=True)
+                time.sleep(5)
+            print('\n')
         if config.VERBOSE is True:
             print(
-                '\nCheck running services with `docker service ls` until all are 1/1 replicas...\n'
-                f'then open https://localhost and login with admin {password}\n\n'
-                'Remove the stack when you are done:\n'
+                f'\nOpen https://localhost and login with admin:{password}\n\n'
+                'To remove the stack when you are done:\n'
                 '> docker stack rm openremote\n'
             )
         if not config.DRY_RUN:
             os.remove(f'mvp-docker-compose.yml')
     if config.VERBOSE is True:
         print(
-            '\nRemove docker resources:\n'
+            'To remove docker resources:\n'
             "> docker images --filter 'reference=openremote/*' -q | xargs docker rmi\n"
             "> docker volume ls --filter 'dangling=true' -q | xargs docker volume rm"
         )
 
 
 def deploy_health(dnsname, verbosity=0):
+    print(_deploy_health(dnsname, verbosity))
+
+
+def _deploy_health(dnsname, verbosity):
     try:
+        # We need this for self-signed certs like localhost
+        ssl._create_default_https_context = ssl._create_unverified_context
         health = json.loads(
             urllib.request.urlopen(
                 f'https://{dnsname}/api/master/health'
             ).read()
         )
         if verbosity == 0:
-            print(health['system']['version'])
+            return health['system']['version']
         elif verbosity == 1:
-            print(health['system'])
+            return health['system']
         else:
-            print(health)
+            return health
     except:
         if '.' not in dnsname and dnsname != 'localhost':
             host, domain = _split_dns(dnsname)
             deploy_health(f'{host}.{domain}', verbosity)
         elif verbosity == 0:
-            print('0')
+            return 0
         else:
-            print(f'Error calling\ncurl https://{dnsname}/api/master/health')
+            return f'Error calling\ncurl https://{dnsname}/api/master/health'
 
 
 def _split_dns(dnsname):
@@ -225,6 +241,7 @@ def clean():
     shell.execute(
         'docker rmi openremote/manager-swarm openremote/deployment '
         'openremote/keycloak openremote/postgresql openremote/proxy ',
+        'openremote/manager',
         no_exception=True,
     )
     shell.execute('docker system prune --force')

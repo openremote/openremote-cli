@@ -282,6 +282,9 @@ class OpenRemote(object):
             parser = self.__parser('manager', 'manage online manager')
             arguments = parser.add_argument_group("manager arguments")
             arguments.add_argument(
+                '-l', '--login', action='store_true', help='login into manager'
+            )
+            arguments.add_argument(
                 '-u',
                 '--user',
                 type=str,
@@ -300,22 +303,29 @@ class OpenRemote(object):
                 default='demo.openremote.io',
             )
             arguments.add_argument(
+                '--realm',
+                required=False,
+                type=str,
+                help='realm to work on',
+                default='master',
+            )
+            arguments.add_argument(
                 '--list-realms',
                 required=False,
                 action='store_true',
                 help='list defined realms',
             )
             arguments.add_argument(
+                '--create-realm',
+                required=False,
+                action='store_true',
+                help='create new realm',
+            )
+            arguments.add_argument(
                 '--list-users',
                 required=False,
                 action='store_true',
                 help='list defined users in a realm',
-            )
-            arguments.add_argument(
-                '--list-public-assets',
-                required=False,
-                action='store_true',
-                help='list public assets in a realm',
             )
             arguments.add_argument(
                 '--create-user',
@@ -330,14 +340,10 @@ class OpenRemote(object):
                 help='delete users from a realm',
             )
             arguments.add_argument(
-                '--realm',
+                '--list-public-assets',
                 required=False,
-                type=str,
-                help='realm to work on',
-                default='master',
-            )
-            arguments.add_argument(
-                '--login', action='store_true', help='login into manager'
+                action='store_true',
+                help='list public assets in a realm',
             )
 
     def shell(self, arguments=[]):
