@@ -19,16 +19,20 @@ def initialize():
 
     if config.sections() == []:
         try:
-            print('creating config file')
             if not os.path.exists(_config_file_name()):
                 os.makedirs(
                     f'{str(Path.home())}/.openremote',
                     mode=0o700,
                     exist_ok=True,
                 )
-                config['DEFAULT'] = {
-                    'telemetry_url': 'https://cli.developers.openremote.io/metrics'
-                }
+                try:
+                    config['DEFAULT'] = {
+                        'telemetry_url': f"{os.environ['TELEMETRY_URL']}/metrics"
+                    }
+                except:
+                    config['DEFAULT'] = {
+                        'telemetry_url': 'https://cli.developers.openremote.io/metrics'
+                    }
                 config['AWS'] = {
                     'profile': 'openremote-cli',
                     'bucket': 'openremote-mvp-map-storage',
@@ -36,6 +40,7 @@ def initialize():
                 }
                 with open(_config_file_name(), 'w') as conf:
                     config.write(conf)
+                    print(f'Config created in {_config_file_name()}')
         except Exception as error:
             logging.error(error)
 

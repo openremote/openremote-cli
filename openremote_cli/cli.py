@@ -266,16 +266,14 @@ class OpenRemote(object):
                 scripts.manager_login(args.dnsname, args.user, args.password)
             if args.list_realms is True:
                 print('\nListing realms\n--------------')
-                scripts.manager_list_realms(
-                    args.user, args.password, args.dnsname
-                )
+                scripts.manager_list_realms(args.dnsname)
             if args.list_users is True:
                 print(
                     f'\nListing users for {args.realm} realm\n--------------'
                 )
-                scripts.manager_list_users(
-                    args.realm, args.password, args.dnsname
-                )
+                scripts.manager_list_users(args.realm, args.dnsname)
+            if args.list_public_assets:
+                scripts.manager_list_public_assets(args.realm, args.dnsname)
             if args.create_user is True:
                 raise Exception('not implemented')
             if args.delete_user is True:
@@ -312,6 +310,12 @@ class OpenRemote(object):
                 required=False,
                 action='store_true',
                 help='list defined users in a realm',
+            )
+            arguments.add_argument(
+                '--list-public-assets',
+                required=False,
+                action='store_true',
+                help='list public assets in a realm',
             )
             arguments.add_argument(
                 '--create-user',

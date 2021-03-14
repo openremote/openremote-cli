@@ -1,7 +1,14 @@
+import os
+
 from openremote_cli import config
 
 
-@when(u'we login into demo.openremote.io with user and password')
+@given(u'we have SETUP_ADMIN_PASSWORD variable set')
+def step_impl(context):
+    context.password = os.environ['SETUP_ADMIN_PASSWORD']
+
+
+@when(u'login into demo.openremote.io as admin')
 def step_impl(context):
     context.code, context.output = context.execute(
         'poetry run openremote-cli manager --login -v -t'
@@ -10,7 +17,36 @@ def step_impl(context):
     print(context.output)
 
 
-@then(u'we can list public assets from master realm')
+@then(u'a token is fetched stored in config')
 def step_impl(context):
     # Check if we have some juice from it
     assert len(config.get_token('demo.openremote.io')) > 100
+
+
+@then(u'we can list realms')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli manager --list-realms -q -t'
+    )
+    print(context.output)
+    assert context.code == 0
+    assert 'master' in context.output
+
+
+@then(u'we can list users of master realm')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli manager --list-users -q -t'
+    )
+    print(context.output)
+    assert context.code == 0
+    assert 'master' in context.output
+
+
+@then(u'we can list public assets from master realm')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli manager --list-public-assets -q -t'
+    )
+    print(context.output)
+    assert context.code == 0

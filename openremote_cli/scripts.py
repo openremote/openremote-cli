@@ -343,16 +343,6 @@ def smtp_credentials(dnsname):
 
 
 # Manager
-def _token(username, password, url):
-    keycloak_openid = KeycloakOpenID(
-        server_url=f'https://{url}/auth/',
-        client_id="admin-cli",
-        realm_name="master",
-        client_secret_key="secret",
-    )
-    return keycloak_openid.token(username, password)['access_token']
-
-
 def manager_login(url, username, password):
     keycloak_openid = KeycloakOpenID(
         server_url=f'https://{url}/auth/',
@@ -360,20 +350,16 @@ def manager_login(url, username, password):
         realm_name="master",
         client_secret_key="secret",
     )
-    print(username, password)
     response = keycloak_openid.token(username, password)
-    print(json.dumps(response, indent=2))
     config.store_token(
         url, response['access_token'], response['refresh_token']
     )
 
 
-def manager_list_realms(username, password, dnsname):
+def manager_list_realms(dnsname):
     response = requests.get(
         f'https://{dnsname}/auth/admin/realms',
-        headers={
-            'Authorization': f'Bearer ' + _token(username, password, dnsname)
-        },
+        headers={'Authorization': f'Bearer ' + config.get_token(dnsname)},
     )
     for r in response.json():
         if config.QUIET:
@@ -382,15 +368,36 @@ def manager_list_realms(username, password, dnsname):
             print(json.dumps(r, indent=2))
 
 
-def manager_list_users(realm, password, dnsname):
+def manager_list_users(realm, dnsname):
     response = requests.get(
         f'https://{dnsname}/auth/admin/realms/{realm}/users',
-        headers={
-            'Authorization': f'Bearer ' + _token('admin', password, dnsname)
+        headers=_bearer(dnsname),
+    )
+    for r in response.json():
+        if config.QUIET:
+            print(f"{r['firstName']} {r['lastName']}\t-\t{r['username']}")
+        else:
+            print(json.dumps(r, indent=2))
+
+
+def manager_list_public_assets(realm, dnsname):
+    response = requests.post(
+        f'https://{dnsname}/api/{realm}/asset/public/query',
+        # headers=_bearer(dnsname), # TODO why it gives 401 with smartcity realm and not with master?
+        json={
+            "select": {"include": "ALL_EXCEPT_PATH"},
+            "type": {
+                "predicateType": "string",
+                "value": "urn:openremote:asset:thing",
+            },
         },
     )
     for r in response.json():
         if config.QUIET:
-            print(f"{r['username']}  \t{r['email']}")
+            print(f"{r['type']}\t{r['name']}")
         else:
             print(json.dumps(r, indent=2))
+
+
+def _bearer(dnsname):
+    return {'Authorization': f'Bearer ' + config.get_token(dnsname)}
