@@ -9,6 +9,7 @@ import string
 import requests
 import ssl
 import time
+import emojis
 
 from keycloak import KeycloakOpenID
 from random import choice, randint
@@ -72,10 +73,11 @@ def deploy(password, smtp_user, smtp_password, dnsname):
             f'{env}docker stack deploy -c mvp-docker-compose.yml openremote'
         )
         if not config.DRY_RUN:
+            print('\nStack deployed, waiting for startup to complete', end=' ')
             while _deploy_health(dnsname, 0) == 0:
+                time.sleep(3)
                 print('.', end='', flush=True)
-                time.sleep(5)
-            print('\n')
+            print(emojis.encode(':thumbsup:\n'))
         if config.VERBOSE is True:
             print(
                 f'\nOpen https://localhost and login with admin:{password}\n\n'
