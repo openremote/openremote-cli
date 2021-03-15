@@ -242,7 +242,7 @@ def clean():
     )
     shell.execute(
         'docker rmi openremote/manager-swarm openremote/deployment '
-        'openremote/keycloak openremote/postgresql openremote/proxy ',
+        'openremote/keycloak openremote/postgresql openremote/proxy '
         'openremote/manager',
         no_exception=True,
     )

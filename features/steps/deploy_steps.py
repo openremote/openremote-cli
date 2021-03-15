@@ -21,13 +21,6 @@ def step_impl(context):
 
 @then(u'show what will be done')
 def step_impl(context):
-    assert (
-        "docker volume create openremote_deployment-data" in context.response
-    )
-    assert (
-        "docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:mvp"
-        in context.response
-    )
     assert "docker stack deploy" in context.response
 
 
