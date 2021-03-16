@@ -8,5 +8,7 @@
     "http-status": "^1.5.0",
     "node-fetch": "^2.6.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "serverless-prune-plugin": "^1.4.4"
+  }
 }

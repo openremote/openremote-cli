@@ -3,6 +3,9 @@ service: openremote-cli
 custom:
   definition: telemetry.yml
   telemetryTableName: openremote-cli-telemetry
+  prune:
+    automatic: true
+    number: 1
 
 provider:
   name: aws
@@ -47,6 +50,7 @@ provider:
         Resource: "*"
   logRetentionInDays: 14
   lambdaHashingVersion: 20201221
+  versionFunctions: false
 
 package:
   individually: true
@@ -94,5 +98,6 @@ functions:
           arn:
             Fn::GetAtt: [telemetryTable, StreamArn]
 
-# plugins:
+plugins:
 #   - serverless-openapi-plugin
+  - serverless-prune-plugin

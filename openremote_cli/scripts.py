@@ -45,7 +45,10 @@ def deploy(password, smtp_user, smtp_password, dnsname):
             f'SETUP_EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
         )
     if dnsname != 'localhost':
-        env = f'{env}DOMAINNAME={dnsname} IDENTITY_NETWORK_HOST={dnsname} '
+        env = (
+            f'{env}DOMAINNAME={dnsname} IDENTITY_NETWORK_HOST={dnsname} '
+            f'KEYCLOAK_FRONTEND_URL=https://{dnsname}/auth '
+        )
         # As you may be facing internet change default password for security
         generate_password, password = _password(password)
         if generate_password:
@@ -57,10 +60,11 @@ def deploy(password, smtp_user, smtp_password, dnsname):
             f'{env}docker-compose -f mvp-docker-compose.yml -p openremote up -d'
         )
         if not config.DRY_RUN:
+            print('\nStack deployed, waiting for startup to complete', end=' ')
             while _deploy_health(dnsname, 0) == 0:
+                time.sleep(3)
                 print('.', end='', flush=True)
-                time.sleep(5)
-            print('\n')
+            print(emojis.encode(':thumbsup:\n'))
         if config.VERBOSE is True:
             print(
                 f'Open https://{dnsname} and login with admin:{password}\n\n'
