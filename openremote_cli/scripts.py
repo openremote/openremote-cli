@@ -275,7 +275,7 @@ def configure_aws(id, secret, region):
 def map_upload(path):
     print(
         shell.execute(
-            f'aws s3 cp {path} s3://{config.BUCKET} --profile {config.PROFILE}'
+            f'aws s3 cp {path} s3://{config.BUCKET}/{path} --profile {config.PROFILE}'
         )[1]
     )
 
@@ -283,7 +283,7 @@ def map_upload(path):
 def map_list():
     print(
         shell.execute(
-            f'aws s3 ls s3://{config.BUCKET} --profile {config.PROFILE}'
+            f'aws s3 ls s3://{config.BUCKET} --recursive --profile {config.PROFILE}'
         )[1]
     )
 
