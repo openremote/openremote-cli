@@ -75,9 +75,12 @@ def deploy(password, smtp_user, smtp_password, dnsname):
         )
         if not config.DRY_RUN:
             print('\nStack deployed, waiting for startup to complete', end=' ')
-            while _deploy_health(dnsname, 0) == 0:
+            c = 0
+            # TODO deploying from docker image has problems with health checking hence 10min time out
+            while _deploy_health(dnsname, 0) == 0 and c < 200:
                 time.sleep(3)
                 print('.', end='', flush=True)
+                c += 1
             print(emojis.encode(':thumbsup:\n'))
         if config.VERBOSE is True:
             print(
