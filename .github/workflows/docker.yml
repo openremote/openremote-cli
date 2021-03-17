@@ -11,8 +11,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# env:
-#   PLATFORM: linux/amd64,linux/arm64
+  # Allows triggering on other workflow
+  repository_dispatch:
+    types: [image-build-event]
 
 jobs:
   build_image:
@@ -34,8 +35,7 @@ jobs:
       - name: login to docker hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
       - name: wait for new PyPI release if any
-        run: sleep 600
+        run: sleep 60
       - name: build and push images
         run: |
           make multi-image
-          # docker build --push --platform $PLATFORM -t openremote/openremote-cli:latest .

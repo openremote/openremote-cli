@@ -283,7 +283,7 @@ def map_upload(path):
 def map_list():
     print(
         shell.execute(
-            f'aws s3 ls s3://{config.BUCKET} --recursive --profile {config.PROFILE}'
+            f'aws s3 ls s3://{config.BUCKET} --recursive --human --profile {config.PROFILE}'
         )[1]
     )
 
