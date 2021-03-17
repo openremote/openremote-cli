@@ -198,7 +198,7 @@ def step_impl(context):
 @then(u'show what will be done with dns')
 def step_impl(context):
     assert 'DOMAINNAME=xxx.yyy.com' in context.output
-    assert 'IDENTITY_NETWORK_HOST=xxx.yyy.com' in context.output
+    assert 'PASSWORD=' in context.output
     assert (
         'docker-compose -f mvp-docker-compose.yml -p openremote up -d'
         in context.output

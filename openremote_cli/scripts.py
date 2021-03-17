@@ -20,9 +20,9 @@ from openremote_cli import gen_aws_smtp_credentials, email
 
 def deploy(password, smtp_user, smtp_password, dnsname):
     shell.execute('docker swarm init', no_exception=True)
-    # shell.execute(
-    #     'docker volume rm openremote_postgresql-data', no_exception=True
-    # )
+    shell.execute(
+        'docker volume rm openremote_postgresql-data', no_exception=True
+    )
     # shell.execute('docker volume create openremote_deployment-data')
     # shell.execute(
     #     'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:mvp'
@@ -37,22 +37,19 @@ def deploy(password, smtp_user, smtp_password, dnsname):
         )
     env = ''
     if password != 'secret':
-        env = f'SETUP_ADMIN_PASSWORD={password} '
+        env = f'PASSWORD={password} '
     if smtp_user and smtp_password:
         env = (
-            f'{env}SETUP_EMAIL_USER={smtp_user} '
-            f'SETUP_EMAIL_PASSWORD={smtp_password} '
-            f'SETUP_EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
+            f'{env}EMAIL_USER={smtp_user} '
+            f'EMAIL_PASSWORD={smtp_password} '
+            f'EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
         )
     if dnsname != 'localhost':
-        env = (
-            f'{env}DOMAINNAME={dnsname} IDENTITY_NETWORK_HOST={dnsname} '
-            f'KEYCLOAK_FRONTEND_URL=https://{dnsname}/auth '
-        )
+        env = f'{env}DOMAINNAME={dnsname} '
         # As you may be facing internet change default password for security
         generate_password, password = _password(password)
         if generate_password:
-            env = f'{env}SETUP_ADMIN_PASSWORD={password} '
+            env = f'{env}PASSWORD={password} '
         # Deploy with docker-compose as proxy container does not obey
         # health check within swarm mode
         # TODO revisit proxy image to fix this, otherwise letsencrypt has problems
