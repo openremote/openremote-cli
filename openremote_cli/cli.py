@@ -201,7 +201,7 @@ class OpenRemote(object):
                 if args.provider == 'aws':
                     scripts.remove_aws(args.dnsname)
                 else:
-                    scripts.remove()
+                    scripts.remove(args.dnsname)
             elif args.action == 'clean':
                 print('Cleaning OR resources...\n')
                 if args.provider == 'aws':

@@ -10,6 +10,8 @@ import requests
 import ssl
 import time
 import emojis
+import re
+
 
 from keycloak import KeycloakOpenID
 from random import choice, randint
@@ -45,7 +47,10 @@ def deploy(password, smtp_user, smtp_password, dnsname):
             f'EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
         )
     if dnsname != 'localhost':
-        env = f'{env}DOMAINNAME={dnsname} '
+        identity = dnsname
+        if _check_ip(dnsname):  # it is pure IP
+            dnsname = 'localhost'  # prevent proxy from issuing cert
+        env = f'{env}DOMAINNAME={dnsname} IDENTITY_NETWORK_HOST={identity} '
         # As you may be facing internet change default password for security
         generate_password, password = _password(password)
         if generate_password:
@@ -236,8 +241,21 @@ def remove_aws(dnsname):
         os.remove(f'aws-delete-stack-{dnsname}.sh')
 
 
-def remove():
-    shell.execute(f'docker stack rm openremote')
+def remove(dnsname):
+    if dnsname == 'localhost':
+        shell.execute(f'docker stack rm openremote')
+    else:
+        if not config.DRY_RUN:
+            wget.download(
+                'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
+            )
+        if config.VERBOSE is True:
+            print(
+                '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
+            )
+        shell.execute(
+            f'docker-compose -f mvp-docker-compose.yml -p openremote down'
+        )
 
 
 def clean():
@@ -424,3 +442,8 @@ def manager_list_public_assets(realm, dnsname):
 
 def _bearer(dnsname):
     return {'Authorization': f'Bearer ' + config.get_token(dnsname)}
+
+
+def _check_ip(ip):
+    regex = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
+    return re.search(regex, ip)
