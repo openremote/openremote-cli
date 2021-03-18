@@ -50,4 +50,4 @@ jobs:
           make multi-image
       - name: test docker image
         run: |
-          docker run --rm openremote/openremote-cli --version --dry-run
+          docker run --rm openremote/openremote-cli --version --dry-run --no-telemetry
