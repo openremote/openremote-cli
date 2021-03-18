@@ -171,7 +171,7 @@ class OpenRemote(object):
                 help='list/upload/download/delete map from S3',
                 default='list',
             )
-            arguments.add_argument('-f', type=str, help="file name")
+            arguments.add_argument('-f', '--file', type=str, help="file name")
 
     def deploy(self, arguments=[]):
         if len(arguments) > 0:
