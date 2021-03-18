@@ -25,17 +25,18 @@ def deploy(password, smtp_user, smtp_password, dnsname):
     shell.execute(
         'docker volume rm openremote_postgresql-data', no_exception=True
     )
+    # TODO fetch tar from S3 and copy to the docker volume
     # shell.execute('docker volume create openremote_deployment-data')
     # shell.execute(
     #     'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:mvp'
     # )
-    if not config.DRY_RUN:
-        wget.download(
-            'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
-        )
     if config.VERBOSE is True:
         print(
             '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
+        )
+    if not config.DRY_RUN:
+        wget.download(
+            'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
         )
     env = ''
     if password != 'secret':
@@ -159,13 +160,13 @@ def deploy_aws(password, dnsname):
     stack_name = f'OpenRemote-{uuid.uuid4()}'
     check_aws_perquisites()
     generate_password, password = _password(password)
-    if not config.DRY_RUN:
-        wget.download(
-            'https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
-        )
     if config.VERBOSE is True:
         print(
             '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
+        )
+    if not config.DRY_RUN:
+        wget.download(
+            'https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
         )
     shell_exec = shell.execute(
         f'aws cloudformation create-stack --stack-name {stack_name} '
@@ -245,13 +246,13 @@ def remove(dnsname):
     if dnsname == 'localhost':
         shell.execute(f'docker stack rm openremote')
     else:
-        if not config.DRY_RUN:
-            wget.download(
-                'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
-            )
         if config.VERBOSE is True:
             print(
                 '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
+            )
+        if not config.DRY_RUN:
+            wget.download(
+                'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
             )
         shell.execute(
             f'docker-compose -f mvp-docker-compose.yml -p openremote down'
