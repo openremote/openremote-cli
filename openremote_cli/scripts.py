@@ -185,6 +185,15 @@ def deploy_aws(password, dnsname):
         raise Exception(shell_exec)
 
     print('Waiting for CloudFormation...')
+    # TODO make better feedback to the useer
+    # code, output = shell.execute
+    # CREATE_STACK_STATUS=$(aws --region ${AWS_REGION} --profile ${AWS_PROFILE} cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].StackStatus' --output text)
+    # while [[ $CREATE_STACK_STATUS == "REVIEW_IN_PROGRESS" ]] || [[ $CREATE_STACK_STATUS == "CREATE_IN_PROGRESS" ]]
+    # do
+    #     # Wait 30 seconds and then check stack status again
+    #     sleep 30
+    #     CREATE_STACK_STATUS=$(aws --region ${AWS_REGION} --profile ${AWS_PROFILE} cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].StackStatus' --output text)
+    # done
     shell.execute(
         f'aws cloudformation wait stack-create-complete '
         f'--stack-name {stack_name} --profile {config.PROFILE}'
@@ -220,16 +229,25 @@ def deploy_aws(password, dnsname):
         print(
             '\nAn email with generated password would be sent to support@openremote.io\n'
         )
-    # shell.execute(
-    #     f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.sh'
-    # )
-    # shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
+    if not config.DRY_RUN:
+        shell.execute(
+            f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.sh'
+        )
+        shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
+        print('\nStack deployed, waiting for startup to complete', end=' ')
+        c = 0
+        while _deploy_health(f'{host}.{domain}', 0) == 0 and c < 200:
+            time.sleep(3)
+            print('.', end='', flush=True)
+            c += 1
+        print(emojis.encode(':thumbsup:\n'))
     print(
-        '\nStack deployed - wait about 15 min for OpenRemote installation to complete.\n'
-        'Mind that running it cost money! To free resources execute:\n'
-        f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}\n\n'
-        'check running stack with health command:\n'
-        f'or deploy -a health --dnsname {host}.{domain} -v'
+        emojis.encode(
+            '\nMind that running it cost money :moneybag::moneybag::moneybag:! To free resources execute:\n\n'
+            f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}\n\n'
+            'check running stack with health command:\n'
+            f'or deploy -a health --dnsname {host}.{domain} -v'
+        )
     )
 
 
