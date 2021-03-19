@@ -153,11 +153,11 @@ class OpenRemote(object):
             if args.action == 'list':
                 scripts.map_list()
             elif args.action == 'upload':
-                scripts.map_upload(args.f)
+                scripts.map_upload(args.file)
             elif args.action == 'download':
-                scripts.map_download(args.f)
+                scripts.map_download(args.file)
             elif args.action == 'delete':
-                scripts.map_delete(args.f)
+                scripts.map_delete(args.file)
             else:
                 raise ValueError(f"'{args.action}' not implemented")
         else:
