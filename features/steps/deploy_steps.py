@@ -203,3 +203,30 @@ def step_impl(context):
         'docker-compose -f mvp-docker-compose.yml -p openremote up -d'
         in context.output
     )
+
+
+@when(u'call or deploy --provider rich --dnsname demo -v -n -t')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run or deploy --provider rich --dnsname demo --password password -v -n -t'
+    )
+    assert context.code == 0
+    print(context.output)
+
+
+@then(u'fetch data from S3 (map is optional)')
+def step_impl(context):
+    assert (
+        'aws s3 cp s3://openremote-mvp-map-storage/demo demo --recursive --profile openremote-cli'
+        in context.output
+    )
+    assert 'cd demo' in context.output
+    assert 'tar xvf deployment.tar.gz' in context.output
+
+
+@then(u'deploy with on localhost with DNS demo.openremote.io')
+def step_impl(context):
+    assert (
+        'PASSWORD=password DOMAINNAME=demo.openremote.io docker-compose -p demo up -d'
+        in context.output
+    )

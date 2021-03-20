@@ -292,52 +292,38 @@ def clean():
 
 def configure_aws(id, secret, region):
     config.REGION = region
-    print(
-        shell.execute(
-            f'aws configure set profile.{config.PROFILE}.aws_access_key_id {id}'
-        )[1]
+    shell.execute(
+        f'aws configure set profile.{config.PROFILE}.aws_access_key_id {id}'
     )
-    print(
-        shell.execute(
-            f'aws configure set profile.{config.PROFILE}.aws_secret_access_key {secret}'
-        )[1]
+    shell.execute(
+        f'aws configure set profile.{config.PROFILE}.aws_secret_access_key {secret}'
     )
-    print(
-        shell.execute(
-            f'aws configure set profile.{config.PROFILE}.region {region}'
-        )[1]
+    shell.execute(
+        f'aws configure set profile.{config.PROFILE}.region {region}'
     )
 
 
 def map_upload(path):
-    print(
-        shell.execute(
-            f'aws s3 cp {path} s3://{config.BUCKET}/{path} --profile {config.PROFILE}'
-        )[1]
+    shell.execute(
+        f'aws s3 cp {path} s3://{config.BUCKET}/{path} --profile {config.PROFILE}'
     )
 
 
 def map_list():
-    print(
-        shell.execute(
-            f'aws s3 ls s3://{config.BUCKET} --recursive --human --profile {config.PROFILE}'
-        )[1]
+    shell.execute(
+        f'aws s3 ls s3://{config.BUCKET} --recursive --human --profile {config.PROFILE}'
     )
 
 
 def map_download(path):
-    print(
-        shell.execute(
-            f'aws s3 cp s3://{config.BUCKET}/{path} {path} --profile {config.PROFILE}'
-        )[1]
+    shell.execute(
+        f'aws s3 cp s3://{config.BUCKET}/{path} {path} --profile {config.PROFILE}'
     )
 
 
 def map_delete(path):
-    print(
-        shell.execute(
-            f'aws s3 rm s3://{config.BUCKET}/{path} --profile {config.PROFILE}'
-        )[1]
+    shell.execute(
+        f'aws s3 rm s3://{config.BUCKET}/{path} --profile {config.PROFILE}'
     )
 
 
@@ -466,3 +452,37 @@ def _bearer(dnsname):
 def _check_ip(ip):
     regex = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
     return re.search(regex, ip)
+
+
+# Richard's way
+def deploy_rich(password, smtp_user, smtp_password, project):
+    shell.execute(
+        f'aws s3 cp s3://{config.BUCKET}/{project} {project} --recursive --profile {config.PROFILE}'
+    )
+    shell.execute(f'cd {project}')
+    shell.execute(f'tar xvf deployment.tar.gz')
+    shell.execute(f'mv mapdata.mbtiles deployment/map/')
+    env = ''
+    # TODO reuse installed credentials docker run {project_manager_1} env
+    if password != 'secret':
+        env = f'PASSWORD={password} '
+    if smtp_user and smtp_password:
+        env = (
+            f'{env}EMAIL_USER={smtp_user} '
+            f'EMAIL_PASSWORD={smtp_password} '
+            f'EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
+        )
+    dnsname = f'{project}.openremote.io'
+    env = f'{env}DOMAINNAME={dnsname} '
+    generate_password, password = _password(password)
+    if generate_password:
+        env = f'{env}PASSWORD={password} '
+    shell.execute(f'{env}docker-compose -p {project} up -d')
+    if not config.DRY_RUN:
+        print('\nStack deployed, waiting for startup to complete', end=' ')
+        while _deploy_health(dnsname, 0) == 0:
+            time.sleep(3)
+            print('.', end='', flush=True)
+        print(emojis.encode(':thumbsup:'))
+    if config.VERBOSE is True:
+        print(f'\nOpen https://{dnsname} and login with admin:{password}')

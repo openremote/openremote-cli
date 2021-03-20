@@ -41,3 +41,9 @@ Feature: deploy
     Then see that the stack is removed
     When call openremote-cli deploy --action clean --dry-run
     Then remove volumes images and prune docker system
+
+  Scenario: deploy using deployments repo and S3
+    Given we have AWS profile openremote-cli
+    When call or deploy --provider rich --dnsname demo -v -n -t
+    Then fetch data from S3 (map is optional)
+    And deploy with on localhost with DNS demo.openremote.io

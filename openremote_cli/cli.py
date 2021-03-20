@@ -12,11 +12,6 @@ import requests
 import time
 import pty
 
-# For checking version
-# TODO check if urllib can be replaced with requests or other way around
-import urllib.request
-import json
-
 from openremote_cli import config
 from openremote_cli import scripts
 from openremote_cli import gen_aws_smtp_credentials
@@ -27,7 +22,6 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 class OpenRemote(object):
     def __init__(self, arguments):
         parser = argparse.ArgumentParser(
-            prog='openremote-cli',
             description=f'OpenRemote Command Line Interface (CLI) version {package_version()}',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             #                   conflict_handler='resolve',
@@ -193,19 +187,38 @@ class OpenRemote(object):
                         logging.debug(
                             f'user: {smtp_user}, password: {smtp_password}'
                         )
-                    scripts.deploy(
-                        args.password, smtp_user, smtp_password, args.dnsname
-                    )
+                    if args.provider == 'rich':
+                        if args.dnsname == 'localhost':
+                            raise Exception('--dnsname must set')
+                        scripts.deploy_rich(
+                            args.password,
+                            smtp_user,
+                            smtp_password,
+                            args.dnsname,
+                        )
+                    else:
+                        scripts.deploy(
+                            args.password,
+                            smtp_user,
+                            smtp_password,
+                            args.dnsname,
+                        )
             elif args.action == 'remove':
                 print('Removing OR stack...\n')
                 if args.provider == 'aws':
                     scripts.remove_aws(args.dnsname)
+                elif args.provider == 'rich':
+                    # TODO
+                    raise Exception('Not implemented')
                 else:
                     scripts.remove(args.dnsname)
             elif args.action == 'clean':
                 print('Cleaning OR resources...\n')
                 if args.provider == 'aws':
                     scripts.remove_aws(args.dnsname)
+                elif args.provider == 'rich':
+                    # TODO
+                    raise Exception('Not implemented')
                 else:
                     scripts.clean()
             elif args.action == 'health':
@@ -237,9 +250,9 @@ class OpenRemote(object):
             arguments.add_argument(
                 '--provider',
                 nargs="?",
-                choices=['aws', 'localhost'],
+                choices=['aws', 'localhost', 'rich'],
                 default='localhost',
-                help='where the stack should be deployed',
+                help='where the stack should be deployed (rich is on localhost but with artifacts from S3)',
             )
             arguments.add_argument(
                 '--dnsname',
@@ -462,10 +475,8 @@ def isLatestVersion():
     if config.QUIET:
         return
     # Check PyPI for the latest version number
-    contents = urllib.request.urlopen(
-        'https://pypi.org/pypi/openremote-cli/json'
-    ).read()
-    data = json.loads(contents)
+    contents = requests.get(f'https://pypi.org/pypi/openremote-cli/json')
+    data = contents.json()
     latest_version = data['info']['version']
     if latest_version != package_version():
         print(
@@ -504,6 +515,7 @@ def main():
             logging.debug(f'skipping telemetry: {exit_reason}')
         # Check if there is a new version on PyPI
         isLatestVersion()
+        return exit_code
 
 
 # Support invoking the script directly from source
