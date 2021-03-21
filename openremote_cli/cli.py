@@ -103,9 +103,10 @@ class OpenRemote(object):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
-            if args.id:
+            if args.id and args.secret:
                 scripts.configure_aws(args.id, args.secret, args.region)
             elif args.secret:
+                # Calculate SMTP password from AWS secret key
                 print(
                     gen_aws_smtp_credentials.calculate_key(
                         args.secret, config.REGION

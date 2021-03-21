@@ -294,32 +294,31 @@ def configure_aws(id, secret, region):
     config.REGION = region
     shell.execute(
         f'aws configure set profile.{config.PROFILE}.aws_access_key_id {id}',
-        echo=True,
+        echo=config.VERBOSE,
     )
     shell.execute(
         f'aws configure set profile.{config.PROFILE}.aws_secret_access_key {secret}',
-        echo=True,
+        echo=config.VERBOSE,
     )
     shell.execute(
         f'aws configure set profile.{config.PROFILE}.region {region}',
-        echo=True,
+        echo=config.VERBOSE,
     )
 
 
 def configure_aws_show():
     if not config.QUIET:
-        print(f'{config.BUCKET}\n')
-    shell.execute(
-        f'aws configure get region --profile {config.PROFILE}', echo=True
-    )
-    shell.execute(
-        f'aws configure get aws_access_key_id --profile {config.PROFILE}',
-        echo=True,
-    )
-    shell.execute(
-        f'aws configure get aws_secret_access_key --profile {config.PROFILE}',
-        echo=True,
-    )
+        print(f'S3 bucket: s3://{config.BUCKET}\n')
+        region = shell.execute(
+            f'aws configure get region --profile {config.PROFILE}'
+        )[1][:-1]
+        id = shell.execute(
+            f'aws configure get aws_access_key_id --profile {config.PROFILE}'
+        )[1][:-1]
+        secret = shell.execute(
+            f'aws configure get aws_secret_access_key --profile {config.PROFILE}'
+        )[1][:-1]
+        print(f'--id={id} --secret="{secret}" --region={region}')
 
 
 def map_upload(path):
