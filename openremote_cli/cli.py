@@ -105,13 +105,15 @@ class OpenRemote(object):
             logging.debug(args)
             if args.id:
                 scripts.configure_aws(args.id, args.secret, args.region)
-            else:
+            elif args.secret:
                 print(
                     gen_aws_smtp_credentials.calculate_key(
                         args.secret, config.REGION
                     ),
                     end='',
                 )
+            else:
+                scripts.configure_aws_show()
         else:
             parser = self.__parser(
                 'configure_aws', 'configure AWS credentials'
@@ -125,11 +127,7 @@ class OpenRemote(object):
                 help="Access key ID (if not given then return SMTP password)",
             )
             arguments.add_argument(
-                "-s",
-                "--secret",
-                type=str,
-                required=True,
-                help="Secret access key",
+                "-s", "--secret", type=str, help="Secret access key"
             )
             arguments.add_argument(
                 "-r",

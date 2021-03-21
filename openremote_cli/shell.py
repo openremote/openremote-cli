@@ -5,7 +5,7 @@ import subprocess
 from openremote_cli import config
 
 
-def execute(args, no_exception=False):
+def execute(args, no_exception=False, echo=False):
     logging.debug(f'executing command:\n\n\t{args}\n')
 
     if config.VERBOSE:
@@ -38,4 +38,6 @@ def execute(args, no_exception=False):
                 )
         else:
             logging.debug(f'stdout: {output.stdout}')
+        if echo and not config.QUIET:
+            print(output.stdout.decode('utf-8'))
         return output.returncode, output.stdout.decode('utf-8')

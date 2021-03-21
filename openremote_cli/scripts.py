@@ -293,37 +293,60 @@ def clean():
 def configure_aws(id, secret, region):
     config.REGION = region
     shell.execute(
-        f'aws configure set profile.{config.PROFILE}.aws_access_key_id {id}'
+        f'aws configure set profile.{config.PROFILE}.aws_access_key_id {id}',
+        echo=True,
     )
     shell.execute(
-        f'aws configure set profile.{config.PROFILE}.aws_secret_access_key {secret}'
+        f'aws configure set profile.{config.PROFILE}.aws_secret_access_key {secret}',
+        echo=True,
     )
     shell.execute(
-        f'aws configure set profile.{config.PROFILE}.region {region}'
+        f'aws configure set profile.{config.PROFILE}.region {region}',
+        echo=True,
+    )
+
+
+def configure_aws_show():
+    if not config.QUIET:
+        print(f'{config.BUCKET}\n')
+    shell.execute(
+        f'aws configure get region --profile {config.PROFILE}', echo=True
+    )
+    shell.execute(
+        f'aws configure get aws_access_key_id --profile {config.PROFILE}',
+        echo=True,
+    )
+    shell.execute(
+        f'aws configure get aws_secret_access_key --profile {config.PROFILE}',
+        echo=True,
     )
 
 
 def map_upload(path):
     shell.execute(
-        f'aws s3 cp {path} s3://{config.BUCKET}/{path} --profile {config.PROFILE}'
+        f'aws s3 cp {path} s3://{config.BUCKET}/{path} --profile {config.PROFILE}',
+        echo=True,
     )
 
 
 def map_list():
     shell.execute(
-        f'aws s3 ls s3://{config.BUCKET} --recursive --human --profile {config.PROFILE}'
+        f'aws s3 ls s3://{config.BUCKET} --recursive --human --profile {config.PROFILE}',
+        echo=True,
     )
 
 
 def map_download(path):
     shell.execute(
-        f'aws s3 cp s3://{config.BUCKET}/{path} {path} --profile {config.PROFILE}'
+        f'aws s3 cp s3://{config.BUCKET}/{path} {path} --profile {config.PROFILE}',
+        echo=True,
     )
 
 
 def map_delete(path):
     shell.execute(
-        f'aws s3 rm s3://{config.BUCKET}/{path} --profile {config.PROFILE}'
+        f'aws s3 rm s3://{config.BUCKET}/{path} --profile {config.PROFILE}',
+        echo=True,
     )
 
 
