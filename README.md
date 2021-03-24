@@ -3,7 +3,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/Naereen/badges/)
-
+[![Donate](https://img.shields.io/badge/donations-appreciated-green.svg)](https://www.paypal.com/webapps/shoppingcart?flowlogging_id=4b5432e8ad1a8&mfid=1616517920020_4b5432e8ad1a8#/checkout/openButton)
 
 # OpenRemote CLI
 
