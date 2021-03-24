@@ -323,7 +323,12 @@ def configure_aws_show():
 
 def map_upload(path):
     shell.execute(
-        f'aws s3 cp {path} s3://{config.BUCKET}/{path} --metadata type=deployment-data --profile {config.PROFILE}',
+        f'aws s3 cp {path} s3://{config.BUCKET}/{path} --profile {config.PROFILE}',
+        echo=True,
+    )
+    shell.execute(
+        'aws s3api put-object-tagging --bucket %s --key %s --tagging \'TagSet=[{Key=type,Value=deployment-data}]\' --profile %s'
+        % (config.BUCKET, path, config.PROFILE),
         echo=True,
     )
 
