@@ -185,7 +185,7 @@ def deploy_aws(password, dnsname):
         raise Exception(shell_exec)
 
     print('Waiting for CloudFormation...')
-    # TODO make better feedback to the useer
+    # TODO make better feedback to the user
     # code, output = shell.execute
     # CREATE_STACK_STATUS=$(aws --region ${AWS_REGION} --profile ${AWS_PROFILE} cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].StackStatus' --output text)
     # while [[ $CREATE_STACK_STATUS == "REVIEW_IN_PROGRESS" ]] || [[ $CREATE_STACK_STATUS == "CREATE_IN_PROGRESS" ]]
@@ -323,14 +323,14 @@ def configure_aws_show():
 
 def map_upload(path):
     shell.execute(
-        f'aws s3 cp {path} s3://{config.BUCKET}/{path} --profile {config.PROFILE}',
+        f'aws s3 cp {path} s3://{config.BUCKET}/{path} --metadata type=deployment-data --profile {config.PROFILE}',
         echo=True,
     )
 
 
 def map_list():
     shell.execute(
-        f'aws s3 ls s3://{config.BUCKET} --recursive --human --profile {config.PROFILE}',
+        f'aws s3 ls s3://{config.BUCKET} --recursive --human-readable  --summarize --profile {config.PROFILE}',
         echo=True,
     )
 
