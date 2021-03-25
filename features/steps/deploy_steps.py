@@ -77,10 +77,7 @@ def step_impl(context):
 
 @then(u'execute AWS CloudFormation')
 def step_impl(context):
-    assert (
-        'aws cloudformation create-stack --stack-name OpenRemote-'
-        in context.output
-    )
+    assert 'aws cloudformation create-stack --stack-name ' in context.output
 
 
 @when(u'call or deploy -a remove aws -d -v --no-telemetry')
