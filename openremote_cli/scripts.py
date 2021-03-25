@@ -157,7 +157,7 @@ def _password(password):
 def deploy_aws(password, dnsname):
     host, domain = _split_dns(dnsname)
     logging.debug(f'{dnsname} => {host} + {domain}')
-    stack_name = f'OpenRemote-{uuid.uuid4()}'
+    stack_name = f'{host}-{uuid.uuid4()}'
     check_aws_perquisites()
     generate_password, password = _password(password)
     if config.VERBOSE is True:
