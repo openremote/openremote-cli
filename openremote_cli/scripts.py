@@ -483,12 +483,17 @@ def _check_ip(ip):
 
 # Richard's way
 def deploy_rich(password, smtp_user, smtp_password, project):
+    staging = False
+    if project.find('staging.') == 0:
+        staging = True
+        project = project[8:]
+    shell.execute(f'mkdir {project}', no_exception=True)
     shell.execute(
         f'aws s3 cp s3://{config.BUCKET}/{project} {project} --recursive --profile {config.PROFILE}'
     )
     shell.execute(f'cd {project}')
     shell.execute(f'tar xvf deployment.tar.gz')
-    shell.execute(f'mv mapdata.mbtiles deployment/map/')
+    shell.execute(f'mv mapdata.mbtiles deployment/map/', no_exception=True)
     env = ''
     # TODO reuse installed credentials docker run {project_manager_1} env
     if password != 'secret':
@@ -500,7 +505,10 @@ def deploy_rich(password, smtp_user, smtp_password, project):
             f'EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
         )
     dnsname = f'{project}.openremote.io'
-    env = f'{env}DEPLOYMENT_NAME={project} '
+    if staging:
+        env = f'{env}DEPLOYMENT_NAME=staging.{project} '
+    else:
+        env = f'{env}DEPLOYMENT_NAME={project} '
     generate_password, password = _password(password)
     if generate_password:
         env = f'{env}PASSWORD={password} '
