@@ -227,6 +227,6 @@ def step_impl(context):
 @then(u'deploy with on localhost with DNS demo.openremote.io')
 def step_impl(context):
     assert (
-        'PASSWORD=password DOMAINNAME=demo.openremote.io docker-compose -p demo up -d'
+        'PASSWORD=password DEPLOYMENT_NAME=demo docker-compose up -d'
         in context.output
     )
