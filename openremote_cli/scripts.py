@@ -500,11 +500,11 @@ def deploy_rich(password, smtp_user, smtp_password, project):
             f'EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
         )
     dnsname = f'{project}.openremote.io'
-    env = f'{env}DOMAINNAME={dnsname} '
+    env = f'{env}DEPLOYMENT_NAME={project} '
     generate_password, password = _password(password)
     if generate_password:
         env = f'{env}PASSWORD={password} '
-    shell.execute(f'{env}docker-compose -p {project} up -d')
+    shell.execute(f'{env}docker-compose up -d')
     if not config.DRY_RUN:
         print('\nStack deployed, waiting for startup to complete', end=' ')
         while _deploy_health(dnsname, 0) == 0:
