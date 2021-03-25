@@ -217,8 +217,7 @@ def step_impl(context):
         'aws s3 cp s3://openremote-mvp-map-storage/demo demo --recursive --profile openremote-cli'
         in context.output
     )
-    assert 'cd demo' in context.output
-    assert 'tar xvf deployment.tar.gz' in context.output
+    assert 'tar xvf demo/deployment.tar.gz' in context.output
 
 
 @then(u'deploy with on localhost with DNS demo.openremote.io')
