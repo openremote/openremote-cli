@@ -10,7 +10,11 @@ import platform
 from datetime import datetime
 import requests
 import time
-import pty
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import pty
 
 from openremote_cli import config
 from openremote_cli import scripts
@@ -369,7 +373,12 @@ class OpenRemote(object):
 
     def shell(self, arguments=[]):
         if len(arguments) > 0:
-            pty.spawn("/bin/sh")
+            if os.name == "nt":
+                raise Exception(
+                    'Does not work on Windows, please use docker instead.'
+                )
+            else:
+                pty.spawn("/bin/sh")
         else:
             self.__parser(
                 'shell', 'spawn shell (useful inside of docker container)'
