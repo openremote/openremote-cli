@@ -18,6 +18,7 @@ from random import choice, randint
 from openremote_cli import shell
 from openremote_cli import config
 from openremote_cli import gen_aws_smtp_credentials, email
+from webbot import Browser
 
 
 def deploy(password, smtp_user, smtp_password, dnsname):
@@ -517,3 +518,13 @@ def deploy_rich(password, smtp_user, smtp_password, project):
         print(emojis.encode(':thumbsup:'))
     if config.VERBOSE is True:
         print(f'\nOpen https://{dnsname} and login with admin:{password}')
+
+
+def manager_open(url, user):
+    driver = Browser()
+    driver.go_to(f'https://{url}')
+    driver.type(user, into='username')
+    driver.type(config.get_password(url, user), into='password')
+    driver.type(user, into='username')
+    driver.click('SIGN IN')
+    input('Press ENTER to quit')

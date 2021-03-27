@@ -96,7 +96,19 @@ def get_token(url):
         client_id="admin-cli",
         realm_name="master",
     )
-
     return keycloak_openid.refresh_token(config[url]['refresh_token'])[
         'access_token'
     ]
+
+
+def get_password(url, username):
+    config = configparser.ConfigParser()
+    config.read(_config_file_name())
+    password = 'secret'
+    try:
+        password = config[url][f'{username}_password']
+    except:
+        raise Exception(
+            f'Password for {username} at {url} is unknown. Use:\nopenremote-cli manager --dnsname {url} --login -u {username} -p ...'
+        )
+    return password

@@ -290,6 +290,8 @@ class OpenRemote(object):
                 raise Exception('not implemented')
             if args.delete_user is True:
                 raise Exception('not implemented')
+            if args.open:
+                scripts.manager_open(args.dnsname, args.user)
         else:
             parser = self.__parser('manager', 'manage online manager')
             arguments = parser.add_argument_group("manager arguments")
@@ -308,6 +310,7 @@ class OpenRemote(object):
                 '-p', '--password', required=False, help='user password'
             )
             arguments.add_argument(
+                '-d',
                 '--dnsname',
                 type=str,
                 required=False,
@@ -356,6 +359,12 @@ class OpenRemote(object):
                 required=False,
                 action='store_true',
                 help='list public assets in a realm',
+            )
+            arguments.add_argument(
+                '-o',
+                '--open',
+                action='store_true',
+                help='open browser and login',
             )
 
     def shell(self, arguments=[]):
