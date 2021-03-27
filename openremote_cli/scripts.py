@@ -523,8 +523,10 @@ def deploy_rich(password, smtp_user, smtp_password, project):
 def manager_open(url, user):
     driver = Browser()
     driver.go_to(f'https://{url}')
+    # TODO find better way to test if browser is loaded
+    time.sleep(3)
     driver.type(user, into='username')
     driver.type(config.get_password(url, user), into='password')
-    driver.type(user, into='username')
     driver.click('SIGN IN')
+    driver.click('LOG IN')
     input('Press ENTER to quit')
