@@ -3,6 +3,7 @@ import configparser
 import logging
 
 from pathlib import Path
+from keycloak import KeycloakOpenID
 
 
 def _config_file_name():
@@ -69,17 +70,20 @@ def initialize():
     LEVEL = 'logging.ERROR'
 
 
-def store_token(url, token, refresh):
+def store_token(url, username, password, refresh):
     config = configparser.ConfigParser()
     config.read(_config_file_name())
     try:
         # first try to update
         managerUrl = config[url]
-        managerUrl['access_token'] = token
+        managerUrl[f'{username}_password'] = password
         managerUrl['refresh_token'] = refresh
     except:
-        # if not the create
-        config[url] = {'access_token': token, 'refresh_token': refresh}
+        # if not then create
+        config[url] = {
+            f'{username}_password': password,
+            'refresh_token': refresh,
+        }
     with open(_config_file_name(), 'w') as conf:
         config.write(conf)
 
@@ -87,6 +91,12 @@ def store_token(url, token, refresh):
 def get_token(url):
     config = configparser.ConfigParser()
     config.read(_config_file_name())
-    # TODO refresh toke or ask to login again
-    # managerUrl = config[url]
-    return config[url]['access_token']
+    keycloak_openid = KeycloakOpenID(
+        server_url=f'https://{url}/auth/',
+        client_id="admin-cli",
+        realm_name="master",
+    )
+
+    return keycloak_openid.refresh_token(config[url]['refresh_token'])[
+        'access_token'
+    ]
