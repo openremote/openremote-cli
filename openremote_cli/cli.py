@@ -375,7 +375,7 @@ class OpenRemote(object):
             arguments.add_argument(
                 '--test-http-rest',
                 action='store_true',
-                help='open browser and login',
+                help='test plan HTTP REST',
             )
             arguments.add_argument(
                 '--delay',
