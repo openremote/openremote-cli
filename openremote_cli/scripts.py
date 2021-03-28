@@ -520,30 +520,52 @@ def deploy_rich(password, smtp_user, smtp_password, project):
         print(f'\nOpen https://{dnsname} and login with admin:{password}')
 
 
-def manager_open(url, user):
+def manager_open(url, user, quit):
     driver = Browser()
     driver.go_to(f'https://{url}')
-    # TODO find better way to test if browser is loaded
-    time.sleep(3)
+    while driver.execute_script("return document.readyState") != "complete":
+        time.sleep(0.3)
     driver.type(user, into='username')
     driver.type(config.get_password(url, user), into='password')
+    driver.type(user, into='username')
     driver.click('SIGN IN')
     driver.click('LOG IN')
-    input('Press ENTER to quit')
+    cnt = 0
+    while cnt < 1000000:
+        try:
+            driver.execute_script(
+                "document.querySelector('or-app').shadowRoot"
+                ".querySelector('page-map').shadowRoot"
+            )
+            cnt = 1000000
+        except:
+            if not config.QUIET:
+                print('.', end='', flush=True)
+            cnt += 1
+            time.sleep(0.2)
+            if cnt > 200:
+                raise Exception("No map shown after login")
+    if quit:
+        # Need this for manager to act (maybe some confirmation TODO)
+        time.sleep(1)
+    else:
+        input('Press ENTER to quit')
 
 
-def manager_test_http_rest(delay=0):
+def manager_test_http_rest(delay, quit):
     url = 'staging.demo.openremote.io'
     user = 'admin'
-    driver = Browser()
+    driver = Browser(showWindow=not config.QUIET)
+    print(f"0. Login into {url}")
     driver.go_to(f'https://{url}')
-    # TODO find better way to test if browser is loaded
-    time.sleep(1)
+    while driver.execute_script("return document.readyState") != "complete":
+        if not config.QUIET:
+            print('.', end='', flush=True)
+        time.sleep(0.2)
     driver.type(user, into='username')
     driver.type(config.get_password(url, user), into='password')
     driver.click('SIGN IN')
     # test plan https://docs.google.com/document/d/1RVt47Y9KLJl_YSNwoLrOE3VNWfUm2VaOpZzS7tebItI/edit
-    time.sleep(5)
     print("1. Go to the 'Assets' page in the webapp")
     time.sleep(delay)
     driver.go_to(f'https://{url}/manager/#!assets')
@@ -551,13 +573,21 @@ def manager_test_http_rest(delay=0):
         "2. Open the add asset dialog by clicking the '+' icon in the asset tree on the left."
     )
     time.sleep(delay)
-    driver.execute_script(
-        "document.querySelector('or-app').shadowRoot"
-        ".querySelector('page-assets').shadowRoot"
-        ".querySelector('or-asset-tree').shadowRoot"
-        ".querySelector('or-input[icon=plus]').shadowRoot"
-        ".querySelector('button').click()"
-    )
+    wait = True
+    while wait:
+        try:
+            driver.execute_script(
+                "document.querySelector('or-app').shadowRoot"
+                ".querySelector('page-assets').shadowRoot"
+                ".querySelector('or-asset-tree').shadowRoot"
+                ".querySelector('or-input[icon=plus]').shadowRoot"
+                ".querySelector('button').click()"
+            )
+            wait = False
+        except:
+            if not config.QUIET:
+                print('.', end='', flush=True)
+            time.sleep(0.2)
     print("3. Give the asset the name 'Weather Agent'")
     time.sleep(delay)
     driver.execute_script(
@@ -573,4 +603,8 @@ def manager_test_http_rest(delay=0):
     driver.execute_script(
         "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-input[id=add-btn]').click()"
     )
-    input('Press ENTER to quit')
+    if quit:
+        # Need this for manager to act (maybe some confirmation TODO)
+        time.sleep(1)
+    else:
+        input('Press ENTER to quit')

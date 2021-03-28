@@ -295,9 +295,9 @@ class OpenRemote(object):
             if args.delete_user is True:
                 raise Exception('not implemented')
             if args.open:
-                scripts.manager_open(args.dnsname, args.user)
+                scripts.manager_open(args.dnsname, args.user, args.quit)
             if args.test_http_rest:
-                scripts.manager_test_http_rest(args.delay)
+                scripts.manager_test_http_rest(args.delay, args.quit)
         else:
             parser = self.__parser('manager', 'manage online manager')
             arguments = parser.add_argument_group("manager arguments")
@@ -382,6 +382,9 @@ class OpenRemote(object):
                 type=int,
                 help='delay between steps in test scenarios',
                 default=1,
+            )
+            arguments.add_argument(
+                '--quit', action='store_true', help='open browser and login'
             )
 
     def shell(self, arguments=[]):
