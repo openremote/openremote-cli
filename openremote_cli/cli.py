@@ -296,6 +296,8 @@ class OpenRemote(object):
                 raise Exception('not implemented')
             if args.open:
                 scripts.manager_open(args.dnsname, args.user)
+            if args.test_http_rest:
+                scripts.manager_test_http_rest(args.delay)
         else:
             parser = self.__parser('manager', 'manage online manager')
             arguments = parser.add_argument_group("manager arguments")
@@ -369,6 +371,17 @@ class OpenRemote(object):
                 '--open',
                 action='store_true',
                 help='open browser and login',
+            )
+            arguments.add_argument(
+                '--test-http-rest',
+                action='store_true',
+                help='open browser and login',
+            )
+            arguments.add_argument(
+                '--delay',
+                type=int,
+                help='delay between steps in test scenarios',
+                default=1,
             )
 
     def shell(self, arguments=[]):

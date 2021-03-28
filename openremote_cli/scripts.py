@@ -530,3 +530,47 @@ def manager_open(url, user):
     driver.click('SIGN IN')
     driver.click('LOG IN')
     input('Press ENTER to quit')
+
+
+def manager_test_http_rest(delay=0):
+    url = 'staging.demo.openremote.io'
+    user = 'admin'
+    driver = Browser()
+    driver.go_to(f'https://{url}')
+    # TODO find better way to test if browser is loaded
+    time.sleep(1)
+    driver.type(user, into='username')
+    driver.type(config.get_password(url, user), into='password')
+    driver.click('SIGN IN')
+    # test plan https://docs.google.com/document/d/1RVt47Y9KLJl_YSNwoLrOE3VNWfUm2VaOpZzS7tebItI/edit
+    time.sleep(5)
+    print("1. Go to the 'Assets' page in the webapp")
+    time.sleep(delay)
+    driver.go_to(f'https://{url}/manager/#!assets')
+    print(
+        "2. Open the add asset dialog by clicking the '+' icon in the asset tree on the left."
+    )
+    time.sleep(delay)
+    driver.execute_script(
+        "document.querySelector('or-app').shadowRoot"
+        ".querySelector('page-assets').shadowRoot"
+        ".querySelector('or-asset-tree').shadowRoot"
+        ".querySelector('or-input[icon=plus]').shadowRoot"
+        ".querySelector('button').click()"
+    )
+    print("3. Give the asset the name 'Weather Agent'")
+    time.sleep(delay)
+    driver.execute_script(
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').value = 'Weather Agent'"
+    )
+    print("4. and select the asset type 'HTTP Client Agent' from the list.")
+    time.sleep(delay)
+    driver.execute_script(
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-mwc-list').shadowRoot.querySelectorAll('span')[3].click()"
+    )
+    print("5. Press 'Add'")
+    time.sleep(delay)
+    driver.execute_script(
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-input[id=add-btn]').click()"
+    )
+    input('Press ENTER to quit')
