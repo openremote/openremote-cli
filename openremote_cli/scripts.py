@@ -425,7 +425,7 @@ def manager_login(url, username, password):
         client_secret_key="secret",
     )
     if password:
-        response = keycloak_openid.token(username, 'secret')
+        response = keycloak_openid.token(username, password)
     else:
         password = config.get_password(url, username)
         response = keycloak_openid.token(username, password)
