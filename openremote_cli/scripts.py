@@ -525,33 +525,8 @@ def deploy_rich(password, smtp_user, smtp_password, project):
 
 
 def manager_open(url, user, quit):
-    driver = Browser(showWindow=not config.QUIET)
-    driver.go_to(f'https://{url}')
-    # TODO does not work for Eindhoven
-    while driver.execute_script("return document.readyState") != "complete":
-        time.sleep(0.3)
-    # time.sleep(5)
-    driver.type(user, into='username')
-    driver.type(config.get_password(url, user), into='password')
-    driver.type(user, into='username')
-    driver.click('SIGN IN')
-    driver.click('LOG IN')
-    cnt = 0
-    while cnt < 1000000:
-        try:
-            driver.execute_script(
-                "document.querySelector('or-app').shadowRoot"
-                ".querySelector('page-map').shadowRoot"
-            )
-            cnt = 1000000
-            print(f"{url} OK")
-        except:
-            if not config.QUIET:
-                print('.', end='', flush=True)
-            cnt += 1
-            time.sleep(0.2)
-            if cnt > 150:
-                raise Exception(f"{url}: No map shown after login")
+    driver = _manager_ui_login(url, user)
+    _manager_ui_wait_map(driver, url)
     if quit:
         # Need this for manager to act (maybe some confirmation TODO)
         time.sleep(1)
@@ -559,19 +534,45 @@ def manager_open(url, user, quit):
         input('Press ENTER to quit')
 
 
-def manager_test_http_rest(delay, quit):
-    url = 'staging.demo.openremote.io'
-    user = 'admin'
+def _manager_ui_login(url, user):
     driver = Browser(showWindow=not config.QUIET)
-    print(f"0. Login into {url}")
     driver.go_to(f'https://{url}')
-    while driver.execute_script("return document.readyState") != "complete":
+    while not driver.exists('LOG IN') and not driver.exists('SIGN IN'):
         if not config.QUIET:
-            print('.', end='', flush=True)
+            print('+', end='', flush=True)
         time.sleep(0.2)
     driver.type(user, into='username')
     driver.type(config.get_password(url, user), into='password')
     driver.click('SIGN IN')
+    driver.click('LOG IN')
+    return driver
+
+
+def _manager_ui_wait_map(driver, url, delay=10):
+    start = time.time()
+    end = start
+    while end - start < delay:
+        try:
+            driver.execute_script(
+                "document.querySelector('or-app').shadowRoot"
+                ".querySelector('page-map').shadowRoot"
+            )
+            print(f"{url} OK")
+            return 0
+        except:
+            if not config.QUIET:
+                print('.', end='', flush=True)
+            time.sleep(0.2)
+            end = time.time()
+    raise Exception(f"{url}: No map shown after login")
+
+
+def manager_test_http_rest(delay, quit):
+    url = 'staging.demo.openremote.io'
+    user = 'admin'
+    print(f"0. Login into {url}")
+    driver = _manager_ui_login(url, user)
+    _manager_ui_wait_map(driver, url)
     # test plan https://docs.google.com/document/d/1RVt47Y9KLJl_YSNwoLrOE3VNWfUm2VaOpZzS7tebItI/edit
     print("1. Go to the 'Assets' page in the webapp")
     time.sleep(delay)
@@ -603,6 +604,9 @@ def manager_test_http_rest(delay, quit):
     time.sleep(delay)
     driver.execute_script(
         "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').value = 'Weather Agent'"
+    )
+    driver.execute_script(
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').dispatchEvent(new Event('change'))"
     )
     print("4. and select the asset type 'HTTP Client Agent' from the list.")
     time.sleep(delay)
