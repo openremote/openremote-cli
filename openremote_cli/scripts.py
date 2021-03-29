@@ -534,13 +534,18 @@ def manager_open(url, user, quit):
         input('Press ENTER to quit')
 
 
-def _manager_ui_login(url, user):
+def _manager_ui_login(url, user, delay=30):
     driver = Browser(showWindow=not config.QUIET)
     driver.go_to(f'https://{url}')
+    start = time.time()
+    end = start
     while not driver.exists('LOG IN') and not driver.exists('SIGN IN'):
         if not config.QUIET:
             print('+', end='', flush=True)
         time.sleep(0.2)
+        end = time.time()
+        if end - start > delay:
+            raise Exception(f'{url}: no login page after {delay}s')
     driver.type(user, into='username')
     driver.type(config.get_password(url, user), into='password')
     driver.click('SIGN IN')
@@ -557,7 +562,7 @@ def _manager_ui_wait_map(driver, url, delay=10):
                 "document.querySelector('or-app').shadowRoot"
                 ".querySelector('page-map').shadowRoot"
             )
-            print(f"{url} OK")
+            print(f"{url} OK {end-start}")
             return 0
         except:
             if not config.QUIET:
@@ -617,6 +622,9 @@ def manager_test_http_rest(delay, quit):
     time.sleep(delay)
     driver.execute_script(
         "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-input[id=add-btn]').click()"
+    )
+    print(
+        "6. First we set the Base URI of the weather service that we will use for further queries. TODO"
     )
     if quit:
         # Need this for manager to act (maybe some confirmation TODO)
