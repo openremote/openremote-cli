@@ -19,6 +19,8 @@ else:
 from openremote_cli import config
 from openremote_cli import scripts
 from openremote_cli import gen_aws_smtp_credentials
+from collections import defaultdict
+
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
@@ -42,6 +44,11 @@ class OpenRemote(object):
                 getattr(self, attr)([])
 
         args, unknown = self.base_subparser.parse_known_args(arguments)
+
+        # command aliases substitution
+        mapping = _get_subparser_aliases(parser, 'command')
+        _remap_args(args, mapping, 'command')
+
         if args.quiet:
             config.QUIET = True
             args.verbosity = 0
@@ -86,7 +93,7 @@ class OpenRemote(object):
                         print(
                             "To see commands use -v switch (-vvv for debug)\n"
                         )
-                    else:
+                    elif not args.command == 'manager':
                         print(
                             'If you need help go to https://forum.openremote.io/\n'
                         )
@@ -299,7 +306,9 @@ class OpenRemote(object):
             if args.test_http_rest:
                 scripts.manager_test_http_rest(args.delay, args.quit)
         else:
-            parser = self.__parser('manager', 'manage online manager')
+            parser = self.__parser(
+                'manager', 'manage online manager', aliases=['m', 'sso']
+            )
             arguments = parser.add_argument_group("manager arguments")
             arguments.add_argument(
                 '-l', '--login', action='store_true', help='login into manager'
@@ -421,12 +430,13 @@ class OpenRemote(object):
                 '--install', action='store_true', help='install missing tools'
             )
 
-    def __parser(self, name, description):
+    def __parser(self, name, description, aliases=[]):
         parser = self.subparsers.add_parser(
             name=name,
             description=description,
             help=description,
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            aliases=aliases,
             # TODO see what is wrong with parents
             # conflict_handler='resolve',
             # parents=[self.base_subparser],
@@ -463,6 +473,28 @@ class OpenRemote(object):
             '-q', '--quiet', action='store_true', help='suppress info'
         )
         return parser
+
+
+def _get_subparser_aliases(parser, dest):
+    out = defaultdict(list)
+    prog_str = parser.prog
+    dest_dict = {a.dest: a for a in parser._actions}
+    try:
+        choices = dest_dict.get(dest).choices
+    except AttributeError:
+        raise AttributeError(
+            f'The parser "{parser}" has no subparser with a `dest` of "{dest}"'
+        )
+
+    for k, v in choices.items():
+        clean_v = v.prog.replace(prog_str, '', 1).strip()
+        out[k] = clean_v
+    return dict(out)
+
+
+def _remap_args(args, mapping, dest):
+    setattr(args, dest, mapping.get(getattr(args, dest)))
+    return args
 
 
 def send_metric(cli_input, exit_reason, exit_code, duration):

@@ -50,3 +50,17 @@ def step_impl(context):
     )
     print(context.output)
     assert context.code == 0
+
+
+@when(
+    u'or sso --open --quit --quiet --no-telemetry -d staging.demo.openremote.io'
+)
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run or sso --open --quit --quiet --no-telemetry -d staging.demo.openremote.io'
+    )
+
+
+@then(u'there should be no errors')
+def step_impl(context):
+    assert context.code == 0

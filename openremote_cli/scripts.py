@@ -536,9 +536,9 @@ def manager_open(url, user, quit):
 
 def _manager_ui_login(url, user, delay=30):
     driver = Browser(showWindow=not config.QUIET)
-    driver.go_to(f'https://{url}')
     start = time.time()
     end = start
+    driver.go_to(f'https://{url}')
     while not driver.exists('LOG IN') and not driver.exists('SIGN IN'):
         if not config.QUIET:
             print('+', end='', flush=True)
@@ -550,10 +550,13 @@ def _manager_ui_login(url, user, delay=30):
     driver.type(config.get_password(url, user), into='password')
     driver.click('SIGN IN')
     driver.click('LOG IN')
+    end = time.time()
+    if not config.QUIET:
+        print(f'{url} login time\t{end-start}s')
     return driver
 
 
-def _manager_ui_wait_map(driver, url, delay=10):
+def _manager_ui_wait_map(driver, url, delay=20):
     start = time.time()
     end = start
     while end - start < delay:
@@ -562,14 +565,15 @@ def _manager_ui_wait_map(driver, url, delay=10):
                 "document.querySelector('or-app').shadowRoot"
                 ".querySelector('page-map').shadowRoot"
             )
-            print(f"{url} OK {end-start}")
+            if not config.QUIET:
+                print(f"{url} map OK\t{end-start}s")
             return 0
         except:
             if not config.QUIET:
                 print('.', end='', flush=True)
             time.sleep(0.2)
             end = time.time()
-    raise Exception(f"{url}: No map shown after login")
+    raise Exception(f"{url}: No map shown after login after {delay}s")
 
 
 def manager_test_http_rest(delay, quit):
