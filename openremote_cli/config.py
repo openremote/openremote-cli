@@ -61,13 +61,14 @@ def initialize():
     SMTP_SERVER = f'email-smtp.{REGION}.amazonaws.com'
 
     # Runtime config
-    global DRY_RUN, LEVEL, VERBOSE, TELEMETRY, QUIET
+    global DRY_RUN, LEVEL, VERBOSE, TELEMETRY, QUIET, TIMEOUT
 
     VERBOSE = False
     DRY_RUN = False
     TELEMETRY = True
     QUIET = False
     LEVEL = 'logging.ERROR'
+    TIMEOUT = 20
 
 
 def store_token(url, username, password, refresh):

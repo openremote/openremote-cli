@@ -11,6 +11,7 @@ import ssl
 import time
 import emojis
 import re
+import functools
 
 
 from keycloak import KeycloakOpenID
@@ -552,28 +553,70 @@ def _manager_ui_login(url, user, delay=30):
     driver.click('LOG IN')
     end = time.time()
     if not config.QUIET:
-        print(f'{url} login time\t{end-start}s')
+        print(f'{url} login time\t{end-start:.2f}s')
     return driver
 
 
-def _manager_ui_wait_map(driver, url, delay=20):
-    start = time.time()
-    end = start
-    while end - start < delay:
-        try:
-            driver.execute_script(
-                "document.querySelector('or-app').shadowRoot"
-                ".querySelector('page-map').shadowRoot"
-            )
-            if not config.QUIET:
-                print(f"{url} map OK\t{end-start}s")
-            return 0
-        except:
-            if not config.QUIET:
-                print('.', end='', flush=True)
-            time.sleep(0.2)
-            end = time.time()
-    raise Exception(f"{url}: No map shown after login after {delay}s")
+def timeout(func):
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        start = time.time()
+        while time.time() - start < config.TIMEOUT:
+            try:
+                result = func(*args, **kwargs)
+                if not config.QUIET:
+                    print(f' {func.__name__!r}: OK {time.time() - start:.2f}s')
+                return result
+            except:
+                if not config.QUIET:
+                    print('.', end='', flush=True)
+                time.sleep(0.1)
+        raise Exception(f'{func.__name__!r}: timeout {config.TIMEOUT}s')
+
+    return inner
+
+
+@timeout
+def _manager_ui_wait_map(driver, url):
+    driver.execute_script(
+        "document.querySelector('or-app').shadowRoot"
+        ".querySelector('page-map').shadowRoot"
+    )
+
+
+@timeout
+def _manager_ui_add_asset_dialog(driver, url):
+    driver.execute_script(
+        "document.querySelector('or-app').shadowRoot"
+        ".querySelector('page-assets').shadowRoot"
+        ".querySelector('or-asset-tree').shadowRoot"
+        ".querySelector('or-input[icon=plus]').shadowRoot"
+        ".querySelector('button').click()"
+    )
+
+
+@timeout
+def _manager_ui_add_http_weather_agent(driver, url):
+    driver.execute_script(
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').value = 'Weather Agent'"
+    )
+    driver.execute_script(
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').dispatchEvent(new Event('change'))"
+    )
+
+
+@timeout
+def _manager_ui_select_http_agent(driver, url):
+    driver.execute_script(
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-mwc-list').shadowRoot.querySelectorAll('span')[3].click()"
+    )
+
+
+@timeout
+def _manager_ui_press_add(driver, url):
+    driver.execute_script(
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-input[id=add-btn]').click()"
+    )
 
 
 def manager_test_http_rest(delay, quit):
@@ -590,43 +633,16 @@ def manager_test_http_rest(delay, quit):
         "2. Open the add asset dialog by clicking the '+' icon in the asset tree on the left."
     )
     time.sleep(delay)
-    cnt = 0
-    while cnt < 1000000:
-        try:
-            driver.execute_script(
-                "document.querySelector('or-app').shadowRoot"
-                ".querySelector('page-assets').shadowRoot"
-                ".querySelector('or-asset-tree').shadowRoot"
-                ".querySelector('or-input[icon=plus]').shadowRoot"
-                ".querySelector('button').click()"
-            )
-            cnt = 1000000
-        except:
-            if not config.QUIET:
-                print('.', end='', flush=True)
-            time.sleep(0.2)
-            cnt += 1
-            time.sleep(0.2)
-            if cnt > 150:
-                raise Exception(f"{url}: Timeout waiting for dialog")
+    _manager_ui_add_asset_dialog(driver, url)
     print("3. Give the asset the name 'Weather Agent'")
     time.sleep(delay)
-    driver.execute_script(
-        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').value = 'Weather Agent'"
-    )
-    driver.execute_script(
-        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').dispatchEvent(new Event('change'))"
-    )
+    _manager_ui_add_http_weather_agent(driver, url)
     print("4. and select the asset type 'HTTP Client Agent' from the list.")
     time.sleep(delay)
-    driver.execute_script(
-        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-mwc-list').shadowRoot.querySelectorAll('span')[3].click()"
-    )
+    _manager_ui_select_http_agent(driver, url)
     print("5. Press 'Add'")
     time.sleep(delay)
-    driver.execute_script(
-        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-input[id=add-btn]').click()"
-    )
+    _manager_ui_press_add(driver, url)
     print(
         "6. First we set the Base URI of the weather service that we will use for further queries. TODO"
     )
