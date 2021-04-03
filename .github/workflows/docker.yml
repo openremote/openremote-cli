@@ -51,3 +51,4 @@ jobs:
       - name: test docker image
         run: |
           docker run --rm openremote/openremote-cli --version --dry-run --no-telemetry
+          docker run --rm -ti openremote/openremote-cli manager -t --quit -v --test-http-rest --quiet --login -p ${{ secrets.SETUP_ADMIN_PASSWORD }} --dnsname staging.demo.openremote.io
