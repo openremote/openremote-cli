@@ -40,13 +40,20 @@ def initialize():
                     'region': 'eu-west-1',
                 }
                 with open(_config_file_name(), 'w') as conf:
-                    config.write(conf)
-                    print(f'Config created in {_config_file_name()}')
+                    try:
+                        config.write(conf)
+                        print(f'Config created in {_config_file_name()}')
+                    except Exception as error:
+                        logging.error(f'Error writing config: {conf}\n{error}')
         except Exception as error:
             logging.error(error)
 
-    default = config['DEFAULT']
-    TELEMETRY_URL = default['telemetry_url']
+    try:
+        default = config['DEFAULT']
+        TELEMETRY_URL = default['telemetry_url']
+    except:
+        TELEMETRY_URL = 'https://cli.developers.openremote.io/metrics'
+
     try:
         if os.environ['TELEMETRY_URL']:
             TELEMETRY_URL = f"{os.environ['TELEMETRY_URL']}/metrics"
@@ -86,7 +93,10 @@ def store_token(url, username, password, refresh):
             'refresh_token': refresh,
         }
     with open(_config_file_name(), 'w') as conf:
-        config.write(conf)
+        try:
+            config.write(conf)
+        except Exception as error:
+            logging.error(f'Error writing config: {conf}\n{error}')
 
 
 def get_token(url):
