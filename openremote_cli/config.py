@@ -12,6 +12,7 @@ def _config_file_name():
 
 # Declare it globally for this module to be robust against readonly runtime
 config = configparser.ConfigParser()
+config_file = True
 
 
 def initialize():
@@ -19,6 +20,7 @@ def initialize():
     # user persistent config
     global TELEMETRY_URL, REGION, PROFILE, BUCKET, SMTP_SERVER
 
+    config_file = True
     if not os.path.exists(_config_file_name()):
         try:
             os.makedirs(
@@ -26,8 +28,10 @@ def initialize():
             )
         except:
             logging.error(f'Cannot create {str(Path.home())}/.openremote')
+            config_file = False
 
-    config.read(_config_file_name())
+    if config_file:
+        config.read(_config_file_name())
     if config.sections() == []:
         try:
             try:
@@ -80,7 +84,8 @@ def initialize():
 
 
 def store_token(url, username, password, refresh):
-    config.read(_config_file_name())
+    if config_file:
+        config.read(_config_file_name())
     try:
         # first try to update
         managerUrl = config[url]
@@ -100,7 +105,8 @@ def store_token(url, username, password, refresh):
 
 
 def get_token(url):
-    config.read(_config_file_name())
+    if config_file:
+        config.read(_config_file_name())
     keycloak_openid = KeycloakOpenID(
         server_url=f'https://{url}/auth/',
         client_id="admin-cli",
@@ -112,7 +118,8 @@ def get_token(url):
 
 
 def get_password(url, username):
-    config.read(_config_file_name())
+    if config_file:
+        config.read(_config_file_name())
     password = 'secret'
     try:
         password = config[url][f'{username}_password']
