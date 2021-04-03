@@ -10,49 +10,50 @@ def _config_file_name():
     return f'{str(Path.home())}/.openremote/config.ini'
 
 
+# Declare it globally for this module to be robust against readonly runtime
+config = configparser.ConfigParser()
+
+
 def initialize():
 
     # user persistent config
     global TELEMETRY_URL, REGION, PROFILE, BUCKET, SMTP_SERVER
 
-    config = configparser.ConfigParser()
-    config.read(_config_file_name())
+    if not os.path.exists(_config_file_name()):
+        try:
+            os.makedirs(
+                f'{str(Path.home())}/.openremote', mode=0o700, exist_ok=True
+            )
+        except:
+            logging.error(f'Cannot create {str(Path.home())}/.openremote')
 
+    config.read(_config_file_name())
     if config.sections() == []:
         try:
-            if not os.path.exists(_config_file_name()):
-                try:
-                    config['DEFAULT'] = {
-                        'telemetry_url': f"{os.environ['TELEMETRY_URL']}/metrics"
-                    }
-                except:
-                    config['DEFAULT'] = {
-                        'telemetry_url': 'https://cli.developers.openremote.io/metrics'
-                    }
-                config['AWS'] = {
-                    'profile': 'openremote-cli',
-                    'bucket': 'openremote-mvp-map-storage',
-                    'region': 'eu-west-1',
+            try:
+                config['DEFAULT'] = {
+                    'telemetry_url': f"{os.environ['TELEMETRY_URL']}/metrics"
                 }
-                os.makedirs(
-                    f'{str(Path.home())}/.openremote',
-                    mode=0o700,
-                    exist_ok=True,
-                )
-                with open(_config_file_name(), 'w') as conf:
-                    try:
-                        config.write(conf)
-                        print(f'Config created in {_config_file_name()}')
-                    except Exception as error:
-                        logging.error(f'Error writing config: {conf}\n{error}')
+            except:
+                config['DEFAULT'] = {
+                    'telemetry_url': 'https://cli.developers.openremote.io/metrics'
+                }
+            config['AWS'] = {
+                'profile': 'openremote-cli',
+                'bucket': 'openremote-mvp-map-storage',
+                'region': 'eu-west-1',
+            }
+            with open(_config_file_name(), 'w') as conf:
+                try:
+                    config.write(conf)
+                    print(f'Config created in {_config_file_name()}')
+                except Exception as error:
+                    logging.error(f'Error writing config: {conf}\n{error}')
         except Exception as error:
             logging.error(error)
 
-    try:
         default = config['DEFAULT']
         TELEMETRY_URL = default['telemetry_url']
-    except:
-        TELEMETRY_URL = 'https://cli.developers.openremote.io/metrics'
 
     try:
         if os.environ['TELEMETRY_URL']:
@@ -79,7 +80,6 @@ def initialize():
 
 
 def store_token(url, username, password, refresh):
-    config = configparser.ConfigParser()
     config.read(_config_file_name())
     try:
         # first try to update
@@ -100,7 +100,6 @@ def store_token(url, username, password, refresh):
 
 
 def get_token(url):
-    config = configparser.ConfigParser()
     config.read(_config_file_name())
     keycloak_openid = KeycloakOpenID(
         server_url=f'https://{url}/auth/',
@@ -113,7 +112,6 @@ def get_token(url):
 
 
 def get_password(url, username):
-    config = configparser.ConfigParser()
     config.read(_config_file_name())
     password = 'secret'
     try:
