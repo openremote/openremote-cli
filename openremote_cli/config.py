@@ -21,11 +21,6 @@ def initialize():
     if config.sections() == []:
         try:
             if not os.path.exists(_config_file_name()):
-                os.makedirs(
-                    f'{str(Path.home())}/.openremote',
-                    mode=0o700,
-                    exist_ok=True,
-                )
                 try:
                     config['DEFAULT'] = {
                         'telemetry_url': f"{os.environ['TELEMETRY_URL']}/metrics"
@@ -39,6 +34,11 @@ def initialize():
                     'bucket': 'openremote-mvp-map-storage',
                     'region': 'eu-west-1',
                 }
+                os.makedirs(
+                    f'{str(Path.home())}/.openremote',
+                    mode=0o700,
+                    exist_ok=True,
+                )
                 with open(_config_file_name(), 'w') as conf:
                     try:
                         config.write(conf)
