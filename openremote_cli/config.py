@@ -47,14 +47,14 @@ def initialize():
                 'bucket': 'openremote-mvp-map-storage',
                 'region': 'eu-west-1',
             }
-            with open(_config_file_name(), 'w') as conf:
-                try:
+            try:
+                with open(_config_file_name(), 'w') as conf:
                     config.write(conf)
                     print(f'Config created in {_config_file_name()}')
-                except Exception as error:
-                    logging.error(f'Error writing config: {conf}\n{error}')
+            except Exception as error:
+                logging.error(f'Error writing config: {error}')
         except Exception as error:
-            logging.error(error)
+            logging.error(f'{config.sections()} {error}')
 
         default = config['DEFAULT']
         TELEMETRY_URL = default['telemetry_url']
@@ -97,11 +97,11 @@ def store_token(url, username, password, refresh):
             f'{username}_password': password,
             'refresh_token': refresh,
         }
-    with open(_config_file_name(), 'w') as conf:
-        try:
+    try:
+        with open(_config_file_name(), 'w') as conf:
             config.write(conf)
-        except Exception as error:
-            logging.error(f'Error writing config: {conf}\n{error}')
+    except Exception as error:
+        logging.error(f'Error writing config: {error}')
 
 
 def get_token(url):

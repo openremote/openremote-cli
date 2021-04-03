@@ -28,8 +28,7 @@ def sendmail(receiver, subject, message_text, smtp_user, smtp_password):
         server.sendmail('no-reply@openremote.io', [receiver], message)
         logging.debug('Successfully sent email')
     except Exception as error:
-        logging.error(error)
-        logging.debug('Error: unable to send email')
+        logging.error(f'Error: unable to send email: {error}')
 
 
 def main():

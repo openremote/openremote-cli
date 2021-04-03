@@ -549,6 +549,9 @@ def isLatestVersion():
         )
 
 
+import traceback
+
+
 def main():
     config.initialize()
     exit_reason = "program finished normally"
@@ -557,7 +560,8 @@ def main():
     try:
         OpenRemote(sys.argv[1:])
     except Exception as error:
-        logging.error(error)
+        logging.error(f'Exiting main because of uncached: {error}')
+        traceback.print_exc()
         exit_reason = str(error)
         exit_code = -1
         try:
