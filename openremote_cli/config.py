@@ -66,8 +66,8 @@ def initialize():
         except Exception as error:
             logging.error(f'{config.sections()} {error}')
 
-        default = config['DEFAULT']
-        TELEMETRY_URL = default['telemetry_url']
+    default = config['DEFAULT']
+    TELEMETRY_URL = default['telemetry_url']
 
     try:
         if os.environ['TELEMETRY_URL']:
