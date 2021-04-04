@@ -1,6 +1,9 @@
 name: CI/CD
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - .github/workflows/docker.yml
 
 jobs:
   # Cancel previous builds in case of a new build trigger

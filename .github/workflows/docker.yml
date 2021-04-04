@@ -48,11 +48,14 @@ jobs:
       - name: build and push images
         run: |
           make multi-image
+      - name: push to AWS ECR
+        env:
+          AWS_REPOSITORY_URL: ${{ secrets.AWS_REPOSITORY_URL }}
+        run: |
           aws configure set aws_access_key_id "${{ secrets.AWS_ID }}"
           aws configure set aws_secret_access_key "${{ secrets.AWS_SECRET }}"
           aws configure set default.region eu-west-1
-          aws ecr get-login-password --region eu-west-1
-          docker login --username AWS --password $(aws ecr get-login-password --region eu-west-1) 134517981306.dkr.ecr.eu-west-1.amazonaws.com/openremote-cli
+          docker login --username AWS --password $(aws ecr get-login-password --region eu-west-1) $AWS_REPOSITORY_URL
           make lambda
       - name: test docker image
         run: |
