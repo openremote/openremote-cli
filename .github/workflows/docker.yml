@@ -48,6 +48,7 @@ jobs:
       - name: build and push images
         run: |
           make multi-image
+          docker run --rm -v $(pwd):/root/.aws openremote/openremote-cli configure_aws --no-telemetry --id "${{ secrets.AWS_ID }}" --secret "${{ secrets.AWS_SECRET }}" -v
           make lambda
       - name: test docker image
         run: |

@@ -10,7 +10,7 @@ image:
 	docker build -t openremote/openremote-cli --no-cache .
 
 lambda:
-	docker login --username AWS --password $$(aws ecr get-login-password --region eu-west-1) $(AWS_REPOSITORY_URL)
+	docker login --username AWS --password $$(aws ecr get-login-password --region eu-west-1 --profile openremote-cli) $(AWS_REPOSITORY_URL)
 	docker tag openremote/openremote-cli:latest $(AWS_REPOSITORY_URL)
 	docker push $(AWS_REPOSITORY_URL)
 
