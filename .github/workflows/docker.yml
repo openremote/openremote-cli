@@ -48,6 +48,7 @@ jobs:
       - name: build and push images
         run: |
           make multi-image
+          make lambda
       - name: test docker image
         run: |
           docker run --rm openremote/openremote-cli --version --dry-run --no-telemetry
