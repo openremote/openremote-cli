@@ -6,29 +6,39 @@ from pathlib import Path
 from keycloak import KeycloakOpenID
 
 
-def _config_file_name():
-    return f'{str(Path.home())}/.openremote/config.ini'
-
-
-# Declare it globally for this module to be robust against readonly runtime
+# Declare it globally for this module to be robust against readonly runtime on AWS lambda
 config = configparser.ConfigParser()
+home_dir = str(Path.home())
 config_file = True
+
+
+def _config_file_name():
+    return f'{home_dir}/.openremote/config.ini'
 
 
 def initialize():
 
     # user persistent config
     global TELEMETRY_URL, REGION, PROFILE, BUCKET, SMTP_SERVER
+    global config_file, home_dir, config
 
-    config_file = True
     if not os.path.exists(_config_file_name()):
         try:
-            os.makedirs(
-                f'{str(Path.home())}/.openremote', mode=0o700, exist_ok=True
-            )
+            os.makedirs(f'{home_dir}/.openremote', mode=0o700, exist_ok=True)
+            config.read(_config_file_name())
+            with open(_config_file_name(), 'w') as conf:
+                config.write(conf)
         except:
             logging.error(f'Cannot create {str(Path.home())}/.openremote')
-            config_file = False
+            # On AWS lambda we have read only file system and can write only to /tmp
+            home_dir = '/tmp'
+            try:
+                os.makedirs(
+                    f'{home_dir}/.openremote', mode=0o700, exist_ok=True
+                )
+            except:
+                logging.error('Unable to create config file. Using in-memory')
+                config_file = False
 
     if config_file:
         config.read(_config_file_name())
@@ -52,7 +62,7 @@ def initialize():
                     config.write(conf)
                     print(f'Config created in {_config_file_name()}')
             except Exception as error:
-                logging.error(f'Error writing config: {error}')
+                logging.error(f'Error initializing config: {error}')
         except Exception as error:
             logging.error(f'{config.sections()} {error}')
 
@@ -101,7 +111,7 @@ def store_token(url, username, password, refresh):
         with open(_config_file_name(), 'w') as conf:
             config.write(conf)
     except Exception as error:
-        logging.error(f'Error writing config: {error}')
+        logging.error(f'Error storing token: {error}')
 
 
 def get_token(url):
