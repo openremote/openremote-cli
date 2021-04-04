@@ -48,10 +48,9 @@ jobs:
       - name: build and push images
         run: |
           make multi-image
-          docker run --rm -v $(pwd)/.aws:/root/.aws openremote/openremote-cli configure_aws --no-telemetry --id "${{ secrets.AWS_ID }}" --secret "${{ secrets.AWS_SECRET }}" -v
-          ls -la
-          ls -la ./.aws
-          pwd
+          aws configure set aws_access_key_id "${{ secrets.AWS_ID }}"
+          aws configure set aws_secret_access_key "${{ secrets.AWS_SECRET }}"
+          aws configure set default.region eu-west-1
           make lambda
       - name: test docker image
         run: |
