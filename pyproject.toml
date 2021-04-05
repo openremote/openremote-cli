@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openremote-cli"
-version = "0.6.17"
+version = "0.6.18"
 description = "OpenRemote Command-line interface"
 readme = "README.md"
 authors = ["Michal Rutka <michal@openremote.io>"]
@@ -13,12 +13,12 @@ keywords = ['openremote', 'iot', 'cli']
 classifiers = ["Topic :: Home Automation ", "Topic :: Utilities "]
 
 [tool.poetry.dependencies]
-python = "^3.6.1"
+python = "^3.8"
 requests = "^2.25.1"
 wget = "^3.2"
 python-keycloak = "^0.24.0"
 emojis = "^0.6.0"
-webbot = "^0.34"
+oronium = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 behave = "^1.2.6"
@@ -32,6 +32,11 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 or = 'openremote_cli.cli:main'
 openremote-cli = 'openremote_cli.cli:main'
+# Send email to test credentials
+or-email = 'openremote_cli.email:main'
+# Generate credentials from AWS secret
+or-gen-aws-smtp = 'openremote_cli.gen_aws_smtp_credentials:main'
+or-gen-aws-smtp-credentials = 'openremote_cli.gen_aws_smtp_credentials:main'
 
 [tool.black]
 skip-string-normalization = true
