@@ -301,6 +301,15 @@ class OpenRemote(object):
             if args.delete_user is True:
                 raise Exception('not implemented')
             if args.open:
+                if args.password:
+                    logging.debug(
+                        f'setting password for user {args.user!r} at {args.dnsname!r} in realm {args.realm!r}'
+                    )
+                    config.set_password(
+                        url=args.dnsname,
+                        username=args.user,
+                        password=args.password,
+                    )
                 scripts.manager_open(
                     args.dnsname, args.user, args.quit, realm=args.realm
                 )

@@ -138,3 +138,20 @@ def get_password(url, username):
             f'Password for {username} at {url} is unknown. Use:\nopenremote-cli manager --dnsname {url} --login -u {username} -p ...'
         )
     return password
+
+
+def set_password(url, username, password):
+    if config_file:
+        config.read(_config_file_name())
+    try:
+        # first try to update
+        managerUrl = config[url]
+        managerUrl[f'{username}_password'] = password
+    except:
+        # if not then create
+        config[url] = {f'{username}_password': password}
+    try:
+        with open(_config_file_name(), 'w') as conf:
+            config.write(conf)
+    except Exception as error:
+        logging.error(f'Error storing password: {error}')
