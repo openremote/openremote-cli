@@ -63,6 +63,7 @@ jobs:
         if: steps.changes.outputs.openapi == 'true'
         run: echo TODO
       - name: Repository Dispatch
+        if: steps.changes.outputs.toml == 'true'
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}

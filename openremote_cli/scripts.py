@@ -20,6 +20,7 @@ from openremote_cli import shell
 from openremote_cli import config
 from openremote_cli import gen_aws_smtp_credentials, email
 from webbot import Browser
+from selenium.common.exceptions import WebDriverException
 
 
 def deploy(password, smtp_user, smtp_password, dnsname):
@@ -567,11 +568,13 @@ def timeout(func):
                 if not config.QUIET:
                     print(f' {func.__name__!r}: OK {time.time() - start:.2f}s')
                 return result
-            except:
+            except WebDriverException:
                 if not config.QUIET:
                     print('.', end='', flush=True)
                 time.sleep(0.1)
-        raise Exception(f'{func.__name__!r}: timeout {config.TIMEOUT}s')
+            except Exception as e:
+                logging.error(f'Exception {e.__class__} in {func.__name__}')
+        logging.error(f'{func.__name__!r}: timeout {config.TIMEOUT}s')
 
     return inner
 
