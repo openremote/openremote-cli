@@ -13,12 +13,11 @@ keywords = ['openremote', 'iot', 'cli']
 classifiers = ["Topic :: Home Automation ", "Topic :: Utilities "]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 requests = "^2.25.1"
 wget = "^3.2"
 python-keycloak = "^0.24.0"
 emojis = "^0.6.0"
-oronium = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 behave = "^1.2.6"
