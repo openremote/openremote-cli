@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openremote-cli"
-version = "0.6.19"
+version = "0.6.20"
 description = "OpenRemote Command-line interface"
 readme = "README.md"
 authors = ["Michal Rutka <michal@openremote.io>"]
@@ -13,7 +13,7 @@ keywords = ['openremote', 'iot', 'cli']
 classifiers = ["Topic :: Home Automation ", "Topic :: Utilities "]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.6"
 requests = "^2.25.1"
 wget = "^3.2"
 python-keycloak = "^0.24.0"

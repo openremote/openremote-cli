@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.6-slim
 
 RUN apt update && apt install curl unzip -y --no-install-recommends && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "awscliv2.zip" && \
