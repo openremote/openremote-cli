@@ -420,10 +420,13 @@ def smtp_credentials(dnsname):
 
 # Manager
 def manager_login(url, username, password):
+    realm = 'master'
+    if username == 'smartcity':
+        realm = 'smartcity'
     keycloak_openid = KeycloakOpenID(
         server_url=f'https://{url}/auth/',
         client_id="admin-cli",
-        realm_name="master",
+        realm_name=realm,
         client_secret_key="secret",
     )
     if password:
@@ -526,8 +529,8 @@ def deploy_rich(password, smtp_user, smtp_password, project):
         print(f'\nOpen https://{dnsname} and login with admin:{password}')
 
 
-def manager_open(url, user, quit):
-    driver = _manager_ui_login(url, user)
+def manager_open(url, user, quit, realm='master'):
+    driver = _manager_ui_login(url, user, realm=realm)
     _manager_ui_wait_map(driver, url)
     if quit:
         # Need this for manager to act (maybe some confirmation TODO)
@@ -536,11 +539,11 @@ def manager_open(url, user, quit):
         input('Press ENTER to quit')
 
 
-def _manager_ui_login(url, user, delay=30):
+def _manager_ui_login(url, user, realm, delay=30):
     driver = Browser(showWindow=not config.QUIET)
     start = time.time()
     end = start
-    driver.go_to(f'https://{url}')
+    driver.go_to(f'https://{url}/manager/?realm={realm}')
     while not driver.exists('LOG IN') and not driver.exists('SIGN IN'):
         if not config.QUIET:
             print('+', end='', flush=True)

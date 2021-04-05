@@ -301,7 +301,9 @@ class OpenRemote(object):
             if args.delete_user is True:
                 raise Exception('not implemented')
             if args.open:
-                scripts.manager_open(args.dnsname, args.user, args.quit)
+                scripts.manager_open(
+                    args.dnsname, args.user, args.quit, realm=args.realm
+                )
             if args.test_http_rest:
                 scripts.manager_test_http_rest(args.delay, args.quit)
         else:

@@ -52,9 +52,7 @@ def step_impl(context):
     assert context.code == 0
 
 
-@when(
-    u'or sso --open --quit --quiet --no-telemetry -d staging.demo.openremote.io'
-)
+@when(u'using alias sso for staging.demo.openremote.io')
 def step_impl(context):
     context.code, context.output = context.execute(
         'poetry run or sso --open --quit --quiet --no-telemetry -d staging.demo.openremote.io'
@@ -64,3 +62,10 @@ def step_impl(context):
 @then(u'there should be no errors')
 def step_impl(context):
     assert context.code == 0
+
+
+@when(u'login into demo realm smartcity as user smartcity')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        'poetry run openremote-cli sso -t -o -p smartcity -u smartcity --realm smartcity --quit -q'
+    )
