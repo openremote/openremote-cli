@@ -51,7 +51,6 @@ class OpenRemote(object):
 
         if args.quiet:
             config.QUIET = True
-            args.verbosity = 0
 
         config.LEVEL = {
             0: logging.ERROR,
