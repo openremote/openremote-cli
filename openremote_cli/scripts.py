@@ -540,6 +540,8 @@ def manager_open(url, user, quit, realm='master'):
 
 
 def _manager_ui_login(url, user, realm, delay=30):
+    if config.DRY_RUN:
+        return Browser(showWindow=False)
     driver = Browser(showWindow=not config.QUIET)
     start = time.time()
     end = start
@@ -564,6 +566,8 @@ def _manager_ui_login(url, user, realm, delay=30):
 def timeout(func):
     @functools.wraps(func)
     def inner(*args, **kwargs):
+        if config.DRY_RUN:
+            return 0
         start = time.time()
         while time.time() - start < config.TIMEOUT:
             try:
@@ -629,7 +633,7 @@ def manager_test_http_rest(delay, quit):
     url = 'staging.demo.openremote.io'
     user = 'admin'
     print(f"0. Login into {url}")
-    driver = _manager_ui_login(url, user)
+    driver = _manager_ui_login(url, user, realm='master')
     _manager_ui_wait_map(driver, url)
     # test plan https://docs.google.com/document/d/1RVt47Y9KLJl_YSNwoLrOE3VNWfUm2VaOpZzS7tebItI/edit
     print("1. Go to the 'Assets' page in the webapp")

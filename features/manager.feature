@@ -13,3 +13,7 @@ Feature: manager
   Then there should be no errors
   When login into demo realm smartcity as user smartcity
   Then there should be no errors
+
+  # Scenario: test http rest
+  # When running manager --test-http-test
+  # Then there should be no errors
