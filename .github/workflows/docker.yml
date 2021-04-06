@@ -57,7 +57,7 @@ jobs:
           make lambda
       - name: push to GitLab
         run: |
-          docker login --username openremote --password {{ secrets.GITLAB_PASSWORD}} registry.gitlab.com
+          docker login --username openremote --password ${{ secrets.GITLAB_PASSWORD}} registry.gitlab.com
           docker tag openremote/openremote-cli:latest registry.gitlab.com/developers110/overview
           docker push registry.gitlab.com/developers110/overview
       - name: test docker image
