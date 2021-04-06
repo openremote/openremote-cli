@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openremote-cli"
-version = "0.6.24"
+version = "0.6.25"
 description = "OpenRemote Command-line interface"
 readme = "README.md"
 authors = ["Michal Rutka <michal@openremote.io>"]
@@ -37,6 +37,8 @@ or-email = 'openremote_cli.email:main'
 # Generate credentials from AWS secret
 or-gen-aws-smtp = 'openremote_cli.gen_aws_smtp_credentials:main'
 or-gen-aws-smtp-credentials = 'openremote_cli.gen_aws_smtp_credentials:main'
+# Test plan
+or-test-http-rest = 'openremote_cli.scripts:manager_test_http_rest'
 
 [tool.black]
 skip-string-normalization = true

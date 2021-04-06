@@ -12,6 +12,8 @@ import time
 import emojis
 import re
 import functools
+import argparse
+import sys
 
 
 from keycloak import KeycloakOpenID
@@ -629,9 +631,47 @@ def _manager_ui_press_add(driver, url):
     )
 
 
-def manager_test_http_rest(delay, quit):
-    url = 'staging.demo.openremote.io'
-    user = 'admin'
+def manager_test_http_rest(delay=1, quit=True):
+    if not hasattr(config, 'DRY_RUN'):
+        # When running directly from installed scripts
+        config.initialize()
+        parser = argparse.ArgumentParser(
+            description=f'Test plan HTTP REST',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        parser.add_argument(
+            '-d',
+            '--dnsname',
+            type=str,
+            required=False,
+            help='OpenRemote dns',
+            default='staging.demo.openremote.io',
+        )
+        parser.add_argument(
+            '-u',
+            '--user',
+            type=str,
+            required=False,
+            help='username',
+            default='admin',
+        )
+        parser.add_argument(
+            '--delay',
+            type=int,
+            help='delay between steps in test scenarios',
+            default=1,
+        )
+        parser.add_argument(
+            '--no-quit', action='store_true', help='open browser and login'
+        )
+        args = parser.parse_args(sys.argv[1:])
+        url = args.dnsname
+        user = args.user
+        delay = args.delay
+        quit = not args.no_quit
+    else:
+        url = 'staging.demo.openremote.io'
+        user = 'admin'
     print(f"0. Login into {url}")
     driver = _manager_ui_login(url, user, realm='master')
     _manager_ui_wait_map(driver, url)
