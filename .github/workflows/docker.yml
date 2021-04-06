@@ -58,7 +58,7 @@ jobs:
       - name: test docker image
         run: |
           docker run --rm openremote/openremote-cli --version --dry-run --no-telemetry
-          docker run --rm -v $(pwd):/.openremote openremote/openremote-cli manager -t --quit -v --test-http-rest --quiet --login -p ${{ secrets.SETUP_ADMIN_PASSWORD }} --dnsname staging.demo.openremote.io
+          docker run --rm -v $(pwd):/root/.openremote openremote/openremote-cli manager -t --quit -v --test-http-rest --quiet --login -p ${{ secrets.SETUP_ADMIN_PASSWORD }} --dnsname staging.demo.openremote.io
           # This is a shortcut to the above command
-          docker run --rm --entrypoint or-test-http-rest -v $(pwd):/.openremote openremote/openremote-cli
+          docker run --rm --entrypoint or-test-http-rest -v $(pwd):/root/.openremote openremote/openremote-cli
           cat config.ini
