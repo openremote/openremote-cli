@@ -704,7 +704,6 @@ def manager_test_http_rest(delay=1, quit=True):
 
         logging.info(args)
         if not args.password:
-            print('no pass')
             try:
                 args.password = os.getenv('SETUP_ADMIN_PASSWORD')
             except:

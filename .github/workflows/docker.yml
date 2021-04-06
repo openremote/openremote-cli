@@ -55,6 +55,11 @@ jobs:
           aws configure set default.region eu-west-1
           docker login --username AWS --password $(aws ecr get-login-password --region eu-west-1) $AWS_REPOSITORY_URL
           make lambda
+      - name: push to GitLab
+        run: |
+          docker login registry.gitlab.com --username openremote -- password {{ secrets.GITLAB_PASSWORD}}
+          docker tag openremote/openremote-cli:latest registry.gitlab.com/developers110/overview
+          docker push registry.gitlab.com/developers110/overview
       - name: test docker image
         run: |
           docker run --rm openremote/openremote-cli --version --dry-run --no-telemetry
