@@ -664,7 +664,35 @@ def manager_test_http_rest(delay=1, quit=True):
         parser.add_argument(
             '--no-quit', action='store_true', help='open browser and login'
         )
+        parser.add_argument(
+            '-n',
+            '--dry-run',
+            action='store_true',
+            help='showing effects without actual run and exit',
+        )
+        parser.add_argument(
+            '-v',
+            '--verbosity',
+            action='count',
+            default=0,
+            help='increase output verbosity',
+        )
+        parser.add_argument(
+            '--no-quiet', action='store_true', help='suppress info'
+        )
         args = parser.parse_args(sys.argv[1:])
+        # if args.no_quiet:
+        config.QUIET = not args.no_quiet
+        config.DRY_RUN = args.dry_run
+        config.LEVEL = {
+            0: logging.ERROR,
+            1: logging.WARNING,
+            2: logging.INFO,
+            3: logging.DEBUG,
+        }.get(args.verbosity, logging.DEBUG)
+        logging.getLogger().setLevel(config.LEVEL)
+        logging.debug(args)
+
         url = args.dnsname
         user = args.user
         delay = args.delay
