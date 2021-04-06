@@ -640,6 +640,17 @@ def manager_test_http_rest(delay=1, quit=True):
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         parser.add_argument(
+            '-u',
+            '--user',
+            type=str,
+            required=False,
+            help='username',
+            default='admin',
+        )
+        parser.add_argument(
+            '-p', '--password', required=False, help='user password'
+        )
+        parser.add_argument(
             '-d',
             '--dnsname',
             type=str,
@@ -648,12 +659,11 @@ def manager_test_http_rest(delay=1, quit=True):
             default='staging.demo.openremote.io',
         )
         parser.add_argument(
-            '-u',
-            '--user',
-            type=str,
+            '--realm',
             required=False,
-            help='username',
-            default='admin',
+            type=str,
+            help='realm to work on',
+            default='master',
         )
         parser.add_argument(
             '--delay',
@@ -691,7 +701,21 @@ def manager_test_http_rest(delay=1, quit=True):
             3: logging.DEBUG,
         }.get(args.verbosity, logging.DEBUG)
         logging.getLogger().setLevel(config.LEVEL)
-        logging.debug(args)
+
+        logging.info(args)
+        if not args.password:
+            print('no pass')
+            try:
+                args.password = os.getenv('SETUP_ADMIN_PASSWORD')
+            except:
+                raise Exception("No password given")
+        if args.password:
+            logging.info(
+                f'setting password for user {args.user!r} at {args.dnsname!r} in realm {args.realm!r}'
+            )
+            config.set_password(
+                url=args.dnsname, username=args.user, password=args.password
+            )
 
         url = args.dnsname
         user = args.user

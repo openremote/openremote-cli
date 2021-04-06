@@ -278,12 +278,22 @@ class OpenRemote(object):
     def manager(self, arguments=[]):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
-            logging.debug(args)
+            logging.info(args)
             if not args.password:
+                print('no pass')
                 try:
                     args.password = os.getenv('SETUP_ADMIN_PASSWORD')
                 except:
                     raise Exception("No password given")
+            if args.password:
+                logging.info(
+                    f'setting password for user {args.user!r} at {args.dnsname!r} in realm {args.realm!r}'
+                )
+                config.set_password(
+                    url=args.dnsname,
+                    username=args.user,
+                    password=args.password,
+                )
             if args.login:
                 scripts.manager_login(args.dnsname, args.user, args.password)
             if args.list_realms is True:
@@ -301,15 +311,6 @@ class OpenRemote(object):
             if args.delete_user is True:
                 raise Exception('not implemented')
             if args.open:
-                if args.password:
-                    logging.debug(
-                        f'setting password for user {args.user!r} at {args.dnsname!r} in realm {args.realm!r}'
-                    )
-                    config.set_password(
-                        url=args.dnsname,
-                        username=args.user,
-                        password=args.password,
-                    )
                 scripts.manager_open(
                     args.dnsname, args.user, args.quit, realm=args.realm
                 )
