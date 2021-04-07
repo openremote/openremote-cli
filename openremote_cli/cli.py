@@ -280,7 +280,9 @@ class OpenRemote(object):
             args = self.base_subparser.parse_args(arguments)
             logging.info(args)
             if not args.password:
-                print('no pass')
+                logging.warning(
+                    'no password in args, trying get it from env SETUP_ADMIN_PASSWORD'
+                )
                 try:
                     args.password = os.getenv('SETUP_ADMIN_PASSWORD')
                 except:
