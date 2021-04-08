@@ -682,7 +682,7 @@ def manager_test_http_rest(delay=1, quit=True):
         )
         parser.add_argument(
             '-v',
-            '--verbosity',
+            '--verbose',
             action='count',
             default=0,
             help='increase output verbosity',
@@ -699,7 +699,7 @@ def manager_test_http_rest(delay=1, quit=True):
             1: logging.WARNING,
             2: logging.INFO,
             3: logging.DEBUG,
-        }.get(args.verbosity, logging.DEBUG)
+        }.get(args.verbose, logging.DEBUG)
         logging.getLogger().setLevel(config.LEVEL)
 
         logging.info(args)

@@ -57,7 +57,7 @@ class OpenRemote(object):
             1: logging.WARNING,
             2: logging.INFO,
             3: logging.DEBUG,
-        }.get(args.verbosity, logging.DEBUG)
+        }.get(args.verbose, logging.DEBUG)
         logging.getLogger().setLevel(config.LEVEL)
 
         if args.no_telemetry:
@@ -66,7 +66,7 @@ class OpenRemote(object):
         if args.dry_run is True:
             logging.info('Enabling dry run mode')
             config.DRY_RUN = True
-        if args.verbosity > 0:
+        if args.verbose > 0:
             config.VERBOSE = True
 
         logging.debug(args)
@@ -231,7 +231,7 @@ class OpenRemote(object):
                 else:
                     scripts.clean()
             elif args.action == 'health':
-                scripts.deploy_health(args.dnsname, args.verbosity)
+                scripts.deploy_health(args.dnsname, args.verbose)
             else:
                 raise ValueError(f"'{args.action}' not implemented")
         else:
@@ -471,7 +471,7 @@ class OpenRemote(object):
         )
         parser.add_argument(
             '-v',
-            '--verbosity',
+            '--verbose',
             action='count',
             default=0,
             help='increase output verbosity',
@@ -557,9 +557,20 @@ def isLatestVersion():
     data = contents.json()
     latest_version = data['info']['version']
     if latest_version != package_version():
-        print(
-            f'\nyour version ({package_version()}) < PyPI version ({latest_version}). Consider\npip3 install --upgrade openremote-cli'
-        )
+        try:
+            user_id = f'{getpass.getuser()}'
+        except:
+            # We don't have login in github workflow
+            user_id = 'No login!'
+        # TODO change docker user to something different than root
+        if user_id == 'root':
+            print(
+                f'\nyour version ({package_version()}) < PyPI version ({latest_version}). Consider\ndocker pull openremote/openremote-cli'
+            )
+        else:
+            print(
+                f'\nyour version ({package_version()}) < PyPI version ({latest_version}). Consider\npip3 install --upgrade openremote-cli'
+            )
 
 
 import traceback
