@@ -360,16 +360,19 @@ def map_delete(path):
 
 
 def check_tools():
-    code, output = shell.execute('docker --version')
-    if not config.QUIET:
-        print(output)
-    code, output = shell.execute('docker-compose --version')
-    if not config.QUIET:
-        print(output)
-    # print('Checking AWS perquisites')
-    code, output = shell.execute('aws --version')
-    if not config.QUIET:
-        print(output)
+    def _show_check_result(tool):
+        code, output = shell.execute(tool, no_exception=True)
+        if not config.QUIET:
+            if code == 0:
+                print(f"{output.rstrip()} {emojis.encode(':thumbsup:')}")
+            else:
+                print(f"{output.rstrip()} {emojis.encode(':thumbsdown:')}")
+        elif code != 0:
+            raise Exception(f'{code}, {output}')
+
+    _show_check_result('docker --version')
+    _show_check_result('docker-compose --version')
+    _show_check_result('aws --version')
     return check_aws_perquisites()
 
 

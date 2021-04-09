@@ -424,7 +424,9 @@ class OpenRemote(object):
         else:
             logging.debug('adding perquisites parser')
             parser = self.__parser(
-                'perquisites', 'Check if all required tools are installed'
+                'perquisites',
+                'Check if all required tools are installed',
+                aliases=['p'],
             )
             arguments = parser.add_argument_group("perquisites arguments")
             arguments.add_argument(
