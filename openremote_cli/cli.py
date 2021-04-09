@@ -239,6 +239,7 @@ class OpenRemote(object):
             parser = self.__parser(
                 'deploy',
                 'Deploy OpenRemote stack. By default create on localhost.',
+                aliases=['d'],
             )
             arguments = parser.add_argument_group("deploy arguments")
             arguments.add_argument(
@@ -280,7 +281,7 @@ class OpenRemote(object):
             args = self.base_subparser.parse_args(arguments)
             logging.info(args)
             if not args.password:
-                logging.warning(
+                logging.info(
                     'no password in args, trying get it from env SETUP_ADMIN_PASSWORD'
                 )
                 try:
@@ -407,19 +408,6 @@ class OpenRemote(object):
             )
             arguments.add_argument(
                 '--quit', action='store_true', help='open browser and login'
-            )
-
-    def shell(self, arguments=[]):
-        if len(arguments) > 0:
-            if os.name == "nt":
-                raise Exception(
-                    'Does not work on Windows, please use docker instead.'
-                )
-            else:
-                pty.spawn("/bin/sh")
-        else:
-            self.__parser(
-                'shell', 'spawn shell (useful inside of docker container)'
             )
 
     def perquisites(self, arguments=[]):
@@ -562,6 +550,7 @@ def isLatestVersion():
         except:
             # We don't have login in github workflow
             user_id = 'No login!'
+        logging.debug(f'isLatestVersion() user_id: {user_id!r}')
         # TODO change docker user to something different than root
         if user_id == 'root':
             print(

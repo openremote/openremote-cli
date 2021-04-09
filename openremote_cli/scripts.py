@@ -581,9 +581,10 @@ def timeout(func):
                 if not config.QUIET:
                     print('.', end='', flush=True)
                 time.sleep(0.1)
-            except Exception as e:
-                logging.error(f'Exception {e.__class__} in {func.__name__}')
+            # except Exception as e:
+            #     logging.error(f'Exception {e.__class__} in {func.__name__}')
         logging.error(f'{func.__name__!r}: timeout {config.TIMEOUT}s')
+        return -1
 
     return inner
 
