@@ -363,10 +363,10 @@ def check_tools():
     def _show_check_result(tool):
         code, output = shell.execute(tool, no_exception=True)
         if not config.QUIET:
-            if code == 0:
-                print(f"{output.rstrip()} {emojis.encode(':thumbsup:')}")
-            else:
-                print(f"{output.rstrip()} {emojis.encode(':thumbsdown:')}")
+            print(f'{output.rstrip()} ', end='')
+            print(emojis.encode(':heavy_check_mark:')) if code == 0 else print(
+                emojis.encode(':x:')
+            )
         elif code != 0:
             raise Exception(f'{code}, {output}')
 
