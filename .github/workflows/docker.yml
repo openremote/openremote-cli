@@ -85,7 +85,8 @@ jobs:
         run: |
           docker swarm init
           wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml
-          docker stack deploy -c mvp-docker-compose.yml openremote
+          #docker stack deploy -c mvp-docker-compose.yml openremote
+          docker-compose -f mvp-docker-compose.yml up -d
           sleep 900
           docker ps
           docker service ls
