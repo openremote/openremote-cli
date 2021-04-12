@@ -89,5 +89,6 @@ jobs:
           sleep 900
           docker ps
           docker service ls
+          curl -L --insecure localhost
           or-test-http-rest --dnsname localhost --password secret -vv
         timeout-minutes: 30
