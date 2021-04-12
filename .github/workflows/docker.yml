@@ -83,12 +83,11 @@ jobs:
           openremote-cli -V -t
       - name: deploy openremote stack on localhost and run UI test
         run: |
-          openremote-cli deploy -t -v -n
           docker swarm init
           wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml
           docker stack deploy -c mvp-docker-compose.yml openremote
           sleep 900
           docker ps
           docker service ls
-          or-test-http-rest --dnsname localhost --password secret
+          or-test-http-rest --dnsname localhost --password secret -vvv
         timeout-minutes: 30
