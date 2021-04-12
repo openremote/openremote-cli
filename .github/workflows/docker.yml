@@ -81,7 +81,7 @@ jobs:
         run: |
           pip3 install openremote-cli
           openremote-cli -V -t
-      - name: deploy openremote stack on localhost
+      - name: deploy openremote stack on localhost and run UI test
         run: |
           openremote-cli deploy -t -v -n
           docker swarm init
@@ -90,7 +90,5 @@ jobs:
           sleep 900
           docker ps
           docker service ls
-        timeout-minutes: 30
-      - name: test UI on localhost
-        run: |
           or-test-http-rest --dnsname localhost --password secret
+        timeout-minutes: 30
