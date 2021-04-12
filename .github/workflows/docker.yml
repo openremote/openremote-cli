@@ -26,7 +26,14 @@ jobs:
     if: "!startsWith(github.ref, 'refs/tags/')"
 
   build_image:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        python-version: [3.7]
+        poetry-version: [1.1.4]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: set up QEMU
@@ -63,7 +70,21 @@ jobs:
       - name: test docker image
         run: |
           docker run --rm openremote/openremote-cli --version --dry-run --no-telemetry
-          docker run --rm -v $(pwd):/root/.openremote openremote/openremote-cli manager -t --quit -v --test-http-rest --quiet --login -p ${{ secrets.SETUP_ADMIN_PASSWORD }} --dnsname staging.demo.openremote.io
-          # This is a shortcut to the above command
-          docker run --rm --entrypoint or-test-http-rest -v $(pwd):/root/.openremote openremote/openremote-cli
-          cat config.ini
+          # docker run --rm -v $(pwd):/root/.openremote openremote/openremote-cli manager -t --quit -v --test-http-rest --quiet --login -p ${{ secrets.SETUP_ADMIN_PASSWORD }} --dnsname staging.demo.openremote.io
+          # # This is a shortcut to the above command
+          # docker run --rm --entrypoint or-test-http-rest -v $(pwd):/root/.openremote openremote/openremote-cli
+          # cat config.ini
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: install openremote-cli
+        run: |
+          pip3 install openremote-cli
+          openremote-cli -V -t
+      - name: deploy openremote stack on localhost
+        run: |
+          openremote-cli deploy -t -v
+          docker ps
+      - name: test UI on localhost
+        run: |
+          or-test-http-rest --dnsname localhost --password secret

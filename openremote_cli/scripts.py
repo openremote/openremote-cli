@@ -547,7 +547,12 @@ def manager_open(url, user, quit, realm='master'):
 def _manager_ui_login(url, user, realm, delay=30):
     if config.DRY_RUN:
         return Browser(showWindow=False)
-    driver = Browser(showWindow=not config.QUIET)
+    browser_options = (
+        ['ignore-certificate-errors'] if url == 'localhost' else []
+    )
+    driver = Browser(
+        showWindow=not config.QUIET, browser_options=browser_options
+    )
     start = time.time()
     end = start
     driver.go_to(f'https://{url}/manager/?realm={realm}')
@@ -733,7 +738,7 @@ def manager_test_http_rest(delay=1, quit=True):
     print(f"0. Login into {url}")
     driver = _manager_ui_login(url, user, realm='master')
     _manager_ui_wait_map(driver, url)
-    # test plan https://docs.google.com/document/d/1RVt47Y9KLJl_YSNwoLrOE3VNWfUm2VaOpZzS7tebItI/edit
+    # test plan document https://docs.google.com/document/d/1RVt47Y9KLJl_YSNwoLrOE3VNWfUm2VaOpZzS7tebItI/edit
     print("1. Go to the 'Assets' page in the webapp")
     time.sleep(delay)
     driver.go_to(f'https://{url}/manager/#!assets')
