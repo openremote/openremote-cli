@@ -85,6 +85,7 @@ jobs:
         run: |
           openremote-cli deploy -t -v
           docker ps
+        timeout-minutes: 30
       - name: test UI on localhost
         run: |
           or-test-http-rest --dnsname localhost --password secret
