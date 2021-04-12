@@ -67,6 +67,11 @@ jobs:
           docker login --username openremote --password ${{ secrets.GITLAB_PASSWORD}} registry.gitlab.com
           docker tag openremote/openremote-cli:latest registry.gitlab.com/developers110/overview
           docker push registry.gitlab.com/developers110/overview
+
+  test_image:
+    runs-on: ubuntu-latest
+    needs: [build_image]
+    steps:
       - name: test docker image
         run: |
           docker run --rm openremote/openremote-cli --version --dry-run --no-telemetry
@@ -76,7 +81,7 @@ jobs:
           # cat config.ini
       - uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.9
       - name: install openremote-cli
         run: |
           pip3 install openremote-cli
@@ -88,4 +93,5 @@ jobs:
           sleep 60
           docker ps
           or-test-http-rest --dnsname localhost --password secret -vv
+        continue-on-error: true
         timeout-minutes: 30
