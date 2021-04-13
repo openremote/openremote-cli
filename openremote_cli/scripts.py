@@ -614,7 +614,7 @@ def _manager_ui_add_asset_dialog(driver, url):
         "document.querySelector('or-app').shadowRoot"
         ".querySelector('page-assets').shadowRoot"
         ".querySelector('or-asset-tree').shadowRoot"
-        ".querySelector('or-input[icon=plus]').shadowRoot"
+        ".querySelector('or-mwc-input[icon=plus]').shadowRoot"
         ".querySelector('button').click()"
     )
 
@@ -622,10 +622,16 @@ def _manager_ui_add_asset_dialog(driver, url):
 @timeout
 def _manager_ui_add_http_weather_agent(driver, url):
     driver.execute_script(
-        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').value = 'Weather Agent'"
+        "document.querySelector('or-mwc-dialog').shadowRoot"
+        ".querySelector('or-add-asset-dialog').shadowRoot"
+        ".querySelector('or-mwc-input').shadowRoot"
+        ".querySelector('input').value = 'Weather Agent'"
     )
     driver.execute_script(
-        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-add-asset-dialog').shadowRoot.querySelector('or-input').shadowRoot.querySelector('input').dispatchEvent(new Event('change'))"
+        "document.querySelector('or-mwc-dialog').shadowRoot"
+        ".querySelector('or-add-asset-dialog').shadowRoot"
+        ".querySelector('or-mwc-input').shadowRoot.querySelector('input')"
+        ".dispatchEvent(new Event('change'))"
     )
 
 
@@ -639,7 +645,7 @@ def _manager_ui_select_http_agent(driver, url):
 @timeout
 def _manager_ui_press_add(driver, url):
     driver.execute_script(
-        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-input[id=add-btn]').click()"
+        "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-mwc-input[id=add-btn]').click()"
     )
 
 
