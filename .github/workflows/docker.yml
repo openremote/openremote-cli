@@ -6,12 +6,15 @@ on:
       - Dockerfile
       - .github/workflows/docker.yml
       - Makefile
-      #- pyproject.toml
+  
+  # Rebuild it every monday at 3:25 AM for updating tools 
+  schedule: 
+    - cron: "25 3 * * 1"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-  # Allows triggering on other workflow
+  # Trigger for new openremote-cli version from the other workflow
   repository_dispatch:
     types: [image-build-event]
 
