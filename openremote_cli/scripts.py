@@ -338,9 +338,9 @@ def map_upload(path):
     )
 
 
-def map_list():
+def map_list(path):
     shell.execute(
-        f'aws s3 ls s3://{config.BUCKET} --recursive --human-readable  --summarize --profile {config.PROFILE}',
+        f'aws s3 ls s3://{config.BUCKET}/{path} --recursive --human-readable  --summarize --profile {config.PROFILE}',
         echo=True,
     )
 
@@ -647,6 +647,9 @@ def _manager_ui_press_add(driver, url):
     driver.execute_script(
         "document.querySelector('or-mwc-dialog').shadowRoot.querySelector('or-mwc-input[id=add-btn]').click()"
     )
+
+
+# Tests in parallel example https://github.com/varungv/MultiThreadingSample
 
 
 def manager_test_http_rest(delay=1, quit=True):

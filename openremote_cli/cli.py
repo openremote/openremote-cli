@@ -154,7 +154,10 @@ class OpenRemote(object):
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
             if args.action == 'list':
-                scripts.map_list()
+
+                scripts.map_list(args.file) if args.file else scripts.map_list(
+                    ''
+                )
             elif args.action == 'upload':
                 scripts.map_upload(args.file)
             elif args.action == 'download':
