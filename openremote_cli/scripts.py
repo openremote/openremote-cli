@@ -568,8 +568,7 @@ def _manager_ui_login(url, user, realm, delay=30):
     driver.click('SIGN IN')
     driver.click('LOG IN')
     end = time.time()
-    if not config.QUIET:
-        print(f'{url} login time\t{end-start:.2f}s')
+    print(f'{url} login time\t{end-start:.2f}s')
     return driver
 
 
@@ -582,8 +581,7 @@ def timeout(func):
         while time.time() - start < config.TIMEOUT:
             try:
                 result = func(*args, **kwargs)
-                if not config.QUIET:
-                    print(f' {func.__name__!r}: OK {time.time() - start:.2f}s')
+                print(f' {func.__name__!r}: OK {time.time() - start:.2f}s')
                 return result
             except WebDriverException:
                 if not config.QUIET:
