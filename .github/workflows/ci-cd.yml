@@ -64,7 +64,8 @@ jobs:
         run: |
           poetry publish -u "${{ secrets.PYPI_USERNAME }}" -p "${{ secrets.PYPI_PASSWORD }}"
           # wait for the new PyPI release before rebuilding docker image with image-build-event
-          sleep 120
+          # TODO find a better way to test when PyPI has a new version
+          sleep 900
       - name: Repository Dispatch
         if: steps.changes.outputs.toml == 'true'
         uses: peter-evans/repository-dispatch@v1
