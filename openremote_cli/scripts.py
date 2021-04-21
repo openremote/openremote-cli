@@ -235,10 +235,15 @@ def deploy_aws(password, dnsname):
             '\nAn email with generated password would be sent to support@openremote.io\n'
         )
     if not config.DRY_RUN:
-        shell.execute(
-            f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.sh'
-        )
-        shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
+        if os.name == "nt":
+            shell.execute(
+                f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.bat'
+            )
+        else:
+            shell.execute(
+                f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.sh'
+            )
+            shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
         print('\nStack deployed, waiting for startup to complete', end=' ')
         c = 0
         while _deploy_health(f'{host}.{domain}', 0) == 0 and c < 200:
@@ -258,11 +263,18 @@ def deploy_aws(password, dnsname):
 
 def remove_aws(dnsname):
     check_aws_perquisites()
-    shell.execute(f'sh aws-delete-stack-{dnsname}.sh')
-    if config.VERBOSE:
-        print(f'rm aws-delete-stack-{dnsname}.sh')
-    if not config.DRY_RUN:
-        os.remove(f'aws-delete-stack-{dnsname}.sh')
+    if os.name == "nt":
+        if config.VERBOSE:
+            print(f'del aws-delete-stack-{dnsname}.bat')
+        shell.execute(f'aws-delete-stack-{dnsname}.bat')
+        if not config.DRY_RUN:
+            os.remove(f'aws-delete-stack-{dnsname}.bat')
+    else:
+        if config.VERBOSE:
+            print(f'rm aws-delete-stack-{dnsname}.sh')
+        shell.execute(f'sh aws-delete-stack-{dnsname}.sh')
+        if not config.DRY_RUN:
+            os.remove(f'aws-delete-stack-{dnsname}.sh')
 
 
 def remove(dnsname):

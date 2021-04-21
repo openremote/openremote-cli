@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openremote-cli"
-version = "0.6.37"
+version = "0.6.38"
 description = "OpenRemote Command-line interface"
 readme = "README.md"
 authors = ["Michal Rutka <michal@openremote.io>"]
