@@ -413,7 +413,7 @@ class OpenRemote(object):
                 '--quit', action='store_true', help='open browser and login'
             )
 
-    def perquisites(self, arguments=[]):
+    def prerequisites(self, arguments=[]):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.debug(args)
@@ -425,13 +425,13 @@ class OpenRemote(object):
                     print('Checking for required tools...\n')
                 scripts.check_tools()
         else:
-            logging.debug('adding perquisites parser')
+            logging.debug('adding prerequisites parser')
             parser = self.__parser(
-                'perquisites',
+                'prerequisites',
                 'Check if all required tools are installed',
                 aliases=['p'],
             )
-            arguments = parser.add_argument_group("perquisites arguments")
+            arguments = parser.add_argument_group("prerequisites arguments")
             arguments.add_argument(
                 '--install', action='store_true', help='install missing tools'
             )

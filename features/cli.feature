@@ -19,7 +19,7 @@ Feature: cli
     # And aws ec2 create-default-vpc --profile mvp
 
     Scenario: check and install missing tools
-      When or perquisites -v --dry-run
+      When or prerequisites -v --dry-run
       Then check if all required tools are installed
-      When or perquisites --install -v --dry-run
+      When or prerequisites --install -v --dry-run
       Then install all missing tools

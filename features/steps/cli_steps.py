@@ -93,10 +93,10 @@ def step_impl(context):
 
 
 # Required tools
-@when(u'or perquisites -v --dry-run')
+@when(u'or prerequisites -v --dry-run')
 def step_impl(context):
     context.code, context.response = context.execute(
-        f"poetry run or perquisites -v --dry-run --no-telemetry"
+        f"poetry run or prerequisites -v --dry-run --no-telemetry"
     )
     assert context.code == 0
 
@@ -106,10 +106,10 @@ def step_impl(context):
     assert "Checking" in context.response
 
 
-@when(u'or perquisites --install -v --dry-run')
+@when(u'or prerequisites --install -v --dry-run')
 def step_impl(context):
     context.code, context.response = context.execute(
-        f"poetry run or perquisites --install -v --dry-run --no-telemetry"
+        f"poetry run or prerequisites --install -v --dry-run --no-telemetry"
     )
     assert context.code == 0
 
