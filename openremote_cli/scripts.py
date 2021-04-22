@@ -352,20 +352,21 @@ def map_upload(path):
 
 def map_list(path):
     shell.execute(
-        f'aws s3 ls s3://{config.BUCKET}/{path} --recursive --human-readable  --summarize --profile {config.PROFILE}',
+        f'aws s3 ls s3://{config.BUCKET}/{path} --recursive --human-readable --summarize --profile {config.PROFILE}',
         echo=True,
     )
 
 
 def map_download(path):
     shell.execute(
-        f'aws s3 cp s3://{config.BUCKET}/{path} {path} --profile {config.PROFILE}',
+        f'aws s3 cp s3://{config.BUCKET}/{path} {path} --recursive --profile {config.PROFILE}',
         echo=True,
     )
 
 
 def map_delete(path):
     shell.execute(
+        # No --recursive here as it can wipe the whole bucket, also for other clients
         f'aws s3 rm s3://{config.BUCKET}/{path} --profile {config.PROFILE}',
         echo=True,
     )
