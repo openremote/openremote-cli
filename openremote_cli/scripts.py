@@ -58,7 +58,7 @@ def deploy(password, smtp_user, smtp_password, dnsname):
             dnsname = 'localhost'  # prevent proxy from issuing cert
         env = f'{env}DOMAINNAME={dnsname} IDENTITY_NETWORK_HOST={identity} '
         # As you may be facing internet change default password for security
-        generate_password, password = _password(password)
+        generate_password, password = _password(password, url=dnsname)
         if generate_password:
             env = f'{env}PASSWORD={password} '
         # Deploy with docker-compose as proxy container does not obey
@@ -149,13 +149,14 @@ def _split_dns(dnsname):
     return host, domain
 
 
-def _password(password):
+def _password(password, url=None):
     generate_password = password == 'secret'
     if generate_password:
         characters = string.ascii_letters + string.digits
         password = "".join(choice(characters) for x in range(randint(8, 16)))
         if not config.QUIET:
             print(f'\nGenerated password: {password}\n')
+    config.set_password(password=password, username='admin', url=url)
     return generate_password, password
 
 
@@ -164,7 +165,7 @@ def deploy_aws(password, dnsname):
     logging.debug(f'{dnsname} => {host} + {domain}')
     stack_name = f'{host}-{uuid.uuid4()}'
     check_aws_perquisites()
-    generate_password, password = _password(password)
+    generate_password, password = _password(password, url=dnsname)
     if config.VERBOSE is True:
         print(
             '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
@@ -455,6 +456,12 @@ def manager_login(url, username, password):
     config.store_token(url, username, password, response['refresh_token'])
 
 
+def manager_show_login(url, username):
+    print(
+        f'For {url} --user={username} --password={config.get_password(url, username)}'
+    )
+
+
 def manager_list_realms(dnsname):
     response = requests.get(
         f'https://{dnsname}/auth/admin/realms',
@@ -533,7 +540,7 @@ def deploy_rich(password, smtp_user, smtp_password, project):
         env = f'{env}DEPLOYMENT_NAME=staging.{project} '
     else:
         env = f'{env}DEPLOYMENT_NAME={project} '
-    generate_password, password = _password(password)
+    generate_password, password = _password(password, url=dnsname)
     if generate_password:
         env = f'{env}PASSWORD={password} '
     shell.execute(f'{env}docker-compose up -d')

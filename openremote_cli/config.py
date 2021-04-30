@@ -130,11 +130,12 @@ def get_token(url):
 def get_password(url, username, no_exception=False):
     if config_file:
         config.read(_config_file_name())
-    password = 'secret'
     try:
         password = config[url][f'{username}_password']
     except:
-        if not no_exception:
+        if no_exception:
+            return ''
+        else:
             raise Exception(
                 f'Password for {username} at {url} is unknown. Use:\nopenremote-cli manager --dnsname {url} --login -u {username} -p ...'
             )

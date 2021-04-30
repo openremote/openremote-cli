@@ -202,10 +202,10 @@ def step_impl(context):
     )
 
 
-@when(u'call or deploy --provider rich --dnsname demo -v -n -t')
+@when(u'call or deploy --provider rich --dnsname rich -v -n -t')
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run or deploy --provider rich --dnsname demo --password password -v -n -t'
+        'poetry run or deploy --provider rich --dnsname rich --password password -v -n -t'
     )
     assert context.code == 0
     print(context.output)
@@ -214,15 +214,33 @@ def step_impl(context):
 @then(u'fetch data from S3 (map is optional)')
 def step_impl(context):
     assert (
-        'aws s3 cp s3://openremote-mvp-map-storage/demo demo --recursive --profile openremote-cli'
+        'aws s3 cp s3://openremote-mvp-map-storage/rich rich --recursive --profile openremote-cli'
         in context.output
     )
-    assert 'tar xvf demo/deployment.tar.gz' in context.output
+    assert 'tar xvf rich/deployment.tar.gz' in context.output
 
 
-@then(u'deploy with on localhost with DNS demo.openremote.io')
+@then(u'deploy with on localhost with DNS rich.openremote.io')
 def step_impl(context):
     assert (
-        'PASSWORD=password DEPLOYMENT_NAME=demo docker-compose up -d'
+        'PASSWORD=password DEPLOYMENT_NAME=rich docker-compose up -d'
         in context.output
     )
+
+
+@when(u'or deploy --dnsname xxx.yyy.com --password xyz --dry-run -t')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        u'poetry run or deploy --dnsname xxx.yyy.com --password xyz --dry-run -t'
+    )
+    print(context.output)
+    assert context.code == 0
+
+
+@then(u'or sso --show --dnsname xxx.yyy.com -t contains password xyz')
+def step_impl(context):
+    context.code, context.output = context.execute(
+        u'poetry run or sso --show --dnsname xxx.yyy.com -t'
+    )
+    print(context.output)
+    assert '--password=xyz' in context.output

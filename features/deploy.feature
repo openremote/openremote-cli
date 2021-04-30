@@ -44,6 +44,10 @@ Feature: deploy
 
   Scenario: deploy using deployments repo and S3
     Given we have AWS profile openremote-cli
-    When call or deploy --provider rich --dnsname demo -v -n -t
+    When call or deploy --provider rich --dnsname rich -v -n -t
     Then fetch data from S3 (map is optional)
-    And deploy with on localhost with DNS demo.openremote.io
+    And deploy with on localhost with DNS rich.openremote.io
+
+  Scenario: on successful deployment store password in config.ini
+    When or deploy --dnsname xxx.yyy.com --password xyz --dry-run -t
+    Then or sso --show --dnsname xxx.yyy.com -t contains password xyz

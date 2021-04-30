@@ -112,7 +112,7 @@ class OpenRemote(object):
     def configure_aws(self, arguments=[]):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
-            logging.debug(args)
+            logging.info(args)
             if args.id and args.secret:
                 scripts.configure_aws(args.id, args.secret, args.region)
             elif args.secret:
@@ -152,7 +152,7 @@ class OpenRemote(object):
     def map(self, arguments=[]):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
-            logging.debug(args)
+            logging.info(args)
             if args.action == 'list':
 
                 scripts.map_list(args.file) if args.file else scripts.map_list(
@@ -182,7 +182,7 @@ class OpenRemote(object):
     def deploy(self, arguments=[]):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
-            logging.debug(args)
+            logging.info(args)
             if args.action == 'create':
                 print(
                     'Deploying OR... This usually takes less than 15 minutes.\n'
@@ -268,6 +268,7 @@ class OpenRemote(object):
                 help='where the stack should be deployed (rich is on localhost but with artifacts from S3)',
             )
             arguments.add_argument(
+                '-d',
                 '--dnsname',
                 type=str,
                 help='host and domain name',
@@ -283,6 +284,12 @@ class OpenRemote(object):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.info(args)
+            args.password = (
+                config.get_password(args.dnsname, args.user, no_exception=True)
+                if not args.password
+                else ''
+            )
+            logging.debug(args.password)
             if not args.password:
                 logging.info(
                     'no password in args, trying get it from env SETUP_ADMIN_PASSWORD'
@@ -322,6 +329,8 @@ class OpenRemote(object):
                 )
             if args.test_http_rest:
                 scripts.manager_test_http_rest(args.delay, args.quit)
+            if args.show:
+                scripts.manager_show_login(args.dnsname, args.user)
         else:
             parser = self.__parser(
                 'manager', 'manage online manager', aliases=['m', 'sso']
@@ -355,6 +364,12 @@ class OpenRemote(object):
                 type=str,
                 help='realm to work on',
                 default='master',
+            )
+            arguments.add_argument(
+                '--show',
+                required=False,
+                action='store_true',
+                help='Show login credentials stored in config.ini',
             )
             arguments.add_argument(
                 '--list-realms',
@@ -416,7 +431,7 @@ class OpenRemote(object):
     def prerequisites(self, arguments=[]):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
-            logging.debug(args)
+            logging.info(args)
             if args.install is True:
                 print('Checking and installing missing tools.\n')
                 logging.error("Not implemented")
