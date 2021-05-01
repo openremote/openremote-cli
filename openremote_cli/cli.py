@@ -602,9 +602,10 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser = _add_std_arguments(parser)
-    args = _parse_default_args(parser=parser, arguments=sys.argv[1:])
-    config.CONFIG_FILE_NAME = args.config_file
-    logging.info(f'Using {config._config_file_name()} as config')
+    if not ('-h' or '--help') in sys.argv:
+        args = _parse_default_args(parser=parser, arguments=sys.argv[1:])
+        config.CONFIG_FILE_NAME = args.config_file
+        logging.info(f'Using {config._config_file_name()} as config')
 
     config.initialize()
     exit_reason = "program finished normally"

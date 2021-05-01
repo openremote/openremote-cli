@@ -5,6 +5,8 @@ Feature: cli
     Then it should show help
     When calling openremote-cli -V
     Then should show version
+    When calling deploy command with -h
+    Then show its arguments
 
   Scenario: configure AWS access keys
     Given we have aws installed

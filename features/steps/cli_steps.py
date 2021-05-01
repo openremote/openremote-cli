@@ -160,3 +160,18 @@ def step_impl(context):
 def step_impl(context):
     print(context.response)
     assert '/.openremote/config.ini' in context.response
+
+
+@when(u'calling deploy command with -h')
+def step_impl(context):
+    context.code, context.response = context.execute(
+        f"poetry run or deploy -h -t"
+    )
+    print(context.response)
+    assert context.code == 0
+
+
+@then(u'show its arguments')
+def step_impl(context):
+    print(context.response)
+    assert 'deploy arguments:' in context.response
