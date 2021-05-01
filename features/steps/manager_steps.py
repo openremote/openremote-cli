@@ -69,3 +69,8 @@ def step_impl(context):
     context.code, context.output = context.execute(
         'poetry run openremote-cli sso -t -o -p smartcity -u smartcity --realm smartcity --quit -q'
     )
+
+
+@when(u'running manager --test-http-test')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: When running manager --test-http-test')

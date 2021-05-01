@@ -26,14 +26,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 class OpenRemote(object):
-    def __init__(self, arguments):
-        parser = argparse.ArgumentParser(
-            description=f'OpenRemote Command Line Interface (CLI) version {package_version()}',
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-            #                   conflict_handler='resolve',
-        )
-
-        self.base_subparser = self._add_std_arguments(parser)
+    def __init__(self, arguments, parser):
+        self.base_subparser = parser
 
         # Create subparsers
         self.subparsers = parser.add_subparsers(
@@ -43,33 +37,7 @@ class OpenRemote(object):
             if inspect.ismethod(getattr(self, attr)) and attr[0] != '_':
                 getattr(self, attr)([])
 
-        args, unknown = self.base_subparser.parse_known_args(arguments)
-
-        # command aliases substitution
-        mapping = _get_subparser_aliases(parser, 'command')
-        _remap_args(args, mapping, 'command')
-
-        if args.quiet:
-            config.QUIET = True
-
-        config.LEVEL = {
-            0: logging.ERROR,
-            1: logging.WARNING,
-            2: logging.INFO,
-            3: logging.DEBUG,
-        }.get(args.verbose, logging.DEBUG)
-        logging.getLogger().setLevel(config.LEVEL)
-
-        if args.no_telemetry:
-            config.TELEMETRY = False
-
-        if args.dry_run is True:
-            logging.info('Enabling dry run mode')
-            config.DRY_RUN = True
-        if args.verbose > 0:
-            config.VERBOSE = True
-
-        logging.debug(args)
+        args = _parse_default_args(parser=parser, arguments=arguments)
 
         # handle no arguments
         if len(arguments) == 0:
@@ -284,11 +252,10 @@ class OpenRemote(object):
         if len(arguments) > 0:
             args = self.base_subparser.parse_args(arguments)
             logging.info(args)
-            args.password = (
-                config.get_password(args.dnsname, args.user, no_exception=True)
-                if not args.password
-                else ''
-            )
+            if not args.password:
+                args.password = config.get_password(
+                    args.dnsname, args.user, no_exception=True
+                )
             logging.debug(args.password)
             if not args.password:
                 logging.info(
@@ -299,6 +266,7 @@ class OpenRemote(object):
                 except:
                     raise Exception("No password given")
             if args.password:
+                # TODO set password only if valid for login
                 logging.info(
                     f'setting password for user {args.user!r} at {args.dnsname!r} in realm {args.realm!r}'
                 )
@@ -462,38 +430,81 @@ class OpenRemote(object):
             # conflict_handler='resolve',
             # parents=[self.base_subparser],
         )
-        return self._add_std_arguments(parser)
+        return _add_std_arguments(parser)
 
-    def _add_std_arguments(self, parser):
-        parser.add_argument(
-            '-V',
-            '--version',
-            action='version',
-            version=f'%(prog)s/{package_version()} {sys.version} {platform.system()}/{platform.version()}',
-        )
-        parser.add_argument(
-            '-n',
-            '--dry-run',
-            action='store_true',
-            help='showing effects without actual run and exit',
-        )
-        parser.add_argument(
-            '-v',
-            '--verbose',
-            action='count',
-            default=0,
-            help='increase output verbosity',
-        )
-        parser.add_argument(
-            '-t',
-            '--no-telemetry',
-            action='store_true',
-            help="Don't send usage data to server",
-        )
-        parser.add_argument(
-            '-q', '--quiet', action='store_true', help='suppress info'
-        )
-        return parser
+
+def _add_std_arguments(parser):
+    parser.add_argument(
+        '-V',
+        '--version',
+        action='version',
+        version=f'%(prog)s/{package_version()} {sys.version} {platform.system()}/{platform.version()}',
+    )
+    parser.add_argument(
+        '-n',
+        '--dry-run',
+        action='store_true',
+        help='showing effects without actual run and exit',
+    )
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        action='count',
+        default=0,
+        help='increase output verbosity',
+    )
+    parser.add_argument(
+        '-t',
+        '--no-telemetry',
+        action='store_true',
+        help="Don't send usage data to server",
+    )
+    parser.add_argument(
+        '-q', '--quiet', action='store_true', help='suppress info'
+    )
+    parser.add_argument(
+        '--config-file',
+        type=str,
+        required=False,
+        help='config.ini file location in home directory',
+        default='~/.openremote/config.ini',
+    )
+    return parser
+
+
+def _parse_default_args(parser, arguments):
+    args, unknown = parser.parse_known_args(arguments)
+
+    # command aliases substitution
+    try:
+        mapping = _get_subparser_aliases(parser, 'command')
+        _remap_args(args, mapping, 'command')
+    except:
+        # so we can call it outside this class
+        ...
+
+    if args.quiet:
+        config.QUIET = True
+
+    config.LEVEL = {
+        0: logging.ERROR,
+        1: logging.WARNING,
+        2: logging.INFO,
+        3: logging.DEBUG,
+    }.get(args.verbose, logging.DEBUG)
+    logging.getLogger().setLevel(config.LEVEL)
+
+    if args.no_telemetry:
+        config.TELEMETRY = False
+
+    if args.dry_run is True:
+        logging.info('Enabling dry run mode')
+        config.DRY_RUN = True
+    if args.verbose > 0:
+        config.VERBOSE = True
+
+    logging.debug(args)
+    return args
 
 
 def _get_subparser_aliases(parser, dest):
@@ -586,12 +597,21 @@ import traceback
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description=f'OpenRemote Command Line Interface (CLI) version {package_version()}',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser = _add_std_arguments(parser)
+    args = _parse_default_args(parser=parser, arguments=sys.argv[1:])
+    config.CONFIG_FILE_NAME = args.config_file
+    logging.info(f'Using {config._config_file_name()} as config')
+
     config.initialize()
     exit_reason = "program finished normally"
     exit_code = 0
     start = time.time()
     try:
-        OpenRemote(sys.argv[1:])
+        OpenRemote(sys.argv[1:], parser=parser)
     except Exception as error:
         logging.error(f'Exiting main because of uncached: {error}')
         traceback.print_exc()

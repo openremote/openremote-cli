@@ -9,18 +9,28 @@ from keycloak import KeycloakOpenID
 # Declare it globally for this module to be robust against readonly runtime on AWS lambda
 config = configparser.ConfigParser()
 home_dir = str(Path.home())
-config_file = True
+config_file_valid = True
 
 
 def _config_file_name():
-    return f'{home_dir}/.openremote/config.ini'
+    # Runtime config
+    global CONFIG_FILE_NAME
+
+    try:
+        CONFIG_FILE_NAME
+        if CONFIG_FILE_NAME[0] == '~':
+            return f'{home_dir}{CONFIG_FILE_NAME[1:]}'
+        else:
+            return f'{CONFIG_FILE_NAME}'
+    except:
+        return f'{home_dir}/.openremote/config.ini'
 
 
 def initialize():
 
     # user persistent config
     global TELEMETRY_URL, REGION, PROFILE, BUCKET, SMTP_SERVER
-    global config_file, home_dir, config
+    global config_file_valid, home_dir, config
 
     if not os.path.exists(_config_file_name()):
         try:
@@ -29,7 +39,9 @@ def initialize():
             with open(_config_file_name(), 'w') as conf:
                 config.write(conf)
         except:
-            logging.error(f'Cannot create {str(Path.home())}/.openremote')
+            logging.warning(
+                f'Config file not in {str(Path.home())}/.openremote'
+            )
             # On AWS lambda we have read only file system and can write only to /tmp
             home_dir = '/tmp'
             try:
@@ -38,9 +50,9 @@ def initialize():
                 )
             except:
                 logging.error('Unable to create config file. Using in-memory')
-                config_file = False
+                config_file_valid = False
 
-    if config_file:
+    if config_file_valid:
         config.read(_config_file_name())
     if config.sections() == []:
         try:
@@ -60,7 +72,7 @@ def initialize():
             try:
                 with open(_config_file_name(), 'w') as conf:
                     config.write(conf)
-                    print(f'Config created in {_config_file_name()}')
+                    logging.info(f'Config created in {_config_file_name()}')
             except Exception as error:
                 logging.error(f'Error initializing config: {error}')
         except Exception as error:
@@ -94,7 +106,7 @@ def initialize():
 
 
 def store_token(url, username, password, refresh):
-    if config_file:
+    if config_file_valid:
         config.read(_config_file_name())
     try:
         # first try to update
@@ -115,7 +127,7 @@ def store_token(url, username, password, refresh):
 
 
 def get_token(url):
-    if config_file:
+    if config_file_valid:
         config.read(_config_file_name())
     keycloak_openid = KeycloakOpenID(
         server_url=f'https://{url}/auth/',
@@ -128,7 +140,7 @@ def get_token(url):
 
 
 def get_password(url, username, no_exception=False):
-    if config_file:
+    if config_file_valid:
         config.read(_config_file_name())
     try:
         password = config[url][f'{username}_password']
@@ -143,7 +155,7 @@ def get_password(url, username, no_exception=False):
 
 
 def set_password(url, username, password):
-    if config_file:
+    if config_file_valid:
         config.read(_config_file_name())
     try:
         # first try to update

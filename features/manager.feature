@@ -14,6 +14,7 @@ Feature: manager
   When login into demo realm smartcity as user smartcity
   Then there should be no errors
 
-  # Scenario: test http rest
-  # When running manager --test-http-test
-  # Then there should be no errors
+  @skip
+  Scenario: test http rest
+   When running manager --test-http-test
+   Then there should be no errors

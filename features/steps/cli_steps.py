@@ -132,3 +132,31 @@ def step_impl(context):
 @then(u'we get SMTP password and nothing else')
 def step_impl(context):
     assert 'BAF8hrfLn8+XGiCdeSx+uyiMJl3zQ3jJAjDo24AyWbVI' == context.response
+
+
+@when(u'or -vv -t --config-file /tmp/my-config')
+def step_impl(context):
+    context.code, context.response = context.execute(
+        f"poetry run or -vv -t --config-file /tmp/my-config"
+    )
+    print(context.response)
+    assert context.code == 0
+
+
+@then(u'it should use /tmp/my-config')
+def step_impl(context):
+    print(context.response)
+    assert 'Using /tmp/my-config as config' in context.response
+
+
+@when(u'or -vv -t')
+def step_impl(context):
+    context.code, context.response = context.execute(f"poetry run or -vv -t")
+    print(context.response)
+    assert context.code == 0
+
+
+@then(u'it should use ~/.openremote/config.ini')
+def step_impl(context):
+    print(context.response)
+    assert '/.openremote/config.ini' in context.response

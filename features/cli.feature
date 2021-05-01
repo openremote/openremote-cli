@@ -23,3 +23,9 @@ Feature: cli
       Then check if all required tools are installed
       When or prerequisites --install -v --dry-run
       Then install all missing tools
+
+    Scenario: use non default config.ini
+      When or -vv -t --config-file /tmp/my-config
+      Then it should use /tmp/my-config
+      When or -vv -t
+      Then it should use ~/.openremote/config.ini
