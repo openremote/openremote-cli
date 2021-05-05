@@ -150,7 +150,7 @@ def _split_dns(dnsname):
 
 
 def _password(password, url=None):
-    generate_password = password == 'secret'
+    generate_password = password == 'secret' and url != 'localhost'
     if generate_password:
         characters = string.ascii_letters + string.digits
         password = "".join(choice(characters) for x in range(randint(8, 16)))

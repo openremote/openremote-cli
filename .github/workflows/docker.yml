@@ -93,9 +93,8 @@ jobs:
         run: |
           # wget -nc https://raw.githubusercontent.com/openremote/openremote/master/docker-compose.yml
           # docker-compose up -d
-          # sleep 60
           openremote-cli deploy -t -v
+          sleep 60
           docker ps
           or-test-http-rest --dnsname localhost --password secret -vv
-        continue-on-error: true
         timeout-minutes: 30
