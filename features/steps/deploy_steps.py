@@ -167,7 +167,7 @@ def step_impl(context):
 @when(u'or deploy --provider aws with default password')
 def step_impl(context):
     context.code, context.output = context.execute(
-        'poetry run openremote-cli deploy --provider aws -v -n -t'
+        'poetry run openremote-cli deploy --provider aws -d test.aws.com -v -n -t'
     )
     assert context.code == 0
     print(context.output)
