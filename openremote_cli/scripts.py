@@ -52,7 +52,7 @@ def deploy(password, smtp_user, smtp_password, dnsname):
             f'EMAIL_PASSWORD={smtp_password} '
             f'EMAIL_HOST=email-smtp.{config.REGION}.amazonaws.com '
         )
-    if dnsname != 'localhost':
+    if True:
         identity = dnsname
         if _check_ip(dnsname):  # it is pure IP
             dnsname = 'localhost'  # prevent proxy from issuing cert

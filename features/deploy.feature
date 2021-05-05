@@ -19,6 +19,7 @@ Feature: deploy
     When or deploy --provider aws with default password
     Then generate password and email it to support
 
+  @skip
   Scenario: deploy to localhost
     Given we have docker and docker-compose installed
     When we call openremote-cli --dry-run deploy --action create

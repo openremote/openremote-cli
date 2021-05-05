@@ -57,9 +57,10 @@ class OpenRemote(object):
                     if config.DRY_RUN:
                         print("--dry-run active!")
                     if not config.VERBOSE:
-                        print(
-                            "To see commands use -v switch (-vvv for debug)\n"
-                        )
+                        if args.command in ['deploy', 'd']:
+                            print(
+                                "To see commands use -v switch (-vvv for debug)\n"
+                            )
                     elif not args.command == 'manager':
                         print(
                             'If you need help go to https://forum.openremote.io/\n'
