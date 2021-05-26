@@ -214,7 +214,7 @@ def step_impl(context):
 @then(u'fetch data from S3 (map is optional)')
 def step_impl(context):
     assert (
-        'aws s3 cp s3://openremote-mvp-map-storage/rich rich --recursive --profile openremote-cli'
+        'aws s3 cp s3://openremote-mvp-map-storage/rich rich --storage-class STANDARD --recursive --profile openremote-cli --force-glacier-transfer'
         in context.output
     )
     assert 'tar xvf rich/deployment.tar.gz' in context.output
