@@ -360,7 +360,7 @@ def map_list(path):
 
 def map_download(path):
     shell.execute(
-        f'aws s3 cp s3://{config.BUCKET}/{path} {path} --recursive --profile {config.PROFILE}',
+        f'aws s3 cp s3://{config.BUCKET}/{path} {path} --storage-class STANDARD --recursive --profile {config.PROFILE} --force-glacier-transfer',
         echo=True,
     )
 
@@ -521,7 +521,7 @@ def deploy_rich(password, smtp_user, smtp_password, project):
         staging = True
         project = project[8:]
     shell.execute(
-        f'aws s3 cp s3://{config.BUCKET}/{project} {project} --recursive --profile {config.PROFILE}'
+        f'aws s3 cp s3://{config.BUCKET}/{project} {project} --storage-class STANDARD --recursive --profile {config.PROFILE} --force-glacier-transfer'
     )
     shell.execute(f'tar xvf {project}/deployment.tar.gz')
     shell.execute(f'mv mapdata.mbtiles deployment/map/', no_exception=True)
