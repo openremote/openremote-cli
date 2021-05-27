@@ -25,6 +25,20 @@ pip install --upgrade openremote-cli
 or --version
 ```
 
+## Docker image
+
+There is also docker image with embedded openremote-cli and other tools used during
+stack management, like `python`, `aws` or `docker-compose`. Therefore, `docker` is
+the only tool installed when you need to work on remote host. Example:
+
+```
+% docker run -ti --rm openremote/openremote-cli -V
+openremote-cli/0.6.46 3.8.10 (default, May 12 2021, 15:56:47) [GCC 8.3.0] Linux/#1 SMP Tue Mar 23 09:27:39 UTC 202
+% docker run -ti --rm --entrypoint bash -v ~/.aws:/root/.aws openremote/openremote-cli
+root@4438b25d0834:/# aws --version
+aws-cli/2.1.39 Python/3.8.8 Linux/5.10.25-linuxkit exe/x86_64.debian.10 prompt/off
+```
+
 ### Deploy local OpenRemote stack
 
 ```bash
