@@ -200,7 +200,7 @@ python-versions = "*"
 
 [[package]]
 name = "oronium"
-version = "1.0.2"
+version = "1.0.4"
 description = "Webbot selenium driver for testing openremote"
 category = "main"
 optional = false
@@ -454,7 +454,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "77287f762807884a6a7279e887d16eac1c4fd048e2973775c5976d017a538a74"
+content-hash = "f836b63ec28b0b5fa672175bad81d8d2c88da9d5e58b984ad5de3313f28faeed"
 
 [metadata.files]
 appdirs = [
@@ -533,8 +533,8 @@ nodeenv = [
     {file = "nodeenv-1.6.0.tar.gz", hash = "sha256:3ef13ff90291ba2a4a7a4ff9a979b63ffdd00a464dbe04acf0ea6471517a4c2b"},
 ]
 oronium = [
-    {file = "oronium-1.0.2-py3-none-any.whl", hash = "sha256:54bf665bc771a93fdd04c6a7369cf2d9568d4cae2a5394b0afc80aa37881d1a0"},
-    {file = "oronium-1.0.2.tar.gz", hash = "sha256:c6173fcf361708d2048c6e011dec3eff75ca25d96c4a6dcd4e56173d74a33d34"},
+    {file = "oronium-1.0.4-py3-none-any.whl", hash = "sha256:90d8306d617e22fecc507cf8d51c94680eb68a438fc9113514b37c58bcee4560"},
+    {file = "oronium-1.0.4.tar.gz", hash = "sha256:27146d4ab63f15a730b4e1a9a1b6b7be7ef60a1b2595ab6245bf9a63882b029e"},
 ]
 parse = [
     {file = "parse-1.19.0.tar.gz", hash = "sha256:9ff82852bcb65d139813e2a5197627a94966245c897796760a3a2a8eb66f020b"},
