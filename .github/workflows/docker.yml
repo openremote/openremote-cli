@@ -91,9 +91,10 @@ jobs:
           openremote-cli -V -t
       - name: deploy openremote stack on localhost and run UI test
         run: |
-          # wget -nc https://raw.githubusercontent.com/openremote/openremote/master/docker-compose.yml
-          # docker-compose up -d
-          openremote-cli deploy -t -v
+          wget -nc https://raw.githubusercontent.com/openremote/openremote/master/docker-compose.yml
+          docker-compose up -d
+          # openremote-cli deployment to localhost is broken (TODO check env variables)
+          # openremote-cli deploy -t -v
           sleep 60
           docker ps
           or-test-http-rest --dnsname localhost --password secret -vv
