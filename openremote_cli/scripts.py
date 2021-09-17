@@ -118,14 +118,12 @@ def _deploy_health(dnsname, verbosity):
         # We need this for self-signed certs like localhost
         ssl._create_default_https_context = ssl._create_unverified_context
         health = json.loads(
-            urllib.request.urlopen(
-                f'https://{dnsname}/api/master/health'
-            ).read()
+            urllib.request.urlopen(f'https://{dnsname}/api/master/info').read()
         )
         if verbosity == 0:
-            return health['system']['version']
+            return '1.0'
         elif verbosity == 1:
-            return health['system']
+            return health['version']
         else:
             return health
     except:
@@ -135,7 +133,7 @@ def _deploy_health(dnsname, verbosity):
         elif verbosity == 0:
             return 0
         else:
-            return f'Error calling\ncurl https://{dnsname}/api/master/health'
+            return f'Error calling\ncurl https://{dnsname}/api/master/info'
 
 
 def _split_dns(dnsname):
@@ -185,6 +183,7 @@ def deploy_aws(password, dnsname):
         f'ParameterKey=KeyName,ParameterValue=openremote '
         f'--capabilities CAPABILITY_NAMED_IAM '
         f'--profile={config.PROFILE}'
+        f'--disable-rollback'
     )
     print(f'\n{shell_exec[1]}')
     if shell_exec[0] != 0:

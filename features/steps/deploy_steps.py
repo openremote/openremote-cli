@@ -129,7 +129,7 @@ def step_impl(context):
 
 @then(u'we get more info')
 def step_impl(context):
-    assert 'systemLoadPercentage' in context.output
+    assert '3.0.0' in context.output
 
 
 @when(u'or deploy -a health --dnsname demo.openremote.io -vv')
@@ -143,7 +143,7 @@ def step_impl(context):
 
 @then(u'we get full health response')
 def step_impl(context):
-    assert 'processLoadPercentage' in context.output
+    assert 'version' in context.output
 
 
 # E-mail setup
