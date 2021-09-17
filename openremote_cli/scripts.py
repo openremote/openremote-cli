@@ -182,8 +182,8 @@ def deploy_aws(password, dnsname):
         f'ParameterKey=InstanceType,ParameterValue=t4g.small '
         f'ParameterKey=KeyName,ParameterValue=openremote '
         f'--capabilities CAPABILITY_NAMED_IAM '
-        f'--profile={config.PROFILE}'
-        f'--disable-rollback'
+        f'--profile={config.PROFILE} '
+        f'--disable-rollback '
     )
     print(f'\n{shell_exec[1]}')
     if shell_exec[0] != 0:
