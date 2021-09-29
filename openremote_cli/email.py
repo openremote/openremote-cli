@@ -32,6 +32,7 @@ def sendmail(receiver, subject, message_text, smtp_user, smtp_password):
 
 
 def main():
+    config.initialize()
     parser = argparse.ArgumentParser(
         description='Sends e-mail with given SMTP credentials'
     )
@@ -52,14 +53,14 @@ def main():
     args = parser.parse_args()
     if not args.message:
         args.message = f"""
-    This is a test e-mail message from {args.sender} to {args.to} via AWS.
+    This is a test e-mail message from no-reply@openremote.io to {args.to} via AWS.
 
     User: {args.user}
     Password: {args.password}
     """
 
     sendmail(
-        args.sender,
+        # args.sender,
         args.to,
         args.subject,
         args.message,
@@ -69,5 +70,4 @@ def main():
 
 
 if __name__ == '__main__':
-    config.initialize()
     main()
