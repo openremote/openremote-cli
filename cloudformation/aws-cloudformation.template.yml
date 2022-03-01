@@ -332,13 +332,18 @@ Resources:
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: SSH + HTTP + HTTPS + MQTT + ping
+      GroupDescription: HTTP + HTTPS + MQTT + ping
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: '22'
         ToPort: '22'
-        CidrIp: 0.0.0.0/0
-        Description: SSH
+        CidrIp: 84.9.45.0/24
+        Description: Rich Home
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: 94.211.80.0/21
+        Description: Michal Home
       - IpProtocol: tcp
         FromPort: '80'
         ToPort: '80'
@@ -364,11 +369,6 @@ Resources:
         ToPort: '-1'
         CidrIp: 0.0.0.0/0
         Description: Ping
-      - IpProtocol: tcp
-        FromPort: '22'
-        ToPort: '22'
-        CidrIpv6: ::/0
-        Description: SSH
       - IpProtocol: tcp
         FromPort: '80'
         ToPort: '80'
