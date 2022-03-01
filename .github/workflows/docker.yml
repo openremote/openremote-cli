@@ -100,4 +100,3 @@ jobs:
           or-test-http-rest --dnsname localhost --password secret -vv
         timeout-minutes: 30
         continue-on-error: true
-
