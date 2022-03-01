@@ -24,6 +24,10 @@ from openremote_cli import gen_aws_smtp_credentials, email
 from webbot import Browser
 from selenium.common.exceptions import WebDriverException
 
+GITPATH = (
+    'https://github.com/openremote/openremote-cli/raw/main/cloudformation'
+)
+
 
 def deploy(password, smtp_user, smtp_password, dnsname):
     shell.execute('docker swarm init', no_exception=True)
@@ -36,13 +40,9 @@ def deploy(password, smtp_user, smtp_password, dnsname):
     #     'docker run --rm -v openremote_deployment-data:/deployment openremote/deployment:mvp'
     # )
     if config.VERBOSE is True:
-        print(
-            '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
-        )
+        print(f'> wget -nc {GITPATH}/mvp-docker-compose.yml')
     if not config.DRY_RUN:
-        wget.download(
-            'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
-        )
+        wget.download(f'{GITPATH}/mvp-docker-compose.yml')
     env = ''
     if password != 'secret':
         env = f'PASSWORD={password} '
@@ -165,13 +165,9 @@ def deploy_aws(password, dnsname):
     check_aws_perquisites()
     generate_password, password = _password(password, url=dnsname)
     if config.VERBOSE is True:
-        print(
-            '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
-        )
+        print(f'> wget -nc {GITPATH}/aws-cloudformation.template.yml')
     if not config.DRY_RUN:
-        wget.download(
-            'https://github.com/openremote/openremote/raw/master/mvp/aws-cloudformation.template.yml'
-        )
+        wget.download(f'{GITPATH}/aws-cloudformation.template.yml')
     shell_exec = shell.execute(
         f'aws cloudformation create-stack --stack-name {stack_name} '
         f'--template-body file://aws-cloudformation.template.yml --parameters '
@@ -282,13 +278,9 @@ def remove(dnsname):
         shell.execute(f'docker stack rm openremote')
     else:
         if config.VERBOSE is True:
-            print(
-                '> wget -nc https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
-            )
+            print(f'> wget -nc {GITPATH}/mvp-docker-compose.yml')
         if not config.DRY_RUN:
-            wget.download(
-                'https://github.com/openremote/openremote/raw/master/mvp/mvp-docker-compose.yml'
-            )
+            wget.download(f'{GITPATH}/mvp-docker-compose.yml')
         shell.execute(
             f'docker-compose -f mvp-docker-compose.yml -p openremote down'
         )
