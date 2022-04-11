@@ -52,7 +52,7 @@ jobs:
       - name: available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
       - name: login to docker hub
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+        run: docker login --username "${{ secrets.DOCKERHUB_USER }}" --password "${{ secrets.DOCKERHUB_PASSWORD }}"
       - name: build and push images
         run: |
           make multi-image
