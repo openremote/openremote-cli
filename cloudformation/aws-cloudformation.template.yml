@@ -407,7 +407,7 @@ Resources:
   SnsTopic:
     Type: AWS::SNS::Topic
     Properties:
-      DisplayName: !Ref EC2Instance
+      DisplayName: !Sub ${HostName}.${DomainName}.${EC2Instance}
 
   SystemStatusAlarm:
     Type: AWS::CloudWatch::Alarm
@@ -416,7 +416,7 @@ Resources:
       MetricName: StatusCheckFailed_System
       Statistic: Minimum
       Period: 60
-      EvaluationPeriod: 2
+      EvaluationPeriods: 2
       ComparisonOperator: GreaterThanThreshold
       Threshold: 0
       AlarmActions:
@@ -435,7 +435,7 @@ Resources:
       MetricName: StatusCheckFailed_Instance
       Statistic: Minimum
       Period: 60
-      EvaluationPeriod: 3
+      EvaluationPeriods: 3
       ComparisonOperator: GreaterThanThreshold
       Threshold: 0
       AlarmActions:
@@ -446,3 +446,20 @@ Resources:
       Dimensions:
       - Name: InstanceId
         Value: !Ref EC2Instance
+
+  # HealthCheckAlarm:
+  #   Type: AWS::CloudWatch::Alarm
+  #   Properties:
+  #     Namespace: AWS/Route53
+  #     MetricName: HealthCheckStatus
+  #     Statistic: Sum
+  #     Period: 60
+  #     EvaluationPeriods: 15
+  #     ComparisonOperator: LowerThanThreshold
+  #     Threshold: 1
+  #     AlarmActions:
+  #     - !Ref SnsTopic
+  #     OKActions:
+  #     - !Ref SnsTopic
+  #     Dimensions:
+  #     - Name:
