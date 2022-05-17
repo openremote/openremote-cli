@@ -26,6 +26,7 @@ volumes:
   proxy-data:
   postgresql-data:
   deployment-data:
+  temp-date:
 
 x-app: &awslogs
   logging:
@@ -37,7 +38,7 @@ x-app: &awslogs
 
 services:
   proxy:
-    image: openremote/proxy:${PROXY_VERSION:-2.5.0.1}
+    image: openremote/proxy:${PROXY_VERSION:-latest}
     networks:
       - public
       - private
@@ -51,7 +52,7 @@ services:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost:80"]
     ports:
       - "80:80"
-      - "443:443"
+      - "${OR_SSL_PORT:-443}:443"
       - "8883:8883"
     volumes:
       - proxy-data:/deployment
@@ -65,8 +66,9 @@ services:
         order: start-first
         delay: 30m
     environment:
-      DOMAINNAME: ${DOMAINNAME:-localhost}
-      LE_EMAIL: admin@${DOMAINNAME}
+      DOMAINNAME: ${OR_HOSTNAME:-localhost}
+      LE_EMAIL: admin@${OR_HOSTNAME}
+      DOMAINNAMES: ${OR_ADDITIONAL_HOSTNAMES:-}
     <<: *awslogs
 
   manager:
@@ -95,16 +97,20 @@ services:
     environment:
       OR_ADMIN_PASSWORD: ${OR_ADMIN_PASSWORD:-secret}
       OR_HOSTNAME: ${OR_HOSTNAME:-https://localhost}
-      OR_EMAIL_HOST: ${EMAIL_HOST:-email-smtp.eu-west-1.amazonaws.com}
-      OR_EMAIL_USER: ${EMAIL_USER}
-      OR_EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      OR_ADDITIONAL_HOSTNAMES: ${OR_ADDITIONAL_HOSTNAMES:-}
+      OR_SSL_PORT: ${OR_SSL_PORT:-443}
+      OR_DEV_MODE: ${OR_DEV_MODE:-false}
+      KEYCLOAK_FRONTEND_URL: https://${OR_HOSTNAME:-localhost}/auth
+      OR_EMAIL_HOST: ${OR_EMAIL_HOST:-email-smtp.eu-west-1.amazonaws.com}
+      OR_EMAIL_USER: ${OR_EMAIL_USER}
+      OR_EMAIL_PASSWORD: ${OR_EMAIL_PASSWORD}
       OR_EMAIL_PORT: ${SETUP_EMAIL_PORT:-587}
-      OR_EMAIL_FROM: no-reply@${DOMAINNAME}
-      OR_EMAIL_ADMIN: admin@${DOMAINNAME}
+      OR_EMAIL_FROM: no-reply@${OR_HOSTNAME}
+      OR_EMAIL_ADMIN: admin@${OR_HOSTNAME}
     <<: *awslogs
 
   keycloak:
-    image: openremote/keycloak:${KEYCLOAK_VERSION:-16.0.0.0}
+    image: openremote/keycloak:${KEYCLOAK_VERSION:-latest}
     networks:
       - public
       - private
@@ -125,12 +131,12 @@ services:
     volumes:
       - deployment-data:/deployment
     environment:
-      KEYCLOAK_PASSWORD: ${PASSWORD:-secret}
-      KEYCLOAK_FRONTEND_URL: ${EXTERNAL_URL:-https://localhost}/auth
+      KEYCLOAK_PASSWORD: ${OR_ADMIN_PASSWORD:-secret}
+      KEYCLOAK_FRONTEND_URL: https://${OR_HOSTNAME:-localhost}/auth
     <<: *awslogs
 
   postgresql:
-    image: openremote/postgresql:${POSTGRESQL_VERSION:-14.1.0.1}
+    image: openremote/postgresql:${POSTGRESQL_VERSION:-latest}
     networks:
       - private
     healthcheck:
@@ -147,4 +153,5 @@ services:
         delay: 20m
     volumes:
       - postgresql-data:/var/lib/postgresql/data
+      - temp-data:/tmp
     <<: *awslogs
