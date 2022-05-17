@@ -304,7 +304,7 @@ Resources:
           echo export OR_EMAIL_HOST=email-smtp.${AWS::Region}.amazonaws.com >> access.txt
           echo export OR_ADMIN_PASSWORD=${OpenRemotePassword} >> access.txt
           echo export OR_HOSTNAME=$DOMAINNAME >> access.txt
-          echo export KEYCLOAK_FRONTEND_URL=https://${OR_HOSTNAME}/auth >> access.txt
+          echo export KEYCLOAK_FRONTEND_URL=https://${DOMAINNAME}/auth >> access.txt
           echo export AWSLOGS_GROUP=${CloudFormationLogs} >> access.txt
           echo export AWS_REGION=${AWS::Region} >> access.txt
           mkdir ${HostName}
