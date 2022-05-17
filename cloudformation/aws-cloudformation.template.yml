@@ -299,12 +299,12 @@ Resources:
           fi
           export EXTERNAL_URL=https://$DOMAINNAME
           openremote-cli -V -t
-          echo export EMAIL_PASSWORD=$(openremote-cli configure_aws --secret ${AccessKeys.SecretAccessKey} --quiet) >> access.txt
-          echo export EMAIL_USER=${AccessKeys} >> access.txt
-          echo export EMAIL_HOST=email-smtp.${AWS::Region}.amazonaws.com >> access.txt
-          echo export PASSWORD=${OpenRemotePassword} >> access.txt
-          echo export DOMAINNAME=$DOMAINNAME >> access.txt
-          echo export EXTERNAL_URL=$EXTERNAL_URL >> access.txt
+          echo export OR_EMAIL_PASSWORD=$(openremote-cli configure_aws --secret ${AccessKeys.SecretAccessKey} --quiet) >> access.txt
+          echo export OR_EMAIL_USER=${AccessKeys} >> access.txt
+          echo export OR_EMAIL_HOST=email-smtp.${AWS::Region}.amazonaws.com >> access.txt
+          echo export OR_ADMIN_PASSWORD=${OpenRemotePassword} >> access.txt
+          echo export OR_HOSTNAME=$DOMAINNAME >> access.txt
+          echo export KEYCLOAK_FRONTEND_URL=https://${OR_HOSTNAME}/auth >> access.txt
           echo export AWSLOGS_GROUP=${CloudFormationLogs} >> access.txt
           echo export AWS_REGION=${AWS::Region} >> access.txt
           mkdir ${HostName}
