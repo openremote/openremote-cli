@@ -447,6 +447,25 @@ Resources:
       - Name: InstanceId
         Value: !Ref EC2Instance
 
+  CPUUtilizationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/EC2
+      MetricName: CPUUtilization
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 4
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 90
+      AlarmActions:
+      - !Sub "arn:aws:automate:${AWS::Region}:ec2:reboot"
+      - !Ref SnsTopic
+      OKActions:
+      - !Ref SnsTopic
+      Dimensions:
+      - Name: InstanceId
+        Value: !Ref EC2Instance
+
   # HealthCheckAlarm:
   #   Type: AWS::CloudWatch::Alarm
   #   Properties:
