@@ -158,7 +158,7 @@ def _password(password, url=None):
     return generate_password, password
 
 
-def deploy_aws(password, dnsname):
+def deploy_aws(password, dnsname, region):
     host, domain = _split_dns(dnsname)
     logging.debug(f'{dnsname} => {host} + {domain}')
     stack_name = f'{host}-{uuid.uuid4()}'
@@ -180,6 +180,7 @@ def deploy_aws(password, dnsname):
         f'--capabilities CAPABILITY_NAMED_IAM '
         f'--profile={config.PROFILE} '
         f'--disable-rollback '
+        f'--region={region}'
     )
     print(f'\n{shell_exec[1]}')
     if shell_exec[0] != 0:
@@ -197,14 +198,14 @@ def deploy_aws(password, dnsname):
     # done
     shell.execute(
         f'aws cloudformation wait stack-create-complete '
-        f'--stack-name {stack_name} --profile {config.PROFILE}'
+        f'--stack-name {stack_name} --profile {config.PROFILE} --region={region}'
     )
     if not config.DRY_RUN:
         os.remove(f'aws-cloudformation.template.yml')
         if generate_password:
             # In case of password generation get email credentials and send it to support
             code, output = shell.execute(
-                f'aws cloudformation describe-stacks --stack-name {stack_name} --profile {config.PROFILE} '
+                f'aws cloudformation describe-stacks --stack-name {stack_name} --profile {config.PROFILE} --region={region} '
                 '--query "Stacks[0].Outputs[?OutputKey==\'UserId\'||OutputKey==\'UserSecret\'].OutputValue" --output json'
             )
             credentials = json.loads(output)
@@ -233,11 +234,11 @@ def deploy_aws(password, dnsname):
     if not config.DRY_RUN:
         if os.name == "nt":
             shell.execute(
-                f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.bat'
+                f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE} --region={region}" > aws-delete-stack-{host}.{domain}.bat'
             )
         else:
             shell.execute(
-                f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}" > aws-delete-stack-{host}.{domain}.sh'
+                f'echo "aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE} --region={region}" > aws-delete-stack-{host}.{domain}.sh'
             )
             shell.execute(f'chmod +x aws-delete-stack-{host}.{domain}.sh')
         print('\nStack deployed, waiting for startup to complete', end=' ')
@@ -250,7 +251,7 @@ def deploy_aws(password, dnsname):
     print(
         emojis.encode(
             '\nMind that running it cost money :moneybag::moneybag::moneybag:! To free resources execute:\n\n'
-            f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE}\n\n'
+            f'aws cloudformation delete-stack --stack-name {stack_name} --profile {config.PROFILE} --region={region}\n\n'
             'check running stack with health command:\n'
             f'or deploy -a health --dnsname {host}.{domain} -v'
         )

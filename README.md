@@ -95,6 +95,7 @@ Following tools are used:
 - AWS (CloudFormation)
 - make
 
+`poetry run openremote-cli -V`
 ### Adding feature
 
 In this project we use Behavior-driven development (or BDD). BDD is an agile

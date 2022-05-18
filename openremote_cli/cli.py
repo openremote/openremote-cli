@@ -157,7 +157,9 @@ class OpenRemote(object):
                     'Deploying OR... This usually takes less than 15 minutes.\n'
                 )
                 if args.provider == 'aws':
-                    scripts.deploy_aws(args.password, args.dnsname)
+                    scripts.deploy_aws(
+                        args.password, args.dnsname, args.region
+                    )
                 else:
                     smtp_user, smtp_password = None, None
                     if args.with_email:
@@ -235,6 +237,12 @@ class OpenRemote(object):
                 choices=['aws', 'localhost', 'rich'],
                 default='localhost',
                 help='where the stack should be deployed (rich is on localhost but with artifacts from S3)',
+            )
+            arguments.add_argument(
+                '--region',
+                type=str,
+                default='us-east-1',
+                help='AWS region to deploy',
             )
             arguments.add_argument(
                 '-d',
