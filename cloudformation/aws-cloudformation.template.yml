@@ -254,7 +254,7 @@ Resources:
                 ensureRunning: 'true'
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT7M
+        Timeout: PT15M
     Properties:
       InstanceType:
         Ref: InstanceType
