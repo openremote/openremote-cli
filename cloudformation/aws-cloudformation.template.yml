@@ -107,9 +107,10 @@ Resources:
             Action:
               - sts:AssumeRole
       Path: /
-      Policies:
+      ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
         - PolicyName: InstancePolicy
           PolicyDocument:
             Version: '2012-10-17'
