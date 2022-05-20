@@ -21,11 +21,11 @@ Parameters:
     AllowedValues:
       - true
       - false
-  KeyName:
-    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
-    Type: AWS::EC2::KeyPair::KeyName
-    Default: openremote
-    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  # KeyName:
+  #   Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+  #   Type: AWS::EC2::KeyPair::KeyName
+  #   Default: openremote
+  #   ConstraintDescription: must be the name of an existing EC2 KeyPair.
   InstanceType:
     Description: EC2 instance type (don't change it unless you know what you are doing)
     Type: String
@@ -108,6 +108,8 @@ Resources:
               - sts:AssumeRole
       Path: /
       Policies:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - PolicyName: InstancePolicy
           PolicyDocument:
             Version: '2012-10-17'

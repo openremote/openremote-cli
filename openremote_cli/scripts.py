@@ -176,7 +176,6 @@ def deploy_aws(password, dnsname, region):
         f'ParameterKey=HostedZone,ParameterValue=true '
         f'ParameterKey=OpenRemotePassword,ParameterValue={password} '
         f'ParameterKey=InstanceType,ParameterValue=t4g.small '
-        f'ParameterKey=KeyName,ParameterValue=openremote '
         f'--capabilities CAPABILITY_NAMED_IAM '
         f'--profile={config.PROFILE} '
         f'--disable-rollback '

@@ -139,12 +139,12 @@ services:
     image: openremote/postgresql:${POSTGRESQL_VERSION:-latest}
     networks:
       - private
-    healthcheck:
-      interval: 3s
-      timeout: 3s
-      start_period: 2s
-      retries: 30
-      test: ["CMD", "gosu", "postgres", "pg_isready"]
+    # healthcheck:
+    #   interval: 3s
+    #   timeout: 3s
+    #   start_period: 2s
+    #   retries: 30
+    #   test: ["CMD", "gosu", "postgres", "pg_isready"]
     deploy:
       replicas: 1
       update_config:
