@@ -37,9 +37,16 @@ Parameters:
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-arm64-gp2'
+  EnableIpv6:
+    Type: String
+    Default: false
+    AllowedValues:
+      - true
+      - false
 Conditions:
   DnsRecordCreate: !Equals [!Ref HostedZone, true]
   DomainName: !Not [ !Equals [!Ref DomainName, ""] ]
+  Ipv6Enable: !Equals [!Ref EnableIpv6, true]
 Outputs:
     InstanceIP:
       Description: The Instance public IP
@@ -267,7 +274,7 @@ Resources:
       PropagateTagsToVolumeOnCreation: true
       SecurityGroups:
         - Ref: InstanceSecurityGroup
-      Ipv6AddressCount: 1
+      Ipv6AddressCount: !If [Ipv6Enable, 1, 0]
       Tags:
         - Key: "Name"
           Value: !Join [ ".", [ !Ref HostName, !Ref DomainName ] ]
@@ -281,9 +288,10 @@ Resources:
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --configsets install_all --region ${AWS::Region}
           groupadd docker
           gpasswd -a ec2-user docker
+          gpasswd -a ssm-user docker
           docker swarm init
-          curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          chmod +x /usr/local/bin/docker-compose
+          curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+          chmod +x /usr/bin/docker-compose
           # TODO SNMP tools (do we need this?)
           #sudo apt install snmp snmpd snmptt snmptrapd -y
           # Install openremote-cli tool (for e-mail credentials)
@@ -469,19 +477,35 @@ Resources:
       - Name: InstanceId
         Value: !Ref EC2Instance
 
-  # HealthCheckAlarm:
-  #   Type: AWS::CloudWatch::Alarm
-  #   Properties:
-  #     Namespace: AWS/Route53
-  #     MetricName: HealthCheckStatus
-  #     Statistic: Sum
-  #     Period: 60
-  #     EvaluationPeriods: 15
-  #     ComparisonOperator: LowerThanThreshold
-  #     Threshold: 1
-  #     AlarmActions:
-  #     - !Ref SnsTopic
-  #     OKActions:
-  #     - !Ref SnsTopic
-  #     Dimensions:
-  #     - Name:
+  HealthCheckAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/Route53
+      MetricName: HealthCheckStatus
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 15
+      ComparisonOperator: LessThanThreshold
+      Threshold: 1
+      AlarmActions:
+      - !Ref SnsTopic
+      OKActions:
+      - !Ref SnsTopic
+      Dimensions:
+      - Name: HealthCheckId
+        Value: !Ref HealthCheck
+
+  HealthCheck:
+    Type: AWS::Route53::HealthCheck
+    DependsOn: EC2Instance
+    Properties:
+      HealthCheckConfig:
+        Port: 443
+        Type: HTTPS
+        ResourcePath: '/api/master/info'
+        FullyQualifiedDomainName: !Sub ${HostName}.${DomainName}
+        RequestInterval: 30
+        FailureThreshold: 10
+      HealthCheckTags:
+      - Key: Name
+        Value: !Sub ${HostName}.${DomainName}
