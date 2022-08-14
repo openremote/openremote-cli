@@ -387,13 +387,6 @@ def check_aws_perquisites():
     if not config.DRY_RUN and config.PROFILE not in output:
         msg = f"aws-cli profile '{config.PROFILE}' missing"
         raise Exception(-1, msg)
-    # Check EC2 key
-    code, output = shell.execute(
-        f'aws ec2 describe-key-pairs --key-names openremote --profile {config.PROFILE}'
-    )
-    if not config.DRY_RUN and 'openremote' not in output:
-        msg = f"ERROR: Missing EC2 keypair 'openremote' in {config.REGION} region (Ireland)"
-        raise Exception(-1, msg)
     return True
 
 
