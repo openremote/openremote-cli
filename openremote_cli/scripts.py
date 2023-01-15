@@ -465,7 +465,10 @@ def manager_list_users(realm, dnsname):
     )
     for r in response.json():
         if config.QUIET:
-            print(f"{r['firstName']} {r['lastName']}\t-\t{r['username']}")
+            try:
+                print(f"{r['firstName']} {r['lastName']}\t-\t{r['username']}")
+            except KeyError:
+                print(f"none NONE\t-\t{r['username']}")
         else:
             print(json.dumps(r, indent=2))
 

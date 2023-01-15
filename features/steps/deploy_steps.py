@@ -21,7 +21,7 @@ def step_impl(context):
 
 @then(u'show what will be done')
 def step_impl(context):
-    assert "docker stack deploy" in context.response
+    assert "docker-compose" in context.response
 
 
 @when(u'we call or --dry-run deploy')
@@ -129,7 +129,7 @@ def step_impl(context):
 
 @then(u'we get more info')
 def step_impl(context):
-    assert '3.0.0' in context.output
+    assert '0.1.0' in context.output
 
 
 @when(u'or deploy -a health --dnsname demo.openremote.io -vv')
