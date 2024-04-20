@@ -10,7 +10,7 @@ repository = "https://github.com/openremote/openremote"
 homepage = "https://www.openremote.io"
 documentation = "https://github.com/openremote/openremote/wiki"
 keywords = ['openremote', 'iot', 'cli']
-classifiers = ["Topic :: Home Automation ", "Topic :: Utilities "]
+# classifiers = ["Topic :: Home Automation ", "Topic :: Utilities "]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
